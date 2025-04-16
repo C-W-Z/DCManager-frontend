@@ -1,2 +1,7 @@
 node_modules
 dist
+Dockerfile
+.git
+.vscode
+.gitignore
+README.md
