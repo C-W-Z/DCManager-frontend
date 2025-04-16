@@ -1,3 +1,12 @@
+# Usage
+
+```sh
+git clone git@github.com:C-W-Z/DCManager-frontend.git
+cd DCManager-frontend
+docker build -t dcm-frontend .
+docker run --rm -it -p 5173:5173 -v .:/app dcm-frontend
+```
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
