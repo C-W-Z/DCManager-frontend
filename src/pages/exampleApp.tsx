@@ -1,7 +1,7 @@
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 
-function App() {
+export default function ExampleApp() {
   return (
     <div className="my-auto flex min-h-screen max-w-screen flex-col items-center justify-center p-8">
       <div className="m-8 flex flex-row">
@@ -32,5 +32,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
