@@ -1,7 +1,7 @@
 import { Rack } from "@/lib/schema";
 import HostComponent from "./host";
 import { HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
-import { JSX, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import {
   DragDropContext,
   Droppable,
@@ -28,6 +28,11 @@ export default function RackComponent({ rack }: RackProps) {
 
     setRackItems(newRackItems);
   };
+
+  useEffect(() => {
+    const newRackItems = buildRackItems(rack);
+    setRackItems(newRackItems);
+  }, [rack]);
 
   return (
     <DragDropContext onDragEnd={handleOnDragEnd}>

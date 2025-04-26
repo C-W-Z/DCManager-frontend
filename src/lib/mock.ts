@@ -15,7 +15,7 @@ export const generateMockHost = () => {
 };
 
 export const generateMockRack = () => {
-  const n_hosts = faker.number.int({ min: 3, max: 5 });
+  const n_hosts = faker.number.int({ min: 3, max: 10 });
   const hosts = Array.from({ length: n_hosts }, (_, i) => ({
     ...generateMockHost(),
     pos: faker.number.int({
@@ -27,7 +27,7 @@ export const generateMockRack = () => {
   return rackSchema.parse({
     id: faker.string.uuid(),
     name: faker.commerce.productName() + " Rack",
-    height: 20,
+    height: 42,
     n_hosts: n_hosts,
     hosts: hosts,
     dc_id: faker.string.uuid(),
