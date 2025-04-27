@@ -18,10 +18,7 @@ export const generateMockRack = () => {
   const n_hosts = faker.number.int({ min: 3, max: 10 });
   const hosts = Array.from({ length: n_hosts }, (_, i) => ({
     ...generateMockHost(),
-    pos: faker.number.int({
-      min: i * 4 + 1,
-      max: (i + 1) * 4,
-    }),
+    pos: i * 4 + 1,
   }));
 
   return rackSchema.parse({

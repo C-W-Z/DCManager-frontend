@@ -29,24 +29,25 @@ export default function RackComponent({ rack }: RackProps) {
     if (update.draggableId && update.destination) {
       const draggingItemIndex = parseInt(update.draggableId.split("-")[1]);
       const draggingItemToIndex = update.destination.index;
-      console.log(draggingItemIndex, draggingItemToIndex);
 
       rackItems.forEach((item, index) => {
         if (index >= draggingItemToIndex && index < draggingItemIndex) {
           item.pos = item.tempPos - rackItems[draggingItemIndex].height;
         } else if (index <= draggingItemToIndex && index > draggingItemIndex) {
           item.pos = item.tempPos + rackItems[draggingItemIndex].height;
-        } else if (index !== draggingItemIndex) {
+        } else {
           item.pos = item.tempPos;
         }
       });
 
       if (draggingItemToIndex < draggingItemIndex) {
-        rackItems[draggingItemIndex].pos += rackItems[draggingItemToIndex].height;
+        rackItems[draggingItemIndex].pos =
+          rackItems[draggingItemToIndex].tempPos -
+          rackItems[draggingItemIndex].height +
+          rackItems[draggingItemToIndex].height;
       } else if (draggingItemToIndex > draggingItemIndex) {
-        rackItems[draggingItemIndex].pos -= rackItems[draggingItemToIndex].height;
+        rackItems[draggingItemIndex].pos = rackItems[draggingItemToIndex].tempPos;
       }
-
       setRackItems(updateRackItems);
     }
   };
@@ -63,7 +64,6 @@ export default function RackComponent({ rack }: RackProps) {
     });
 
     setRackItems(newRackItems);
-    console.log("drag end", newRackItems);
   };
 
   return (
