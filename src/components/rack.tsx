@@ -23,33 +23,28 @@ export default function RackComponent({ rack }: RackProps) {
     setRackItems(rackItems);
   }, [rack]);
 
-  const handleOnDragStart = () => {
-    // store initial positions
-    const newRackItems = Array.from(rackItems);
-    newRackItems.forEach((item) => {
-      item.tempPos = item.pos;
-    });
-    setRackItems(newRackItems);
-  };
-
   const handleOnDragUpdate = (update: DragUpdate) => {
     const updateRackItems = Array.from(rackItems);
 
     if (update.draggableId && update.destination) {
       const draggingItemIndex = parseInt(update.draggableId.split("-")[1]);
       const draggingItemToIndex = update.destination.index;
+      console.log(draggingItemIndex, draggingItemToIndex);
 
       rackItems.forEach((item, index) => {
         if (index >= draggingItemToIndex && index < draggingItemIndex) {
           item.pos = item.tempPos - rackItems[draggingItemIndex].height;
-        } else {
+        } else if (index <= draggingItemToIndex && index > draggingItemIndex) {
+          item.pos = item.tempPos + rackItems[draggingItemIndex].height;
+        } else if (index !== draggingItemIndex) {
           item.pos = item.tempPos;
         }
       });
 
-      if (draggingItemToIndex !== draggingItemIndex) {
-        rackItems[draggingItemIndex].pos =
-          rackItems[draggingItemToIndex].pos + rackItems[draggingItemToIndex].height;
+      if (draggingItemToIndex < draggingItemIndex) {
+        rackItems[draggingItemIndex].pos += rackItems[draggingItemToIndex].height;
+      } else if (draggingItemToIndex > draggingItemIndex) {
+        rackItems[draggingItemIndex].pos -= rackItems[draggingItemToIndex].height;
       }
 
       setRackItems(updateRackItems);
@@ -63,21 +58,22 @@ export default function RackComponent({ rack }: RackProps) {
     const [reorderedItem] = newRackItems.splice(result.source.index, 1);
     newRackItems.splice(result.destination.index, 0, reorderedItem);
 
+    newRackItems.forEach((item) => {
+      item.tempPos = item.pos;
+    });
+
     setRackItems(newRackItems);
+    console.log("drag end", newRackItems);
   };
 
   return (
-    <DragDropContext
-      onDragStart={handleOnDragStart}
-      onDragUpdate={handleOnDragUpdate}
-      onDragEnd={handleOnDragEnd}
-    >
+    <DragDropContext onDragUpdate={handleOnDragUpdate} onDragEnd={handleOnDragEnd}>
       <Droppable droppableId="rack">
         {(provided) => (
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className="flex h-[720px] w-fit flex-col items-end overflow-y-scroll rounded-lg border-2 border-gray-950 p-4"
+            className="flex h-[70vh] w-fit flex-col items-end overflow-y-scroll rounded-lg border-2 border-gray-950 p-4"
             style={{ gap: `${RACK_GAP}px` }}
           >
             {rackItems.map((item, index) => (
@@ -133,7 +129,7 @@ function buildRackItems(rack: Rack) {
           host: null,
           height: 1,
           pos: i,
-          tempPos: 0,
+          tempPos: i,
         });
       }
     }
@@ -142,7 +138,7 @@ function buildRackItems(rack: Rack) {
       host: host,
       height: host.height,
       pos: host.pos,
-      tempPos: 0,
+      tempPos: host.pos,
     });
 
     currentPos = host.pos + host.height;
@@ -154,7 +150,7 @@ function buildRackItems(rack: Rack) {
         host: null,
         height: 1,
         pos: i,
-        tempPos: 0,
+        tempPos: i,
       });
     }
   }
