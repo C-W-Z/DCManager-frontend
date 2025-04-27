@@ -1,26 +1,63 @@
-import { Rack } from "@/lib/schema";
+import { Host, Rack } from "@/lib/schema";
 import HostComponent from "./host";
 import { HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
-import { JSX, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DragDropContext,
   Droppable,
   Draggable,
   DropResult,
+  DragUpdate,
 } from "@hello-pangea/dnd";
+import { cn } from "@/lib/utils";
 
 interface RackProps {
   rack: Rack;
 }
 
 export default function RackComponent({ rack }: RackProps) {
-  const [rackItems, setRackItems] = useState(buildRackItems(rack));
+  const [rackItems, setRackItems] = useState([] as RackItem[]);
+
+  useEffect(() => {
+    const rackItems = buildRackItems(rack);
+    setRackItems(rackItems);
+  }, [rack]);
+
+  const handleOnDragStart = () => {
+    // store initial positions
+    const newRackItems = Array.from(rackItems);
+    newRackItems.forEach((item) => {
+      item.tempPos = item.pos;
+    });
+    setRackItems(newRackItems);
+  };
+
+  const handleOnDragUpdate = (update: DragUpdate) => {
+    const updateRackItems = Array.from(rackItems);
+
+    if (update.draggableId && update.destination) {
+      const draggingItemIndex = parseInt(update.draggableId.split("-")[1]);
+      const draggingItemToIndex = update.destination.index;
+
+      rackItems.forEach((item, index) => {
+        if (index >= draggingItemToIndex && index < draggingItemIndex) {
+          item.pos = item.tempPos - rackItems[draggingItemIndex].height;
+        } else {
+          item.pos = item.tempPos;
+        }
+      });
+
+      if (draggingItemToIndex !== draggingItemIndex) {
+        rackItems[draggingItemIndex].pos =
+          rackItems[draggingItemToIndex].pos + rackItems[draggingItemToIndex].height;
+      }
+
+      setRackItems(updateRackItems);
+    }
+  };
 
   const handleOnDragEnd = (result: DropResult) => {
     if (!result.destination) return;
-
-    console.log(rackItems);
-    console.log(result.source.index, result.destination.index);
 
     const newRackItems = Array.from(rackItems);
     const [reorderedItem] = newRackItems.splice(result.source.index, 1);
@@ -29,13 +66,12 @@ export default function RackComponent({ rack }: RackProps) {
     setRackItems(newRackItems);
   };
 
-  useEffect(() => {
-    const newRackItems = buildRackItems(rack);
-    setRackItems(newRackItems);
-  }, [rack]);
-
   return (
-    <DragDropContext onDragEnd={handleOnDragEnd}>
+    <DragDropContext
+      onDragStart={handleOnDragStart}
+      onDragUpdate={handleOnDragUpdate}
+      onDragEnd={handleOnDragEnd}
+    >
       <Droppable droppableId="rack">
         {(provided) => (
           <div
@@ -45,20 +81,30 @@ export default function RackComponent({ rack }: RackProps) {
             style={{ gap: `${RACK_GAP}px` }}
           >
             {rackItems.map((item, index) => (
-              <Draggable
-                key={index}
-                draggableId={`item-${index}`}
-                index={index}
-              >
-                {(provided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                  >
-                    {item}
-                  </div>
-                )}
+              <Draggable key={index} draggableId={`item-${index}`} index={index}>
+                {(provided, snapshot) => {
+                  return (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      className={cn(
+                        "flex w-fit flex-row items-end justify-start",
+                        snapshot.isDragging ? "scale-110" : "",
+                      )}
+                    >
+                      <div className="w-12 pb-2 text-sm font-bold">{item.pos}</div>
+                      {item.host ? (
+                        <HostComponent host={item.host} />
+                      ) : (
+                        <div
+                          className="w-[400px] rounded-lg bg-gray-100"
+                          style={{ height: `${HOST_HEIGHT}px` }}
+                        ></div>
+                      )}
+                    </div>
+                  );
+                }}
               </Draggable>
             ))}
             {provided.placeholder}
@@ -69,37 +115,47 @@ export default function RackComponent({ rack }: RackProps) {
   );
 }
 
-const spaceElement = (
-  <div
-    className="w-[400px] rounded-lg bg-gray-100"
-    style={{ height: `${HOST_HEIGHT}px` }}
-  ></div>
-);
+interface RackItem {
+  host: Host | null;
+  height: number;
+  pos: number;
+  tempPos: number;
+}
 
 function buildRackItems(rack: Rack) {
-  const items: JSX.Element[] = [];
+  const items: RackItem[] = [];
   let currentPos = 1;
 
   rack.hosts.forEach((host) => {
     if (host.pos > currentPos) {
       for (let i = currentPos; i < host.pos; i++) {
-        items.push(spaceElement);
+        items.push({
+          host: null,
+          height: 1,
+          pos: i,
+          tempPos: 0,
+        });
       }
     }
-    const hostElement = (
-      <div className="flex w-fit flex-row items-end justify-start">
-        <div className="w-8 pb-2 text-sm font-bold">{host.pos}</div>
-        <HostComponent host={host} />
-      </div>
-    );
-    items.push(hostElement);
+
+    items.push({
+      host: host,
+      height: host.height,
+      pos: host.pos,
+      tempPos: 0,
+    });
 
     currentPos = host.pos + host.height;
   });
 
   if (currentPos <= rack.height) {
     for (let i = currentPos; i <= rack.height; i++) {
-      items.push(spaceElement);
+      items.push({
+        host: null,
+        height: 1,
+        pos: i,
+        tempPos: 0,
+      });
     }
   }
 
