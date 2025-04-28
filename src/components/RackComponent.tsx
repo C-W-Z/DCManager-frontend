@@ -1,6 +1,3 @@
-import { Host, Rack } from "@/lib/schema";
-import HostComponent from "./HostComponent";
-import { HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
 import { useEffect, useState } from "react";
 import {
   DragDropContext,
@@ -9,12 +6,18 @@ import {
   DropResult,
   DragUpdate,
 } from "@hello-pangea/dnd";
+import { z } from "zod";
 import { cn } from "@/lib/utils";
+import HostComponent from "./HostComponent";
+import { rack_schema } from "@/lib/schema";
+import { HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
+
+type Rack = z.infer<typeof rack_schema>;
+type Host = z.infer<typeof rack_schema.shape.hosts.element>;
 
 interface RackProps {
   rack: Rack;
 }
-
 export default function RackComponent({ rack }: RackProps) {
   const [rackItems, setRackItems] = useState([] as RackItem[]);
 
@@ -23,48 +26,48 @@ export default function RackComponent({ rack }: RackProps) {
     setRackItems(rackItems);
   }, [rack]);
 
-  const handleOnDragUpdate = (update: DragUpdate) => {
-    const updateRackItems = Array.from(rackItems);
+  function handleOnDragUpdate(update: DragUpdate) {
+    const new_rack_items = Array.from(rackItems);
 
     if (update.draggableId && update.destination) {
-      const draggingItemIndex = parseInt(update.draggableId.split("-")[1]);
-      const draggingItemToIndex = update.destination.index;
+      const dragging_item_index = parseInt(update.draggableId.split("-")[1]);
+      const dragging_to_index = update.destination.index;
 
       rackItems.forEach((item, index) => {
-        if (index >= draggingItemToIndex && index < draggingItemIndex) {
-          item.pos = item.tempPos - rackItems[draggingItemIndex].height;
-        } else if (index <= draggingItemToIndex && index > draggingItemIndex) {
-          item.pos = item.tempPos + rackItems[draggingItemIndex].height;
+        if (index >= dragging_to_index && index < dragging_item_index) {
+          item.display_pos = item.stored_pos - rackItems[dragging_item_index].height;
+        } else if (index <= dragging_to_index && index > dragging_item_index) {
+          item.display_pos = item.stored_pos + rackItems[dragging_item_index].height;
         } else {
-          item.pos = item.tempPos;
+          item.display_pos = item.stored_pos;
         }
       });
 
-      if (draggingItemToIndex < draggingItemIndex) {
-        rackItems[draggingItemIndex].pos =
-          rackItems[draggingItemToIndex].tempPos -
-          rackItems[draggingItemIndex].height +
-          rackItems[draggingItemToIndex].height;
-      } else if (draggingItemToIndex > draggingItemIndex) {
-        rackItems[draggingItemIndex].pos = rackItems[draggingItemToIndex].tempPos;
+      if (dragging_to_index < dragging_item_index) {
+        rackItems[dragging_item_index].display_pos =
+          rackItems[dragging_to_index].stored_pos -
+          rackItems[dragging_item_index].height +
+          rackItems[dragging_to_index].height;
+      } else if (dragging_to_index > dragging_item_index) {
+        rackItems[dragging_item_index].display_pos = rackItems[dragging_to_index].stored_pos;
       }
-      setRackItems(updateRackItems);
+      setRackItems(new_rack_items);
     }
-  };
+  }
 
-  const handleOnDragEnd = (result: DropResult) => {
+  function handleOnDragEnd(result: DropResult) {
     if (!result.destination) return;
 
-    const newRackItems = Array.from(rackItems);
-    const [reorderedItem] = newRackItems.splice(result.source.index, 1);
-    newRackItems.splice(result.destination.index, 0, reorderedItem);
+    const new_rack_items = Array.from(rackItems);
+    const [reordered_rack_items] = new_rack_items.splice(result.source.index, 1);
+    new_rack_items.splice(result.destination.index, 0, reordered_rack_items);
 
-    newRackItems.forEach((item) => {
-      item.tempPos = item.pos;
+    new_rack_items.forEach((item) => {
+      item.stored_pos = item.display_pos;
     });
 
-    setRackItems(newRackItems);
-  };
+    setRackItems(new_rack_items);
+  }
 
   return (
     <DragDropContext onDragEnd={handleOnDragEnd} onDragUpdate={handleOnDragUpdate}>
@@ -90,13 +93,9 @@ export default function RackComponent({ rack }: RackProps) {
                         item.host ? "" : "pointer-events-none",
                       )}
                     >
-                      <div className="w-12 pb-2 text-sm font-bold">{item.pos}</div>
+                      <div className="w-12 pb-2 text-sm font-bold">{item.display_pos}</div>
                       {item.host ? (
-                        <HostComponent
-                          name={item.host.name}
-                          height={item.height}
-                          isRunning={item.host.service_id !== null}
-                        />
+                        <HostComponent host={item.host} />
                       ) : (
                         <div
                           className="w-[400px] rounded-lg bg-gray-100"
@@ -119,8 +118,8 @@ export default function RackComponent({ rack }: RackProps) {
 interface RackItem {
   host: Host | null;
   height: number;
-  pos: number;
-  tempPos: number;
+  display_pos: number;
+  stored_pos: number;
 }
 
 function buildRackItems(rack: Rack) {
@@ -133,8 +132,8 @@ function buildRackItems(rack: Rack) {
         items.push({
           host: null,
           height: 1,
-          pos: i,
-          tempPos: i,
+          display_pos: i,
+          stored_pos: i,
         });
       }
     }
@@ -142,8 +141,8 @@ function buildRackItems(rack: Rack) {
     items.push({
       host: host,
       height: host.height,
-      pos: host.pos,
-      tempPos: host.pos,
+      display_pos: host.pos,
+      stored_pos: host.pos,
     });
 
     currentPos = host.pos + host.height;
@@ -154,8 +153,8 @@ function buildRackItems(rack: Rack) {
       items.push({
         host: null,
         height: 1,
-        pos: i,
-        tempPos: i,
+        display_pos: i,
+        stored_pos: i,
       });
     }
   }

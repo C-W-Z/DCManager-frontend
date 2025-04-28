@@ -1,33 +1,36 @@
 import { faker } from "@faker-js/faker";
-import { hostSchema, rackSchema } from "./schema";
+import { host_schema, rack_schema } from "./schema";
 
-export const generateMockHost = () => {
-  return hostSchema.parse({
-    id: faker.string.uuid(),
-    name: faker.commerce.productName() + " Host",
+export const generateMockHost = (dc_id: string, room_id: string, rack_id: string) => {
+  return host_schema.parse({
+    name: "Host-" + faker.string.alphanumeric(10),
     height: faker.number.int({ min: 1, max: 4 }),
-    ip: faker.internet.ipv4(),
-    service_id: faker.string.uuid(),
-    dc_id: faker.string.uuid(),
-    room_id: faker.string.uuid(),
-    rack_id: faker.string.uuid(),
+    is_running: faker.datatype.boolean(),
+    dc_id: dc_id,
+    room_id: room_id,
+    rack_id: rack_id,
+    id: faker.string.uuid(),
   });
 };
 
 export const generateMockRack = () => {
+  const dc_id = faker.string.uuid();
+  const room_id = faker.string.uuid();
+  const rack_id = faker.string.uuid();
+
   const n_hosts = faker.number.int({ min: 3, max: 10 });
   const hosts = Array.from({ length: n_hosts }, (_, i) => ({
-    ...generateMockHost(),
+    ...generateMockHost(dc_id, room_id, rack_id),
     pos: i * 4 + 1,
   }));
 
-  return rackSchema.parse({
-    id: faker.string.uuid(),
-    name: faker.commerce.productName() + " Rack",
+  return rack_schema.parse({
+    name: "Rack-" + faker.string.alphanumeric(10),
     height: 42,
     n_hosts: n_hosts,
+    dc_id: dc_id,
+    room_id: room_id,
     hosts: hosts,
-    dc_id: faker.string.uuid(),
-    room_id: faker.string.uuid(),
+    id: rack_id,
   });
 };
