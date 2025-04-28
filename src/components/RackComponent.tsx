@@ -1,5 +1,5 @@
 import { Host, Rack } from "@/lib/schema";
-import HostComponent from "./host";
+import HostComponent from "./HostComponent";
 import { HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
 import { useEffect, useState } from "react";
 import {
@@ -67,7 +67,7 @@ export default function RackComponent({ rack }: RackProps) {
   };
 
   return (
-    <DragDropContext onDragUpdate={handleOnDragUpdate} onDragEnd={handleOnDragEnd}>
+    <DragDropContext onDragEnd={handleOnDragEnd} onDragUpdate={handleOnDragUpdate}>
       <Droppable droppableId="rack">
         {(provided) => (
           <div
@@ -87,11 +87,16 @@ export default function RackComponent({ rack }: RackProps) {
                       className={cn(
                         "flex w-fit flex-row items-end justify-start",
                         snapshot.isDragging ? "scale-110" : "",
+                        item.host ? "" : "pointer-events-none",
                       )}
                     >
                       <div className="w-12 pb-2 text-sm font-bold">{item.pos}</div>
                       {item.host ? (
-                        <HostComponent host={item.host} />
+                        <HostComponent
+                          name={item.host.name}
+                          height={item.height}
+                          isRunning={item.host.service_id !== null}
+                        />
                       ) : (
                         <div
                           className="w-[400px] rounded-lg bg-gray-100"

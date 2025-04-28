@@ -3,7 +3,7 @@ import { z } from "zod";
 export const hostSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-  height: z.number().int().min(0),
+  height: z.number().int().min(1).max(4),
   ip: z.string().ip(),
 
   service_id: z.string().uuid(),
@@ -16,7 +16,7 @@ export type Host = z.infer<typeof hostSchema>;
 export const rackSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-  height: z.number().int().min(0),
+  height: z.number().int().min(1).max(60),
   n_hosts: z.number().int().min(0),
   hosts: z.array(
     hostSchema.extend({
