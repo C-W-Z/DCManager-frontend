@@ -6,20 +6,26 @@ import {
   DropResult,
   DragUpdate,
 } from "@hello-pangea/dnd";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
+
 import HostComponent from "./HostComponent";
 import { rack_schema } from "@/lib/schema";
 import { HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
+import { AddHostDialog } from "@/components/AddHostDialog";
 
 type Rack = z.infer<typeof rack_schema>;
 type Host = z.infer<typeof rack_schema.shape.hosts.element>;
 
 interface RackProps {
   rack: Rack;
+  setRack: (rack: Rack) => void;
 }
-export default function RackComponent({ rack }: RackProps) {
+export default function RackComponent({ rack, setRack }: RackProps) {
   const [rackItems, setRackItems] = useState([] as RackItem[]);
+  const [isUpdate, setIsUpdate] = useState(false);
 
   useEffect(() => {
     const rackItems = buildRackItems(rack);
@@ -53,6 +59,8 @@ export default function RackComponent({ rack }: RackProps) {
       }
       setRackItems(new_rack_items);
     }
+
+    setIsUpdate(true);
   }
 
   function handleOnDragEnd(result: DropResult) {
@@ -69,49 +77,88 @@ export default function RackComponent({ rack }: RackProps) {
     setRackItems(new_rack_items);
   }
 
+  function saveRackUpdate() {
+    const new_hosts: Host[] = [];
+    for (let i = rackItems.length - 1; i >= 0; i--) {
+      const item = rackItems[i];
+      if (item.host) {
+        new_hosts.push({
+          ...item.host,
+          pos: item.display_pos,
+        });
+      }
+    }
+
+    setRack({
+      ...rack,
+      hosts: new_hosts,
+      n_hosts: new_hosts.length,
+    });
+  }
+
   return (
-    <DragDropContext onDragEnd={handleOnDragEnd} onDragUpdate={handleOnDragUpdate}>
-      <Droppable droppableId="rack">
-        {(provided) => (
-          <div
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-            className="flex h-[70vh] w-fit flex-col items-end overflow-y-scroll rounded-lg border-2 border-gray-950 p-4"
-            style={{ gap: `${RACK_GAP}px` }}
+    <div className="flex flex-col items-start justify-start gap-4">
+      <DragDropContext onDragEnd={handleOnDragEnd} onDragUpdate={handleOnDragUpdate}>
+        <Droppable droppableId="rack">
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className="flex h-[70vh] w-fit flex-col items-end overflow-y-scroll rounded-lg border-2 border-gray-950 p-4"
+              style={{ gap: `${RACK_GAP}px` }}
+            >
+              {rackItems.map((item, index) => (
+                <Draggable key={index} draggableId={`item-${index}`} index={index}>
+                  {(provided, snapshot) => {
+                    return (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className={cn(
+                          "flex w-fit flex-row items-end justify-start",
+                          snapshot.isDragging ? "scale-110" : "",
+                          item.host ? "" : "pointer-events-none",
+                        )}
+                      >
+                        <div className="w-12 pb-2 text-sm font-bold">{item.display_pos}</div>
+                        {item.host ? (
+                          <HostComponent host={item.host} />
+                        ) : (
+                          <div
+                            className="w-[400px] rounded-lg bg-gray-100"
+                            style={{ height: `${HOST_HEIGHT}px` }}
+                          ></div>
+                        )}
+                      </div>
+                    );
+                  }}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+
+      <div className="flex w-full flex-row items-start justify-between">
+        <div className="flex flex-col">
+          <Button
+            variant="destructive"
+            className={cn("w-[140px]", isUpdate ? "" : "pointer-events-none bg-gray-300")}
+            onClick={() => {
+              saveRackUpdate();
+              toast.success("Rack saved successfully");
+              setIsUpdate(false);
+            }}
           >
-            {rackItems.map((item, index) => (
-              <Draggable key={index} draggableId={`item-${index}`} index={index}>
-                {(provided, snapshot) => {
-                  return (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      className={cn(
-                        "flex w-fit flex-row items-end justify-start",
-                        snapshot.isDragging ? "scale-110" : "",
-                        item.host ? "" : "pointer-events-none",
-                      )}
-                    >
-                      <div className="w-12 pb-2 text-sm font-bold">{item.display_pos}</div>
-                      {item.host ? (
-                        <HostComponent host={item.host} />
-                      ) : (
-                        <div
-                          className="w-[400px] rounded-lg bg-gray-100"
-                          style={{ height: `${HOST_HEIGHT}px` }}
-                        ></div>
-                      )}
-                    </div>
-                  );
-                }}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+            Save
+          </Button>
+          {isUpdate && <div className="text-red-500">You have changes not saved</div>}
+        </div>
+        <AddHostDialog rack={rack} setRack={setRack} isUpdate={isUpdate} />
+      </div>
+    </div>
   );
 }
 

@@ -27,8 +27,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 import { host_schema, rack_schema } from "@/lib/schema";
+import { toast } from "sonner";
 
 type Rack = z.infer<typeof rack_schema>;
 const form_schema = host_schema.pick({ name: true, height: true });
@@ -36,8 +38,9 @@ const form_schema = host_schema.pick({ name: true, height: true });
 interface AddHostDialogProps {
   rack: Rack;
   setRack: (rack: Rack) => void;
+  isUpdate: boolean;
 }
-export function AddHostDialog({ rack, setRack }: AddHostDialogProps) {
+export function AddHostDialog({ rack, setRack, isUpdate }: AddHostDialogProps) {
   const [open, setOpen] = useState(false);
   const [isRackFull, setIsRackFull] = useState(false);
 
@@ -55,6 +58,7 @@ export function AddHostDialog({ rack, setRack }: AddHostDialogProps) {
 
     setRack(new_rack);
     setIsRackFull(false);
+
     form.reset();
     setOpen(false);
   }
@@ -62,7 +66,9 @@ export function AddHostDialog({ rack, setRack }: AddHostDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>New Host</Button>
+        <Button className={cn("w-[140px]", isUpdate ? "pointer-events-none bg-gray-300" : "")}>
+          New Host
+        </Button>
       </DialogTrigger>
       <DialogContent className="w-[400px]">
         <DialogHeader>
@@ -142,6 +148,10 @@ function insertNewHostToRack(rack: Rack, new_host: z.infer<typeof form_schema>) 
         rack_id: rack.id || "temp",
         id: null,
         pos: new_host_pos,
+      });
+
+      toast.success("Host added successfully", {
+        description: `Host ${new_host.name} added to position ${new_host_pos}`,
       });
 
       return {
