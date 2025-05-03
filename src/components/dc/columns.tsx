@@ -19,7 +19,6 @@ export type DCInfo = {
   id: string;
   name: string;
   default_height: number;
-  rooms: string[];
   n_rooms: number;
   n_racks: number;
   n_hosts: number;
