@@ -1,7 +1,7 @@
 "use client"
 
 import { ChevronRight } from "lucide-react"
-import type { ViewLevel } from "./dc-manager"
+import type { ViewLevel } from "../dc-manager"
 
 interface BreadcrumbProps {
   currentView: ViewLevel

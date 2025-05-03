@@ -11,7 +11,7 @@ interface RoomViewProps {
 
 export function RoomView({ dataCenterId, onSelect }: RoomViewProps) {
   const columns = roomColumns(onSelect)
-  const filteredRooms = mockRooms.filter((room) => room.dataCenterId === dataCenterId)
+  const filteredRooms = mockRooms.filter((room) => room.dc_id === dataCenterId)
 
   return (
     <div>

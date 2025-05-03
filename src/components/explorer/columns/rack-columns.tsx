@@ -14,11 +14,12 @@ import {
 
 export type Rack = {
   id: string
-  roomId: string
   name: string
-  service: string
-  capacity: string
-  hosts: number
+  capacity: number
+  height: number
+  n_hosts: number
+  service_id: string
+  room_id: string
 }
 
 export const rackColumns: ColumnDef<Rack>[] = [
@@ -57,7 +58,7 @@ export const rackColumns: ColumnDef<Rack>[] = [
     },
   },
   {
-    accessorKey: "service",
+    accessorKey: "service_id",
     header: ({ column }) => {
       return (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
@@ -67,27 +68,28 @@ export const rackColumns: ColumnDef<Rack>[] = [
       )
     },
     cell: ({ row }) => {
-      const service: string = row.getValue("service")
+      const service: string = row.getValue("service_id")
       return <div className="pl-4 text-left font-medium">{service}</div>
     },
   },
   {
-    accessorKey: "capacity",
+    id: "Capacity",
     header: ({ column }) => {
       return (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          Capacity
+          Left Capacity
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
     },
     cell: ({ row }) => {
-      const capacity: string = row.getValue("capacity")
-      return <div className="pl-4 text-left font-medium">{capacity}</div>
+      const capacity: number = row.original.capacity
+      const height: number = row.original.height
+      return <div className="pl-4 text-left font-medium">{capacity}/{height}U</div>
     },
   },
   {
-    accessorKey: "hosts",
+    accessorKey: "n_hosts",
     header: ({ column }) => {
       return (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
@@ -97,8 +99,8 @@ export const rackColumns: ColumnDef<Rack>[] = [
       )
     },
     cell: ({ row }) => {
-      const hosts: number = Number.parseInt(row.getValue("hosts"))
-      return <div className="pl-4 text-left font-medium">{hosts}</div>
+      const n_hosts: number = Number.parseInt(row.getValue("n_hosts"))
+      return <div className="pl-4 text-left font-medium">{n_hosts}</div>
     },
   },
   {

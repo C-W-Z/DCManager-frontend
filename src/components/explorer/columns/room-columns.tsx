@@ -14,10 +14,11 @@ import {
 
 export type Room = {
   id: string
-  dataCenterId: string
   name: string
+  height: number
   n_racks: number
   n_hosts: number
+  dc_id: string
 }
 
 export function roomColumns(onSelect: (id: string) => void): ColumnDef<Room>[] {
@@ -60,6 +61,21 @@ export function roomColumns(onSelect: (id: string) => void): ColumnDef<Room>[] {
             </button>
           </div>
         )
+      },
+    },
+    {
+      accessorKey: "height",
+      header: ({ column }) => {
+        return (
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            Height
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        const height: number = Number.parseInt(row.getValue("height"))
+        return <div className="pl-4 text-left font-medium">{height}</div>
       },
     },
     {

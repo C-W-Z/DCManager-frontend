@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Sidebar } from "./sidebar";
-import { DataCenterView } from "./data-center-view";
-import { RoomView } from "./room-view";
-import { RackView } from "./rack-view";
-import { Breadcrumb } from "./breadcrumb";
+import { Sidebar } from "./explorer/sidebar";
+import { DataCenterView } from "./explorer/data-center-view";
+import { RoomView } from "./explorer/room-view";
+import { RackView } from "./explorer/rack-view";
+import { Breadcrumb } from "./explorer/breadcrumb";
 import { mockDataCenters, mockRooms } from "@/lib/mock-data";
 
 export type ViewLevel = "datacenter" | "room" | "rack";
@@ -24,6 +24,10 @@ export function DCManager() {
     setSelectedRoom(roomId);
     setCurrentView("rack");
   };
+
+  // const handleRackSelect = (roomId: string) => {
+
+  // };
 
   const handleBreadcrumbClick = (level: ViewLevel) => {
     setCurrentView(level);
@@ -54,6 +58,16 @@ export function DCManager() {
             room={selectedRoomName}
             onNavigate={handleBreadcrumbClick}
           />
+          {currentView === "datacenter" && (
+            <button className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white">
+              New DataCenter
+            </button>
+          )}
+          {currentView === "room" && (
+            <button className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white">
+              New Room
+            </button>
+          )}
           {currentView === "rack" && (
             <button className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white">
               New Rack
@@ -67,7 +81,9 @@ export function DCManager() {
           {currentView === "room" && selectedDataCenter && (
             <RoomView dataCenterId={selectedDataCenter} onSelect={handleRoomSelect} />
           )}
-          {currentView === "rack" && selectedRoom && <RackView roomId={selectedRoom} />}
+          {currentView === "rack" && selectedRoom && (
+            <RackView roomId={selectedRoom}/>
+          )}
         </div>
       </div>
     </div>

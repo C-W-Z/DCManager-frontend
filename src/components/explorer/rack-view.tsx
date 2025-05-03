@@ -9,7 +9,7 @@ interface RackViewProps {
 }
 
 export function RackView({ roomId }: RackViewProps) {
-  const filteredRacks = mockRacks.filter((rack) => rack.roomId === roomId)
+  const filteredRacks = mockRacks.filter((rack) => rack.room_id === roomId)
 
   return (
     <div>
