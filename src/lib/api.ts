@@ -1,11 +1,6 @@
-import { generateMockHost } from "./mock";
+import * as schema from "./schema";
 
-export function getHostByRack(rack_id: string) {
-  console.log("getHostByRack", rack_id);
-  return generateMockHost();
-}
-
-export function getRackByRoom(room_id: string) {
-  console.log("getRackByRoom", room_id);
-  return generateMockHost();
-}
+export function addDC(name: string, height: number) {}
+export function GetAllDC(): Promise<schema.SimpleDatacenter[]> {}
+export function GetDC(dc_id: string): Promise<schema.Datacenter> {}
+export function ModifyDC(dc_id: string, body: schema.SimpleDatacenter) {}
