@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -116,9 +116,7 @@ export const rackColumns: ColumnDef<SimpleRack>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const rack = row.original;
-
+    cell: () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -128,13 +126,14 @@ export const rackColumns: ColumnDef<SimpleRack>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(rack.name)}>
-              Copy Rack Name
-            </DropdownMenuItem>
-            <DropdownMenuItem>Modify</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-600">DELETE</DropdownMenuItem>
-          </DropdownMenuContent>
+              <DropdownMenuItem>
+                <Edit className="mr-2 h-4 w-4" /> Edit
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-red-600">
+                <Trash2 className="mr-2 h-4 w-4" /> DELETE
+              </DropdownMenuItem>
+            </DropdownMenuContent>
         </DropdownMenu>
       );
     },

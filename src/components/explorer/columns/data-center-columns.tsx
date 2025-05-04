@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Trash2, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -141,9 +141,7 @@ export function dataCenterColumns(
     },
     {
       id: "actions",
-      cell: ({ row }) => {
-        const dc = row.original;
-
+      cell: () => {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -153,12 +151,13 @@ export function dataCenterColumns(
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(dc.name)}>
-                Copy Data Center Name
+              <DropdownMenuItem>
+                <Edit className="mr-2 h-4 w-4" /> Edit
               </DropdownMenuItem>
-              <DropdownMenuItem>Modify</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">DELETE</DropdownMenuItem>
+              <DropdownMenuItem className="text-red-600">
+                <Trash2 className="mr-2 h-4 w-4" /> DELETE
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );

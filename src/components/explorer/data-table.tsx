@@ -37,6 +37,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [dropdownOpen, setDropdownOpen] = useState(false)
 
   const table = useReactTable({
     data,
@@ -70,13 +71,13 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
           className="max-w-sm"
         />
 
-        <DropdownMenu>
+        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
               Columns
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-[200px]">
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())
@@ -86,7 +87,9 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                     key={column.id}
                     className="capitalize"
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                    onCheckedChange={(value) => {
+                      column.toggleVisibility(!!value)
+                    }}
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
@@ -98,7 +101,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-100">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -113,8 +116,12 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+              table.getRowModel().rows.map((row, index) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}

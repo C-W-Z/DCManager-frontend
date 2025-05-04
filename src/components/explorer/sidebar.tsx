@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { FolderKanban, HardDrive, Settings, Server, ChevronLeft, ChevronRight } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
@@ -13,7 +13,7 @@ export function Sidebar() {
     <div
       className={cn(
         "relative flex h-full flex-col bg-gray-50 border-r transition-all duration-300",
-        collapsed ? "w-16" : "w-60",
+        collapsed ? "w-20" : "w-60",
       )}
     >
       <div className={cn("p-6 font-bold text-xl", collapsed && "text-center p-4")}>
@@ -29,7 +29,7 @@ export function Sidebar() {
       </div>
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-20 flex h-6 w-6 items-center justify-center rounded-full border bg-white shadow-sm"
+        className="absolute -right-3 top-20 flex h-6 w-6 items-center justify-center rounded-full border bg-white shadow-sm hover:bg-gray-100"
       >
         {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
       </button>
@@ -49,8 +49,8 @@ function SidebarItem({ icon, label, active, collapsed }: SidebarItemProps) {
     <a
       href="#"
       className={cn(
-        "flex items-center gap-3 px-6 py-3 text-sm",
-        active ? "bg-gray-200 rounded-md mx-2" : "text-gray-700 hover:bg-gray-100",
+        "flex items-center gap-3 px-6 py-3 text-sm transition-colors ml-2 mr-4",
+        active ? "bg-gray-200 rounded-md" : "text-gray-700 hover:bg-gray-100",
         collapsed && "justify-center px-0",
       )}
     >
