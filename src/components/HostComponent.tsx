@@ -1,12 +1,9 @@
 import { cn } from "../lib/utils";
 import { HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
+import { SimpleHost } from "@/lib/schema";
 
 interface HostComponentProps {
-  host: {
-    name: string;
-    height: number;
-    is_running: boolean;
-  };
+  host: SimpleHost;
 }
 
 export default function HostComponent({ host }: HostComponentProps) {
@@ -19,7 +16,10 @@ export default function HostComponent({ host }: HostComponentProps) {
     >
       <div className="text-sm font-bold">{host.name}</div>
       <div
-        className={cn("h-3 w-3 rounded-full", host.is_running ? "bg-green-600" : "bg-red-400")}
+        className={cn(
+          "h-3 w-3 rounded-full",
+          host.status == "running" ? "bg-green-600" : "bg-red-400",
+        )}
       ></div>
     </div>
   );
