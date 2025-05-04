@@ -44,7 +44,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isColumnMenuOpen, setIsColumnMenuOpen] = useState(false);
 
   const table = useReactTable({
     data,
@@ -78,7 +78,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
           className="max-w-sm"
         />
 
-        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+        <DropdownMenu open={isColumnMenuOpen} onOpenChange={setIsColumnMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
               Columns
@@ -116,14 +116,22 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
         </DropdownMenu>
       </div>
 
-      <div className="rounded-md border">
+      <div className="modern-table">
         <Table>
-          <TableHeader className="bg-gray-100">
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+              <TableRow
+                key={headerGroup.id}
+                className="table-header-row bg-gray-200 hover:bg-gray-200"
+              >
+                {headerGroup.headers.map((header, index) => {
                   return (
-                    <TableHead key={header.id} className="py-2">
+                    <TableHead
+                      key={header.id}
+                      className={`${index === 0 ? "first-header-cell" : ""} ${
+                        index === headerGroup.headers.length - 1 ? "last-header-cell" : ""
+                      }`}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
@@ -139,10 +147,15 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  // className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                  className={`table-data-row bg-gray-50`}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                  {row.getVisibleCells().map((cell, cellIndex) => (
+                    <TableCell
+                      key={cell.id}
+                      className={`${cellIndex === 0 ? "first-cell" : ""} ${
+                        cellIndex === row.getVisibleCells().length - 1 ? "last-cell" : ""
+                      }`}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
