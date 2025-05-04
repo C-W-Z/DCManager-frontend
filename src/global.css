@@ -131,8 +131,28 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom styles for dropdown menu items */
+@layer components {
+  /* Regular menu items - black background on hover */
+  [role="menuitem"]:hover {
+    background-color: black !important;
+    color: white !important;
+  }
+
+  /* Delete/Remove menu items - red background on hover */
+  [role="menuitem"]:has(svg.lucide-trash2):hover {
+    background-color: red !important; /* red-100 */
+    color: white !important; /* red-600 */
+  }
+
   button:hover {
     cursor: pointer;
+  }
+
+  input[readonly]::placeholder {
+    color: black !important;
   }
 }
 
