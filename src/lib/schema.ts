@@ -25,6 +25,7 @@ export const simple_host_schema = host_schema.pick({
   name: true,
   height: true,
   status: true,
+  rack_id: true,
   pos: true,
 });
 export type SimpleHost = z.infer<typeof simple_host_schema>;
@@ -33,6 +34,7 @@ export const rack_schema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   height: z.number().int().min(1).max(60),
+  capacity: z.number().int().min(1).max(60),
   n_hosts: z.number().int().min(0),
   hosts: z.array(simple_host_schema),
   service_id: z.string().uuid(),
@@ -45,8 +47,10 @@ export const simple_rack_schema = rack_schema.pick({
   id: true,
   name: true,
   height: true,
+  capacity: true,
   n_hosts: true,
   service_id: true,
+  room_id: true,
 });
 export type SimpleRack = z.infer<typeof simple_rack_schema>;
 
@@ -67,6 +71,7 @@ export const simple_room_schema = room_schema.pick({
   height: true,
   n_hosts: true,
   n_racks: true,
+  dc_id: true,
 });
 export type SimpleRoom = z.infer<typeof simple_room_schema>;
 

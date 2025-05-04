@@ -1,33 +1,31 @@
-"use client"
+"use client";
 
-import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import type { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
-export type DataCenter = {
-  id: string
-  name: string
-  default_height: number
-  n_rooms: number
-  n_racks: number
-  n_hosts: number
-}
+import { SimpleDatacenter } from "@/lib/schema";
 
-export function dataCenterColumns(onSelect: (id: string) => void): ColumnDef<DataCenter>[] {
+export function dataCenterColumns(
+  onSelect: (id: string) => void,
+): ColumnDef<SimpleDatacenter>[] {
   return [
     {
       id: "select",
       header: ({ table }) => (
         <Checkbox
-          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
         />
@@ -46,87 +44,105 @@ export function dataCenterColumns(onSelect: (id: string) => void): ColumnDef<Dat
       accessorKey: "name",
       header: ({ column }) => {
         return (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
             Name
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        )
+        );
       },
       cell: ({ row }) => {
-        const name: string = row.getValue("name")
+        const name: string = row.getValue("name");
         return (
           <div className="pl-4 text-left font-medium">
-            <button className="hover:underline focus:outline-none" onClick={() => onSelect(row.original.id)}>
+            <button
+              className="hover:underline focus:outline-none"
+              onClick={() => onSelect(row.original.id)}
+            >
               {name}
             </button>
           </div>
-        )
+        );
       },
     },
     {
       accessorKey: "n_rooms",
       header: ({ column }) => {
         return (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
             Rooms
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        )
+        );
       },
       cell: ({ row }) => {
-        const n_rooms: number = Number.parseInt(row.getValue("n_rooms"))
-        return <div className="pl-4 text-left font-medium">{n_rooms}</div>
+        const n_rooms: number = Number.parseInt(row.getValue("n_rooms"));
+        return <div className="pl-4 text-left font-medium">{n_rooms}</div>;
       },
     },
     {
-      accessorKey: "default_height",
+      accessorKey: "height",
       header: ({ column }) => {
         return (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Default Height
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Height
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        )
+        );
       },
       cell: ({ row }) => {
-        const default_height: number = Number.parseInt(row.getValue("default_height"))
-        return <div className="pl-4 text-left font-medium">{default_height}U</div>
+        const height: number = Number.parseInt(row.getValue("height"));
+        return <div className="pl-4 text-left font-medium">{height}U</div>;
       },
     },
     {
       accessorKey: "n_racks",
       header: ({ column }) => {
         return (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
             Racks
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        )
+        );
       },
       cell: ({ row }) => {
-        const n_racks: number = Number.parseInt(row.getValue("n_racks"))
-        return <div className="pl-4 text-left font-medium">{n_racks}</div>
+        const n_racks: number = Number.parseInt(row.getValue("n_racks"));
+        return <div className="pl-4 text-left font-medium">{n_racks}</div>;
       },
     },
     {
       accessorKey: "n_hosts",
       header: ({ column }) => {
         return (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
             Hosts
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        )
+        );
       },
       cell: ({ row }) => {
-        const n_hosts: number = Number.parseInt(row.getValue("n_hosts"))
-        return <div className="pl-4 text-left font-medium">{n_hosts}</div>
+        const n_hosts: number = Number.parseInt(row.getValue("n_hosts"));
+        return <div className="pl-4 text-left font-medium">{n_hosts}</div>;
       },
     },
     {
       id: "actions",
       cell: ({ row }) => {
-        const dc = row.original
+        const dc = row.original;
 
         return (
           <DropdownMenu>
@@ -145,8 +161,8 @@ export function dataCenterColumns(onSelect: (id: string) => void): ColumnDef<Dat
               <DropdownMenuItem className="text-red-600">DELETE</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
       },
     },
-  ]
+  ];
 }
