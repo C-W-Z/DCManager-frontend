@@ -1,12 +1,10 @@
-import type { DataCenter } from "@/components/explorer/columns/data-center-columns";
-import type { Room } from "@/components/explorer/columns/room-columns";
-import type { Rack } from "@/components/explorer/columns/rack-columns";
+import { SimpleDatacenter, SimpleRoom, SimpleRack } from "./schema";
 
-export const mockDataCenters: DataCenter[] = [
+export const mockDataCenters: SimpleDatacenter[] = [
   {
     id: "dc-001",
     name: "Taipei-1",
-    default_height: 42,
+    height: 42,
     n_rooms: 5,
     n_racks: 123,
     n_hosts: 456,
@@ -14,7 +12,7 @@ export const mockDataCenters: DataCenter[] = [
   {
     id: "dc-002",
     name: "Taipei-2",
-    default_height: 38,
+    height: 38,
     n_rooms: 3,
     n_racks: 87,
     n_hosts: 321,
@@ -22,7 +20,7 @@ export const mockDataCenters: DataCenter[] = [
   {
     id: "dc-003",
     name: "Kaohsiung-1",
-    default_height: 42,
+    height: 42,
     n_rooms: 4,
     n_racks: 95,
     n_hosts: 380,
@@ -30,14 +28,14 @@ export const mockDataCenters: DataCenter[] = [
   {
     id: "dc-004",
     name: "Taichung-1",
-    default_height: 40,
+    height: 40,
     n_rooms: 2,
     n_racks: 45,
     n_hosts: 180,
   },
 ];
 
-export const mockRooms: Room[] = [
+export const mockRooms: SimpleRoom[] = [
   {
     id: "room-001",
     dc_id: "dc-001",
@@ -104,7 +102,7 @@ export const mockRooms: Room[] = [
   },
 ];
 
-export const mockRacks: Rack[] = [
+export const mockRacks: SimpleRack[] = [
   {
     id: "rack-001",
     room_id: "room-001",

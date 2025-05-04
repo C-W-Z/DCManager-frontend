@@ -1,33 +1,28 @@
-"use client"
+"use client";
 
-import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import type { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
-export type Rack = {
-  id: string
-  name: string
-  capacity: number
-  height: number
-  n_hosts: number
-  service_id: string
-  room_id: string
-}
+import { SimpleRack } from "@/lib/schema";
 
-export const rackColumns: ColumnDef<Rack>[] = [
+export const rackColumns: ColumnDef<SimpleRack>[] = [
   {
     id: "select",
     header: ({ table }) => (
       <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
@@ -46,67 +41,83 @@ export const rackColumns: ColumnDef<Rack>[] = [
     accessorKey: "name",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           Rack Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => {
-      const name: string = row.getValue("name")
-      return <div className="pl-4 text-left font-medium">{name}</div>
+      const name: string = row.getValue("name");
+      return <div className="pl-4 text-left font-medium">{name}</div>;
     },
   },
   {
     accessorKey: "service_id",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           Service
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => {
-      const service: string = row.getValue("service_id")
-      return <div className="pl-4 text-left font-medium">{service}</div>
+      const service: string = row.getValue("service_id");
+      return <div className="pl-4 text-left font-medium">{service}</div>;
     },
   },
   {
     id: "Capacity",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           Left Capacity
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => {
-      const capacity: number = row.original.capacity
-      const height: number = row.original.height
-      return <div className="pl-4 text-left font-medium">{capacity}/{height}U</div>
+      const capacity: number = row.original.capacity;
+      const height: number = row.original.height;
+      return (
+        <div className="pl-4 text-left font-medium">
+          {capacity}/{height}U
+        </div>
+      );
     },
   },
   {
     accessorKey: "n_hosts",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           Hosts
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => {
-      const n_hosts: number = Number.parseInt(row.getValue("n_hosts"))
-      return <div className="pl-4 text-left font-medium">{n_hosts}</div>
+      const n_hosts: number = Number.parseInt(row.getValue("n_hosts"));
+      return <div className="pl-4 text-left font-medium">{n_hosts}</div>;
     },
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const rack = row.original
+      const rack = row.original;
 
       return (
         <DropdownMenu>
@@ -117,13 +128,15 @@ export const rackColumns: ColumnDef<Rack>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(rack.name)}>Copy Rack Name</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(rack.name)}>
+              Copy Rack Name
+            </DropdownMenuItem>
             <DropdownMenuItem>Modify</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-red-600">DELETE</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
-]
+];

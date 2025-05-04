@@ -8,16 +8,12 @@ import {
 } from "@hello-pangea/dnd";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { z } from "zod";
 import { cn } from "@/lib/utils";
 
 import HostComponent from "./HostComponent";
-import { rack_schema } from "@/lib/schema";
+import { Rack, SimpleHost } from "@/lib/schema";
 import { HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
 import { AddHostDialog } from "@/components/AddHostDialog";
-
-type Rack = z.infer<typeof rack_schema>;
-type Host = z.infer<typeof rack_schema.shape.hosts.element>;
 
 interface RackProps {
   rack: Rack;
@@ -78,7 +74,7 @@ export default function RackComponent({ rack, setRack }: RackProps) {
   }
 
   function saveRackUpdate() {
-    const new_hosts: Host[] = [];
+    const new_hosts: SimpleHost[] = [];
     for (let i = rackItems.length - 1; i >= 0; i--) {
       const item = rackItems[i];
       if (item.host) {
@@ -163,7 +159,7 @@ export default function RackComponent({ rack, setRack }: RackProps) {
 }
 
 interface RackItem {
-  host: Host | null;
+  host: SimpleHost | null;
   height: number;
   display_pos: number;
   stored_pos: number;

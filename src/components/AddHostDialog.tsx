@@ -29,8 +29,9 @@ import { z } from "zod";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-import { host_schema, rack_schema } from "@/lib/schema";
+import { host_schema, rack_schema, simple_host_schema } from "@/lib/schema";
 import { toast } from "sonner";
+import { addHost } from "@/lib/api";
 
 type Rack = z.infer<typeof rack_schema>;
 const form_schema = host_schema.pick({ name: true, height: true });
@@ -49,18 +50,52 @@ export function AddHostDialog({ rack, setRack, isUpdate }: AddHostDialogProps) {
   });
 
   function onSubmit(values: z.infer<typeof form_schema>) {
-    const new_rack = insertNewHostToRack(rack, values);
+    const [new_host_index, new_host_pos] = calculateNewHostPos(rack, values);
 
-    if (new_rack === null) {
+    if (new_host_index === null || new_host_pos === null) {
       setIsRackFull(true);
       return;
     }
 
-    setRack(new_rack);
-    setIsRackFull(false);
+    addHost({
+      name: values.name,
+      height: values.height,
+      rack_id: rack.id,
+      room_id: rack.room_id,
+      dc_id: rack.dc_id,
+      pos: new_host_pos,
+    }).then((new_host_id) => {
+      if (new_host_id) {
+        // insert new host
+        const new_host = simple_host_schema.parse({
+          id: new_host_id,
+          name: values.name,
+          height: values.height,
+          status: "idle",
+          pos: new_host_pos,
+        });
+        const new_hosts = [...rack.hosts];
+        new_hosts.splice(new_host_index, 0, new_host);
 
-    form.reset();
-    setOpen(false);
+        setRack({
+          ...rack,
+          hosts: new_hosts,
+          n_hosts: rack.n_hosts + 1,
+        });
+
+        setIsRackFull(false);
+        form.reset();
+        setOpen(false);
+
+        toast.success("Host added successfully", {
+          description: `Host ${values.name} added to position ${new_host_pos}`,
+        });
+      } else {
+        toast.error("Failed to add host", {
+          description: `Host ${values.name} failed to add`,
+        });
+      }
+    });
   }
 
   return (
@@ -125,11 +160,10 @@ export function AddHostDialog({ rack, setRack, isUpdate }: AddHostDialogProps) {
   );
 }
 
-function insertNewHostToRack(rack: Rack, new_host: z.infer<typeof form_schema>) {
+function calculateNewHostPos(rack: Rack, new_host: z.infer<typeof form_schema>) {
   let new_host_pos;
   let current_top = rack.height;
 
-  const new_hosts = rack.hosts;
   for (let i = rack.hosts.length - 1; i >= 0; i--) {
     const host = rack.hosts[i];
     const host_top = host.pos + host.height - 1;
@@ -138,31 +172,11 @@ function insertNewHostToRack(rack: Rack, new_host: z.infer<typeof form_schema>) 
     if (space >= new_host.height) {
       new_host_pos = current_top - new_host.height + 1;
 
-      // insert new host in the current position
-      new_hosts.splice(i + 1, 0, {
-        name: new_host.name,
-        height: new_host.height,
-        is_running: false,
-        dc_id: rack.dc_id,
-        room_id: rack.room_id,
-        rack_id: rack.id || "temp",
-        id: null,
-        pos: new_host_pos,
-      });
-
-      toast.success("Host added successfully", {
-        description: `Host ${new_host.name} added to position ${new_host_pos}`,
-      });
-
-      return {
-        ...rack,
-        hosts: new_hosts,
-        n_hosts: rack.n_hosts + 1,
-      };
+      return [i + 1, new_host_pos];
     }
 
     current_top = host.pos - 1;
   }
 
-  return null;
+  return [null, null]; // No space found
 }
