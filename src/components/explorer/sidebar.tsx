@@ -13,7 +13,7 @@ export function Sidebar() {
     <div
       className={cn(
         "relative flex h-full flex-col bg-gray-50 border-r transition-all duration-300",
-        collapsed ? "w-20" : "w-60",
+        collapsed ? "w-16" : "w-60",
       )}
     >
       <div className={cn("p-6 font-bold text-xl", collapsed && "text-center p-4")}>
@@ -24,7 +24,7 @@ export function Sidebar() {
         <SidebarItem icon={<HardDrive className="h-5 w-5" />} label="Hosts" collapsed={collapsed} />
         <SidebarItem icon={<Server className="h-5 w-5" />} label="Services" collapsed={collapsed} />
       </nav>
-      <div className="p-4 border-t">
+      <div className="py-4 border-t">
         <SidebarItem icon={<Settings className="h-5 w-5" />} label="Setting" collapsed={collapsed} />
       </div>
       <button
@@ -49,8 +49,8 @@ function SidebarItem({ icon, label, active, collapsed }: SidebarItemProps) {
     <a
       href="#"
       className={cn(
-        "flex items-center gap-3 px-6 py-3 text-sm transition-colors ml-2 mr-4",
-        active ? "bg-gray-200 rounded-md" : "text-gray-700 hover:bg-gray-100",
+        "flex items-center gap-3 px-6 py-3 text-sm transition-colors my-2 ml-2 mr-4 rounded-full",
+        active ? "bg-gray-300" : "text-gray-700 hover:bg-gray-200",
         collapsed && "justify-center px-0",
       )}
     >
