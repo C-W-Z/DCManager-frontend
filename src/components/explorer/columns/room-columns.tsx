@@ -12,9 +12,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { SimpleRoom } from "@/lib/schema";
+import { SimpleRoom } from "@/lib/type";
 
-export function roomColumns(onSelect: (id: string) => void): ColumnDef<SimpleRoom>[] {
+export function roomColumns(onSelect: (room: SimpleRoom) => void): ColumnDef<SimpleRoom>[] {
   return [
     {
       id: "select",
@@ -57,7 +57,7 @@ export function roomColumns(onSelect: (id: string) => void): ColumnDef<SimpleRoo
           <div className="pl-4 text-left font-medium">
             <button
               className="hover:underline focus:outline-none"
-              onClick={() => onSelect(row.original.id)}
+              onClick={() => onSelect(row.original)}
             >
               {name}
             </button>
