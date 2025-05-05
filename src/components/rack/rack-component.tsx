@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import HostComponent from "@/components/rack/host-component";
 import { Rack, SimpleHost } from "@/lib/type";
 import { HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
-import { AddHostDialog } from "@/components/rack/add-host-dialog";
+import { AddHostDialog } from "@/components/explorer/dialogs/add-host-dialog";
 
 interface RackProps {
   rack: Rack;
