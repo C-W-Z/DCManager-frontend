@@ -23,6 +23,7 @@ import { useState } from "react";
 import { rack_schema, SimpleDatacenter, SimpleRoom } from "@/lib/type";
 import { toast } from "sonner";
 import { addRack } from "@/lib/api";
+import Icon from "@/components/icon";
 
 interface AddRackDialogProps {
   currentDC: SimpleDatacenter;
@@ -65,7 +66,10 @@ export function AddRackDialog({ currentRoom, currentDC }: AddRackDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-[140px]">Add Rack</Button>
+        <Button className="flex h-fit min-w-[130px] flex-row items-center justify-start gap-3 py-3 text-sm font-bold">
+          <Icon id="add" className="size-4 fill-white" />
+          <p>New Rack</p>
+        </Button>
       </DialogTrigger>
       <DialogContent className="w-[400px]">
         <DialogHeader>

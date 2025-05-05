@@ -23,6 +23,7 @@ import { useState } from "react";
 import { room_schema, SimpleDatacenter } from "@/lib/type";
 import { toast } from "sonner";
 import { addRoom } from "@/lib/api";
+import Icon from "@/components/icon";
 
 interface AddRoomDialogProps {
   currentDC: SimpleDatacenter;
@@ -63,7 +64,10 @@ export function AddRoomDialog({ currentDC }: AddRoomDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-[140px]">Add Room</Button>
+        <Button className="flex h-fit min-w-[130px] flex-row items-center justify-start gap-3 py-3 text-sm font-bold">
+          <Icon id="add" className="size-4 fill-white" />
+          <p>New Room</p>
+        </Button>
       </DialogTrigger>
       <DialogContent className="w-[400px]">
         <DialogHeader>

@@ -24,6 +24,7 @@ import { datacenter_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addDC } from "@/lib/api";
 import { MAX_HEIGHT } from "@/lib/constant";
+import Icon from "@/components/icon";
 
 export function AddDatacenterDialog() {
   const [open, setOpen] = useState(false);
@@ -59,7 +60,10 @@ export function AddDatacenterDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-[140px]">Add DC</Button>
+        <Button className="flex h-fit min-w-[130px] flex-row items-center justify-start gap-3 py-3 text-sm font-bold">
+          <Icon id="add" className="size-4 fill-white" />
+          <p>New DC</p>
+        </Button>
       </DialogTrigger>
       <DialogContent className="w-[400px]">
         <DialogHeader>

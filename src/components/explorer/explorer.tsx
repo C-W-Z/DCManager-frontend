@@ -7,6 +7,9 @@ import { RoomTable } from "@/components/explorer/tables/room-table";
 import { RackTable } from "@/components/explorer/tables/rack-table";
 import { Breadcrumb } from "./breadcrumb";
 import { SimpleDatacenter, SimpleRack, SimpleRoom } from "@/lib/type";
+import { AddDatacenterDialog } from "./dialogs/add-datacenter-dialog";
+import { AddRoomDialog } from "./dialogs/add-room-dialog";
+import { AddRackDialog } from "./dialogs/add-rack-dialog";
 
 export type ViewLevel = "datacenter" | "room" | "rack";
 
@@ -47,7 +50,15 @@ export function Explorer() {
             roomName={selectedRoom ? selectedRoom.name : null}
             onNavigate={handleBreadcrumbClick}
           />
+          {currentView === "datacenter" && <AddDatacenterDialog />}
+          {currentView === "room" && selectedDataCenter && (
+            <AddRoomDialog currentDC={selectedDataCenter} />
+          )}
+          {currentView === "rack" && selectedDataCenter && selectedRoom && (
+            <AddRackDialog currentDC={selectedDataCenter} currentRoom={selectedRoom} />
+          )}
         </div>
+
         <div className="flex-1 overflow-auto p-4">
           {currentView === "datacenter" && (
             <DataCenterTable onSelect={handleDataCenterSelect} />
@@ -56,11 +67,7 @@ export function Explorer() {
             <RoomTable datacenter={selectedDataCenter} onSelect={handleRoomSelect} />
           )}
           {currentView === "rack" && selectedDataCenter && selectedRoom && (
-            <RackTable
-              datacenter={selectedDataCenter}
-              room={selectedRoom}
-              onSelect={setSelectedRack}
-            />
+            <RackTable room={selectedRoom} onSelect={setSelectedRack} />
           )}
         </div>
       </div>

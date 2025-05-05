@@ -5,7 +5,6 @@ import { roomColumns } from "../columns/room-columns";
 import { SimpleDatacenter, SimpleRoom } from "@/lib/type";
 import { getDC } from "@/lib/api";
 import { useEffect, useState } from "react";
-import { AddRoomDialog } from "@/components/explorer/dialogs/add-room-dialog";
 
 interface RoomTableProps {
   datacenter: SimpleDatacenter;
@@ -28,10 +27,5 @@ export function RoomTable({ datacenter, onSelect }: RoomTableProps) {
       });
   }, [datacenter]);
 
-  return (
-    <div>
-      <AddRoomDialog currentDC={datacenter} />
-      <DataTable columns={columns} data={filteredRooms} />
-    </div>
-  );
+  return <DataTable columns={columns} data={filteredRooms} />;
 }

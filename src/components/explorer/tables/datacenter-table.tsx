@@ -5,7 +5,6 @@ import { dataCenterColumns } from "@/components/explorer/columns/datacenter-colu
 import { SimpleDatacenter } from "@/lib/type";
 import { getAllDC } from "@/lib/api";
 import { useEffect, useState } from "react";
-import { AddDatacenterDialog } from "@/components/explorer/dialogs/add-datacenter-dialog";
 
 interface DataCenterTableProps {
   onSelect: (dc: SimpleDatacenter) => void;
@@ -27,10 +26,5 @@ export function DataCenterTable({ onSelect }: DataCenterTableProps) {
       });
   }, []);
 
-  return (
-    <div>
-      <AddDatacenterDialog />
-      <DataTable columns={columns} data={dataCenters} />
-    </div>
-  );
+  return <DataTable columns={columns} data={dataCenters} />;
 }
