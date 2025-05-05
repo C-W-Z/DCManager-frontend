@@ -1,9 +1,5 @@
-import { Explorer } from "@/components/explorer/explorer";
+import ExampleApp from "./exampleApp";
 
 export default function Home() {
-  return (
-    <main className="min-h-screen">
-      <Explorer />
-    </main>
-  );
+  return <ExampleApp />;
 }

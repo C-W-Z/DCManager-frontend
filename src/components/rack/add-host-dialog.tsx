@@ -31,6 +31,7 @@ import { cn } from "@/lib/utils";
 import { Rack, SimpleHost, host_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addHost } from "@/lib/api";
+import Icon from "@/components/icon";
 
 const form_schema = host_schema.pick({ name: true, height: true });
 
@@ -97,8 +98,14 @@ export function AddHostDialog({ rack, setRack, isUpdate }: AddHostDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className={cn("w-[140px]", isUpdate ? "pointer-events-none bg-gray-300" : "")}>
-          Add Host
+        <Button
+          className={cn(
+            "flex h-fit min-w-[130px] flex-row items-center justify-start gap-3 py-3 text-sm font-bold",
+            isUpdate ? "pointer-events-none bg-gray-300" : "",
+          )}
+        >
+          <Icon id="add" className="size-4 fill-white" />
+          <p>New Host</p>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[400px]">

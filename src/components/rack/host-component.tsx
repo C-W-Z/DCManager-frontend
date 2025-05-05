@@ -1,4 +1,4 @@
-import { cn } from "../lib/utils";
+import { cn } from "@/lib/utils";
 import { HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
 import { SimpleHost } from "@/lib/type";
 

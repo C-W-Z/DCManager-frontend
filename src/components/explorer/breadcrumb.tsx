@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronRight } from "lucide-react";
-import type { ViewLevel } from "./explorer";
+import type { ViewLevel } from "../../pages/explorer";
 
 interface BreadcrumbProps {
   currentView: ViewLevel;

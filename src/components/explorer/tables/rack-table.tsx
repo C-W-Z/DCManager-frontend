@@ -8,11 +8,10 @@ import { getRoom } from "@/lib/api";
 
 interface RackTableProps {
   room: SimpleRoom;
-  onSelect: (rack: SimpleRack) => void;
 }
 
-export function RackTable({ room, onSelect }: RackTableProps) {
-  const columns = rackColumns(onSelect);
+export function RackTable({ room }: RackTableProps) {
+  const columns = rackColumns();
 
   const [filteredRacks, setFilteredRacks] = useState<SimpleRack[]>([]);
 

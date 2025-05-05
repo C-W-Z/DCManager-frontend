@@ -13,8 +13,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { SimpleRack } from "@/lib/type";
+import { Link } from "react-router-dom";
 
-export function rackColumns(onSelect: (room: SimpleRack) => void): ColumnDef<SimpleRack>[] {
+export function rackColumns(): ColumnDef<SimpleRack>[] {
   return [
     {
       id: "select",
@@ -53,14 +54,12 @@ export function rackColumns(onSelect: (room: SimpleRack) => void): ColumnDef<Sim
       },
       cell: ({ row }) => {
         const name: string = row.getValue("name");
+        const rack = row.original;
         return (
           <div className="pl-4 text-left font-medium">
-            <button
-              className="hover:underline focus:outline-none"
-              onClick={() => onSelect(row.original)}
-            >
+            <Link to={`/rack/${rack.id}`} className="hover:underline focus:outline-none">
               {name}
-            </button>
+            </Link>
           </div>
         );
       },
