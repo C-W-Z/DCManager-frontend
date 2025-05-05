@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Trash2, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -28,6 +28,7 @@ export function dataCenterColumns(
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          className="ml-1 h-5 w-5"
         />
       ),
       cell: ({ row }) => (
@@ -35,6 +36,7 @@ export function dataCenterColumns(
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
+          className="ml-1 h-5 w-5"
         />
       ),
       enableSorting: false,
@@ -141,9 +143,7 @@ export function dataCenterColumns(
     },
     {
       id: "actions",
-      cell: ({ row }) => {
-        const dc = row.original;
-
+      cell: () => {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -153,12 +153,13 @@ export function dataCenterColumns(
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(dc.name)}>
-                Copy Data Center Name
+              <DropdownMenuItem>
+                <Edit className="mr-2 h-4 w-4" /> Edit
               </DropdownMenuItem>
-              <DropdownMenuItem>Modify</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">DELETE</DropdownMenuItem>
+              <DropdownMenuItem className="text-red-600">
+                <Trash2 className="mr-2 h-4 w-4" /> DELETE
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
