@@ -5,13 +5,14 @@ import { roomColumns } from "../columns/room-columns";
 import { SimpleDatacenter, SimpleRoom } from "@/lib/type";
 import { getDC } from "@/lib/api";
 import { useEffect, useState } from "react";
+import { AddRoomDialog } from "../dialogs/add-room-dialog";
 
 interface RoomTableProps {
   datacenter: SimpleDatacenter;
   onSelect: (room: SimpleRoom) => void;
 }
 
-export function RoomTable({ datacenter, onSelect }: RoomTableProps) {
+export default function RoomTable({ datacenter, onSelect }: RoomTableProps) {
   const columns = roomColumns(onSelect);
 
   const [filteredRooms, setFilteredRooms] = useState<SimpleRoom[]>([]);
@@ -27,5 +28,12 @@ export function RoomTable({ datacenter, onSelect }: RoomTableProps) {
       });
   }, [datacenter]);
 
-  return <DataTable columns={columns} data={filteredRooms} />;
+  return (
+    <div>
+      <div className="mb-4 flex items-center justify-end">
+        <AddRoomDialog currentDC={datacenter} />
+      </div>
+      <DataTable columns={columns} data={filteredRooms} />
+    </div>
+  );
 }

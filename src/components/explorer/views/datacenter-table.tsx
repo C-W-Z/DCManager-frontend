@@ -5,12 +5,13 @@ import { dataCenterColumns } from "@/components/explorer/columns/datacenter-colu
 import { SimpleDatacenter } from "@/lib/type";
 import { getAllDC } from "@/lib/api";
 import { useEffect, useState } from "react";
+import { AddDatacenterDialog } from "@/components/explorer/dialogs/add-datacenter-dialog";
 
 interface DataCenterTableProps {
   onSelect: (dc: SimpleDatacenter) => void;
 }
 
-export function DataCenterTable({ onSelect }: DataCenterTableProps) {
+export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
   const columns = dataCenterColumns(onSelect);
 
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
@@ -26,5 +27,12 @@ export function DataCenterTable({ onSelect }: DataCenterTableProps) {
       });
   }, []);
 
-  return <DataTable columns={columns} data={dataCenters} />;
+  return (
+    <div>
+      <div className="mb-4 flex items-center justify-end">
+        <AddDatacenterDialog />
+      </div>
+      <DataTable columns={columns} data={dataCenters} />
+    </div>
+  );
 }
