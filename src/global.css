@@ -141,10 +141,19 @@
     color: white !important;
   }
 
+  [role="menuitem"]:has(svg.lucide-trash2) {
+    color: red !important;
+  }
+
   /* Delete/Remove menu items - red background on hover */
   [role="menuitem"]:has(svg.lucide-trash2):hover {
-    background-color: red !important; /* red-100 */
-    color: white !important; /* red-600 */
+    background-color: red !important;
+    color: white !important;
+  }
+
+  /* Ensure icons in dropdown menu items change color on hover */
+  [role="menuitem"] svg {
+    color: inherit !important;
   }
 
   button:hover {
@@ -156,6 +165,7 @@
   }
 
   /* Modern table styling */
+
   .modern-table {
     @apply rounded-lg overflow-hidden;
   }

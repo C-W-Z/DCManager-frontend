@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal, Trash2, Edit } from "lucide-react";
+import { ArrowUpDown, Edit, MoreHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { SimpleDatacenter } from "@/lib/type";
+import type { SimpleDatacenter } from "@/lib/type";
 
 export function dataCenterColumns(
   onSelect: (dc: SimpleDatacenter) => void,
@@ -143,7 +143,14 @@ export function dataCenterColumns(
     },
     {
       id: "actions",
-      cell: () => {
+      cell: ({ row, table }) => {
+        const dc = row.original;
+
+        // Access the openDeleteDialog function from table meta
+        const { openDeleteDialog } = table.options.meta as {
+          openDeleteDialog: (row: unknown, name?: string) => void;
+        };
+
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -157,7 +164,9 @@ export function dataCenterColumns(
                 <Edit className="mr-2 h-4 w-4" /> Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem
+                onClick={() => openDeleteDialog(row, dc.name)}
+              >
                 <Trash2 className="mr-2 h-4 w-4" /> DELETE
               </DropdownMenuItem>
             </DropdownMenuContent>
