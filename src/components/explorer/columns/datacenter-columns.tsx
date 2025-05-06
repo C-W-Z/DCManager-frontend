@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { SimpleDatacenter } from "@/lib/type";
+import type { SimpleDatacenter } from "@/lib/type";
 
 export function dataCenterColumns(
   onSelect: (dc: SimpleDatacenter) => void,

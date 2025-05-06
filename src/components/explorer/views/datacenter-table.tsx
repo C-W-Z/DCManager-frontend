@@ -3,7 +3,7 @@
 import { DataTable } from "@/components/explorer/data-table";
 import { dataCenterColumns } from "@/components/explorer/columns/datacenter-columns";
 import { SimpleDatacenter } from "@/lib/type";
-import { getAllDC } from "@/lib/api";
+import { getAllDC, deleteDC } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { AddDatacenterDialog } from "@/components/explorer/dialogs/add-datacenter-dialog";
 import type { Row } from "@tanstack/react-table";
@@ -13,15 +13,6 @@ interface DataCenterTableProps {
 }
 
 export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
-  const handleDeleteDataCenter = (id: string) => {
-    setDataCenters((prev) => prev.filter((dc) => dc.id !== id));
-  };
-
-  const handleDeleteMultiple = (rows: Row<SimpleDatacenter>[]) => {
-    const idsToDelete = rows.map((row) => row.original.id);
-    setDataCenters((prev) => prev.filter((dc) => !idsToDelete.includes(dc.id)));
-  };
-
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
 
   useEffect(() => {
@@ -34,6 +25,21 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
         setDataCenters([]);
       });
   }, []);
+
+  const handleDeleteDataCenter = (id: string) => {
+    // Call API to delete room
+    deleteDC(id);
+    // Update local state
+    setDataCenters((prev) => prev.filter((dc) => dc.id !== id));
+  };
+
+  const handleDeleteMultiple = (rows: Row<SimpleDatacenter>[]) => {
+    const idsToDelete = rows.map((row) => row.original.id);
+    // Call API to delete rooms
+    idsToDelete.forEach((id) => deleteDC(id));
+    // Update local state
+    setDataCenters((prev) => prev.filter((dc) => !idsToDelete.includes(dc.id)));
+  };
 
   const columns = dataCenterColumns(onSelect);
 

@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { SimpleRoom } from "@/lib/type";
+import type { SimpleRoom } from "@/lib/type";
 
 export function roomColumns(onSelect: (room: SimpleRoom) => void): ColumnDef<SimpleRoom>[] {
   return [
@@ -123,7 +123,14 @@ export function roomColumns(onSelect: (room: SimpleRoom) => void): ColumnDef<Sim
     },
     {
       id: "actions",
-      cell: () => {
+      cell: ({ row, table }) => {
+        const room = row.original;
+
+        // Access the openDeleteDialog function from table meta
+        const { openDeleteDialog } = table.options.meta as {
+          openDeleteDialog: (row: unknown, name?: string) => void;
+        };
+
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -137,7 +144,10 @@ export function roomColumns(onSelect: (room: SimpleRoom) => void): ColumnDef<Sim
                 <Edit className="mr-2 h-4 w-4" /> Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem
+                className="text-red-600"
+                onClick={() => openDeleteDialog(row, room.name)}
+              >
                 <Trash2 className="mr-2 h-4 w-4" /> DELETE
               </DropdownMenuItem>
             </DropdownMenuContent>
