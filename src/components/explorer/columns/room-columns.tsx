@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -12,9 +12,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { SimpleRoom } from "@/lib/schema";
+import { SimpleRoom } from "@/lib/type";
 
-export function roomColumns(onSelect: (id: string) => void): ColumnDef<SimpleRoom>[] {
+export function roomColumns(onSelect: (room: SimpleRoom) => void): ColumnDef<SimpleRoom>[] {
   return [
     {
       id: "select",
@@ -26,6 +26,7 @@ export function roomColumns(onSelect: (id: string) => void): ColumnDef<SimpleRoo
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          className="ml-1 h-5 w-5"
         />
       ),
       cell: ({ row }) => (
@@ -33,6 +34,7 @@ export function roomColumns(onSelect: (id: string) => void): ColumnDef<SimpleRoo
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
+          className="ml-1 h-5 w-5"
         />
       ),
       enableSorting: false,
@@ -57,7 +59,7 @@ export function roomColumns(onSelect: (id: string) => void): ColumnDef<SimpleRoo
           <div className="pl-4 text-left font-medium">
             <button
               className="hover:underline focus:outline-none"
-              onClick={() => onSelect(row.original.id)}
+              onClick={() => onSelect(row.original)}
             >
               {name}
             </button>
@@ -121,9 +123,7 @@ export function roomColumns(onSelect: (id: string) => void): ColumnDef<SimpleRoo
     },
     {
       id: "actions",
-      cell: ({ row }) => {
-        const room = row.original;
-
+      cell: () => {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -133,12 +133,13 @@ export function roomColumns(onSelect: (id: string) => void): ColumnDef<SimpleRoo
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(room.name)}>
-                Copy Room Name
+              <DropdownMenuItem>
+                <Edit className="mr-2 h-4 w-4" /> Edit
               </DropdownMenuItem>
-              <DropdownMenuItem>Modify</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">DELETE</DropdownMenuItem>
+              <DropdownMenuItem className="text-red-600">
+                <Trash2 className="mr-2 h-4 w-4" /> DELETE
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
