@@ -156,6 +156,7 @@
   }
 
   /* Modern table styling */
+
   .modern-table {
     @apply rounded-lg overflow-hidden;
   }
@@ -212,6 +213,11 @@
   /* Remove default table borders */
   .modern-table .border-b {
     @apply border-0;
+  }
+
+  /* Selected row styling */
+  .table-data-row[data-state="selected"] {
+    @apply bg-gray-100;
   }
 }
 

@@ -16,6 +16,7 @@ import {
   type ColumnFiltersState,
   type SortingState,
   type VisibilityState,
+  type Row,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -34,17 +35,28 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTablePagination } from "./data-table-pagination";
+import { DeleteConfirmation } from "@/components/explorer/dialogs/delete-confirm";
+import { Trash2 } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onDeleteRows?: (rows: Row<TData>[]) => void;
+  getRowId?: (row: TData) => string;
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+  onDeleteRows,
+  getRowId,
+}: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [isColumnMenuOpen, setIsColumnMenuOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [rowsToDelete, setRowsToDelete] = useState<Row<TData>[]>([]);
 
   const table = useReactTable({
     data,
@@ -66,17 +78,49 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
       columnFilters,
       columnVisibility,
     },
+    getRowId: getRowId ? (row) => getRowId(row) : undefined,
   });
+
+  const handleDeleteSelected = () => {
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    setRowsToDelete(selectedRows);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (onDeleteRows && rowsToDelete.length > 0) {
+      onDeleteRows(rowsToDelete);
+      table.resetRowSelection();
+    }
+    setDeleteDialogOpen(false);
+    setRowsToDelete([]);
+  };
+
+  const selectedRowCount = table.getFilteredSelectedRowModel().rows.length;
 
   return (
     <div>
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter by name..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Filter by name..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
+            className="max-w-sm"
+          />
+
+          {selectedRowCount > 0 && (
+            <Button
+              variant="destructive"
+              size="sm"
+              className="flex items-center gap-1"
+              onClick={handleDeleteSelected}
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Selected ({selectedRowCount})
+            </Button>
+          )}
+        </div>
 
         <DropdownMenu open={isColumnMenuOpen} onOpenChange={setIsColumnMenuOpen}>
           <DropdownMenuTrigger asChild>
@@ -173,6 +217,13 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
       </div>
 
       <DataTablePagination table={table} />
+
+      <DeleteConfirmation
+        isOpen={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        itemCount={rowsToDelete.length}
+      />
     </div>
   );
 }

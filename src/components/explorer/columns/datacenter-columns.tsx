@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal, Trash2, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { SimpleDatacenter } from "@/lib/type";
+import { DeleteConfirmation } from "@/components/explorer/dialogs/delete-confirm";
+
 
 export function dataCenterColumns(
   onSelect: (dc: SimpleDatacenter) => void,
+  onDelete?: (id: string) => void,
 ): ColumnDef<SimpleDatacenter>[] {
   return [
     {
@@ -143,25 +147,44 @@ export function dataCenterColumns(
     },
     {
       id: "actions",
-      cell: () => {
+      cell: ({ row }) => {
+        const dc = row.original
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+        const handleDelete = () => {
+          if (onDelete) {
+            onDelete(dc.id)
+          }
+        }
+
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Edit className="mr-2 h-4 w-4" /> Edit
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
-                <Trash2 className="mr-2 h-4 w-4" /> DELETE
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  <Edit className="mr-2 h-4 w-4" /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteConfirm(true)}>
+                  <Trash2 className="mr-2 h-4 w-4" /> DELETE
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DeleteConfirmation
+              isOpen={showDeleteConfirm}
+              onClose={() => setShowDeleteConfirm(false)}
+              onConfirm={handleDelete}
+              itemName={dc.name}
+            />
+          </>
         );
       },
     },

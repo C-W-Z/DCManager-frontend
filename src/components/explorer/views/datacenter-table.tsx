@@ -6,13 +6,23 @@ import { SimpleDatacenter } from "@/lib/type";
 import { getAllDC } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { AddDatacenterDialog } from "@/components/explorer/dialogs/add-datacenter-dialog";
+import type { Row } from "@tanstack/react-table";
 
 interface DataCenterTableProps {
   onSelect: (dc: SimpleDatacenter) => void;
 }
 
 export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
-  const columns = dataCenterColumns(onSelect);
+  const handleDeleteDataCenter = (id: string) => {
+    setDataCenters((prev) => prev.filter((dc) => dc.id !== id));
+  };
+
+  const handleDeleteMultiple = (rows: Row<SimpleDatacenter>[]) => {
+    const idsToDelete = rows.map((row) => row.original.id);
+    setDataCenters((prev) => prev.filter((dc) => !idsToDelete.includes(dc.id)));
+  };
+
+  const columns = dataCenterColumns(onSelect, handleDeleteDataCenter);
 
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
 
@@ -32,7 +42,13 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
       <div className="mb-4 flex items-center justify-end">
         <AddDatacenterDialog />
       </div>
-      <DataTable columns={columns} data={dataCenters} />
+      <h1 className="mb-6 text-2xl font-bold">Data Centers</h1>
+      <DataTable
+        columns={columns}
+        data={dataCenters}
+        onDeleteRows={handleDeleteMultiple}
+        getRowId={(row) => row.id}
+      />
     </div>
   );
 }
