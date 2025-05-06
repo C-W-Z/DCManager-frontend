@@ -1,15 +1,6 @@
 "use client";
 import { Trash2 } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 interface DeleteConfirmationProps {
   isOpen: boolean;
@@ -30,6 +21,8 @@ export function DeleteConfirmation({
   itemName,
   itemCount = 1,
 }: DeleteConfirmationProps) {
+  if (!isOpen) return null;
+
   const defaultTitle =
     itemCount > 1 ? `Delete ${itemCount} items` : `Delete ${itemName || "item"}`;
 
@@ -40,29 +33,34 @@ export function DeleteConfirmation({
 
   const handleConfirm = () => {
     onConfirm();
-    onClose();
   };
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4 flex flex-col space-y-2 text-center sm:text-left">
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-red-600">
             <Trash2 className="h-5 w-5" />
             {title || defaultTitle}
-          </AlertDialogTitle>
-          <AlertDialogDescription>{description || defaultDescription}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleConfirm}
-            className="bg-red-600 text-white hover:bg-red-700"
-          >
+          </h2>
+          <p className="text-sm text-gray-500">{description || defaultDescription}</p>
+        </div>
+
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+          <Button variant="outline" onClick={onClose} className="mt-2 sm:mt-0">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirm} className="bg-red-600 text-white hover:bg-red-700">
             Delete
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }

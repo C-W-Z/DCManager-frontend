@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   type ColumnDef,
   flexRender,
@@ -43,7 +43,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   onDeleteRows?: (rows: Row<TData>[]) => void;
   onDeleteRow?: (id: string) => void;
-  getRowId: (row: TData) => string; // Make this required
+  getRowId: (row: TData) => string;
 }
 
 export function DataTable<TData, TValue>({
@@ -60,7 +60,7 @@ export function DataTable<TData, TValue>({
 
   // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [rowsToDelete, setRowsToDelete] = useState<Row<TData>[]>([]);
+  const rowsToDeleteRef = useRef<Row<TData>[]>([]);
   const [itemToDeleteName, setItemToDeleteName] = useState<string | undefined>(undefined);
 
   const table = useReactTable({
@@ -83,11 +83,11 @@ export function DataTable<TData, TValue>({
       columnFilters,
       columnVisibility,
     },
-    getRowId: getRowId ? (row) => getRowId(row) : undefined,
+    getRowId: (row) => getRowId(row),
     meta: {
       // Add a function to the table meta that can be called from cell renderers
       openDeleteDialog: (row: Row<TData>, name?: string) => {
-        setRowsToDelete([row]);
+        rowsToDeleteRef.current = [row];
         setItemToDeleteName(name);
         setDeleteDialogOpen(true);
       },
@@ -96,14 +96,16 @@ export function DataTable<TData, TValue>({
 
   const handleDeleteSelected = () => {
     const selectedRows = table.getFilteredSelectedRowModel().rows;
-    setRowsToDelete(selectedRows);
+    rowsToDeleteRef.current = selectedRows;
     setItemToDeleteName(undefined);
     setDeleteDialogOpen(true);
   };
 
   const handleConfirmDelete = () => {
+    const rowsToDelete = rowsToDeleteRef.current;
+
     if (rowsToDelete.length === 1 && onDeleteRow) {
-      // Single row delete - use the getRowId function to safely get the ID
+      // Single row delete
       const rowId = getRowId(rowsToDelete[0].original);
       onDeleteRow(rowId);
     } else if (rowsToDelete.length > 0 && onDeleteRows) {
@@ -117,7 +119,7 @@ export function DataTable<TData, TValue>({
 
   const closeDeleteDialog = () => {
     setDeleteDialogOpen(false);
-    setRowsToDelete([]);
+    // Don't clear rowsToDeleteRef here, just close the dialog
     setItemToDeleteName(undefined);
   };
 
@@ -241,15 +243,13 @@ export function DataTable<TData, TValue>({
 
       <DataTablePagination table={table} />
 
-      {deleteDialogOpen && (
-        <DeleteConfirmation
-          isOpen={deleteDialogOpen}
-          onClose={closeDeleteDialog}
-          onConfirm={handleConfirmDelete}
-          itemName={itemToDeleteName}
-          itemCount={rowsToDelete.length}
-        />
-      )}
+      <DeleteConfirmation
+        isOpen={deleteDialogOpen}
+        onClose={closeDeleteDialog}
+        onConfirm={handleConfirmDelete}
+        itemName={itemToDeleteName}
+        itemCount={rowsToDeleteRef.current.length}
+      />
     </div>
   );
 }
