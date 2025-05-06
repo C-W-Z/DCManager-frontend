@@ -145,7 +145,6 @@ export function roomColumns(onSelect: (room: SimpleRoom) => void): ColumnDef<Sim
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-red-600"
                 onClick={() => openDeleteDialog(row, room.name)}
               >
                 <Trash2 className="mr-2 h-4 w-4" /> DELETE

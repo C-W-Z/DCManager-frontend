@@ -150,7 +150,6 @@ export function rackColumns(onSelect: (room: SimpleRack) => void): ColumnDef<Sim
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-red-600"
                 onClick={() => openDeleteDialog(row, rack.name)}
               >
                 <Trash2 className="mr-2 h-4 w-4" /> DELETE

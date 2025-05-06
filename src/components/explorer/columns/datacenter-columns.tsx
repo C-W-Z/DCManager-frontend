@@ -165,7 +165,6 @@ export function dataCenterColumns(
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-red-600"
                 onClick={() => openDeleteDialog(row, dc.name)}
               >
                 <Trash2 className="mr-2 h-4 w-4" /> DELETE
