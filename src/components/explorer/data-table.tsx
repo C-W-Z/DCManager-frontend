@@ -100,7 +100,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center justify-between py-4">
         <div className="flex items-center gap-2">
           <Input
             placeholder="Filter by name..."
@@ -187,11 +187,11 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row, index) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className={`table-data-row bg-gray-50`}
+                  className={`table-data-row ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
                 >
                   {row.getVisibleCells().map((cell, cellIndex) => (
                     <TableCell
@@ -218,12 +218,14 @@ export function DataTable<TData, TValue>({
 
       <DataTablePagination table={table} />
 
-      <DeleteConfirmation
-        isOpen={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={handleConfirmDelete}
-        itemCount={rowsToDelete.length}
-      />
+      {deleteDialogOpen && (
+        <DeleteConfirmation
+          isOpen={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          onConfirm={handleConfirmDelete}
+          itemCount={rowsToDelete.length}
+        />
+      )}
     </div>
   );
 }

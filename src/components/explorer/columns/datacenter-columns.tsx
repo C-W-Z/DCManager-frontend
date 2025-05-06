@@ -16,7 +16,6 @@ import {
 import { SimpleDatacenter } from "@/lib/type";
 import { DeleteConfirmation } from "@/components/explorer/dialogs/delete-confirm";
 
-
 export function dataCenterColumns(
   onSelect: (dc: SimpleDatacenter) => void,
   onDelete?: (id: string) => void,
@@ -148,15 +147,16 @@ export function dataCenterColumns(
     {
       id: "actions",
       cell: ({ row }) => {
-        const dc = row.original
+        const dc = row.original;
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+        const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
         const handleDelete = () => {
           if (onDelete) {
-            onDelete(dc.id)
+            onDelete(dc.id);
           }
-        }
+          setShowDeleteConfirm(false);
+        };
 
         return (
           <>
@@ -172,18 +172,26 @@ export function dataCenterColumns(
                   <Edit className="mr-2 h-4 w-4" /> Edit
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteConfirm(true)}>
+                <DropdownMenuItem
+                  className="text-red-600"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowDeleteConfirm(true);
+                  }}
+                >
                   <Trash2 className="mr-2 h-4 w-4" /> DELETE
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <DeleteConfirmation
-              isOpen={showDeleteConfirm}
-              onClose={() => setShowDeleteConfirm(false)}
-              onConfirm={handleDelete}
-              itemName={dc.name}
-            />
+            {showDeleteConfirm && (
+              <DeleteConfirmation
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={handleDelete}
+                itemName={dc.name}
+              />
+            )}
           </>
         );
       },

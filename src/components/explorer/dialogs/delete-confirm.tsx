@@ -38,6 +38,11 @@ export function DeleteConfirmation({
       ? `Are you sure you want to delete these ${itemCount} items? This action cannot be undone.`
       : `Are you sure you want to delete this ${itemName || "item"}? This action cannot be undone.`;
 
+  const handleConfirm = () => {
+    onConfirm();
+    onClose();
+  };
+
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
@@ -49,9 +54,9 @@ export function DeleteConfirmation({
           <AlertDialogDescription>{description || defaultDescription}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={onConfirm}
+            onClick={handleConfirm}
             className="bg-red-600 text-white hover:bg-red-700"
           >
             Delete
