@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal, Trash2, Edit } from "lucide-react";
+import { ArrowUpDown, Edit, MoreHorizontal, Trash2, MoveUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -14,12 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { SimpleDatacenter } from "@/lib/type";
-import { DeleteConfirmation } from "@/components/explorer/dialogs/delete-confirm";
 
-export function dataCenterColumns(
-  onSelect: (dc: SimpleDatacenter) => void,
-  onDelete?: (id: string) => void,
-): ColumnDef<SimpleDatacenter>[] {
+export function dataCenterColumns(onSelect: (dc: SimpleDatacenter) => void,): ColumnDef<SimpleDatacenter>[] {
   return [
     {
       id: "select",
@@ -146,53 +141,41 @@ export function dataCenterColumns(
     },
     {
       id: "actions",
-      cell: ({ row }) => {
+      cell: ({ row, table }) => {
         const dc = row.original;
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-        const handleDelete = () => {
-          if (onDelete) {
-            onDelete(dc.id);
-          }
-          setShowDeleteConfirm(false);
+        // Access the openDeleteDialog function from table meta
+        const { openDeleteDialog } = table.options.meta as {
+          openDeleteDialog: (id: string, name?: string) => void;
         };
 
         return (
-          <>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Edit className="mr-2 h-4 w-4" /> Edit
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="text-red-600"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setShowDeleteConfirm(true);
-                  }}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" /> DELETE
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {showDeleteConfirm && (
-              <DeleteConfirmation
-                isOpen={showDeleteConfirm}
-                onClose={() => setShowDeleteConfirm(false)}
-                onConfirm={handleDelete}
-                itemName={dc.name}
-              />
-            )}
-          </>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(dc.name)}>
+                <MoveUpRight className="mr-2 h-4 w-4" /> Copy Name
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Edit className="mr-2 h-4 w-4" /> Edit
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-red-600"
+                onClick={(e) => {
+                  e.preventDefault();
+                  openDeleteDialog(dc.id, dc.name);
+                }}
+              >
+                <Trash2 className="mr-2 h-4 w-4" /> DELETE
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         );
       },
     },

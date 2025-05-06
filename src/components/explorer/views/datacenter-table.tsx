@@ -22,8 +22,6 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
     setDataCenters((prev) => prev.filter((dc) => !idsToDelete.includes(dc.id)));
   };
 
-  const columns = dataCenterColumns(onSelect, handleDeleteDataCenter);
-
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
 
   useEffect(() => {
@@ -37,6 +35,8 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
       });
   }, []);
 
+  const columns = dataCenterColumns(onSelect);
+
   return (
     <div>
       <div className="mb-4 flex items-center justify-end">
@@ -47,6 +47,7 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
         columns={columns}
         data={dataCenters}
         onDeleteRows={handleDeleteMultiple}
+        onDeleteRow={handleDeleteDataCenter}
         getRowId={(row) => row.id}
       />
     </div>
