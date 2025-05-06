@@ -147,6 +147,11 @@
     color: white !important; /* red-600 */
   }
 
+  /* Ensure icons in dropdown menu items change color on hover */
+  [role="menuitem"]:hover svg {
+    color: inherit !important;
+  }
+
   button:hover {
     cursor: pointer;
   }
@@ -213,11 +218,6 @@
   /* Remove default table borders */
   .modern-table .border-b {
     @apply border-0;
-  }
-
-  /* Selected row styling */
-  .table-data-row[data-state="selected"] {
-    @apply bg-gray-100;
   }
 }
 
