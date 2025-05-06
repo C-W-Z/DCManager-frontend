@@ -14,7 +14,9 @@ import {
 
 import { SimpleDatacenter } from "@/lib/type";
 
-export function dataCenterColumns(onSelect: (dc: SimpleDatacenter) => void,): ColumnDef<SimpleDatacenter>[] {
+export function dataCenterColumns(
+  onSelect: (dc: SimpleDatacenter) => void,
+): ColumnDef<SimpleDatacenter>[] {
   return [
     {
       id: "select",
@@ -167,10 +169,7 @@ export function dataCenterColumns(onSelect: (dc: SimpleDatacenter) => void,): Co
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-red-600"
-                onClick={(e) => {
-                  e.preventDefault();
-                  openDeleteDialog(row, dc.name);
-                }}
+                onClick={() => openDeleteDialog(row, dc.name)}
               >
                 <Trash2 className="mr-2 h-4 w-4" /> DELETE
               </DropdownMenuItem>
