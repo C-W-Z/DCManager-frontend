@@ -146,7 +146,7 @@ export function dataCenterColumns(onSelect: (dc: SimpleDatacenter) => void,): Co
 
         // Access the openDeleteDialog function from table meta
         const { openDeleteDialog } = table.options.meta as {
-          openDeleteDialog: (id: string, name?: string) => void;
+          openDeleteDialog: (row: unknown, name?: string) => void;
         };
 
         return (
@@ -169,7 +169,7 @@ export function dataCenterColumns(onSelect: (dc: SimpleDatacenter) => void,): Co
                 className="text-red-600"
                 onClick={(e) => {
                   e.preventDefault();
-                  openDeleteDialog(dc.id, dc.name);
+                  openDeleteDialog(row, dc.name);
                 }}
               >
                 <Trash2 className="mr-2 h-4 w-4" /> DELETE
