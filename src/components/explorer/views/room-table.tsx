@@ -49,7 +49,7 @@ export default function RoomTable({ datacenter, onSelect }: RoomTableProps) {
     <div>
       <RoomSummary datacenter={datacenter} />
 
-      <div className="mb-4 flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Rooms</h1>
         <AddRoomDialog currentDC={datacenter} />
       </div>

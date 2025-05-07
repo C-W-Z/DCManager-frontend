@@ -50,7 +50,7 @@ export default function RackTable({ datacenter, room, onSelect }: RackTableProps
     <div>
       <RackSummary room={room} />
 
-      <div className="mb-4 flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Racks</h1>
         <AddRackDialog currentDC={datacenter} currentRoom={room} />
       </div>

@@ -63,7 +63,7 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
     <div>
       <DataCenterSummary totalCount={totalCounts} />
 
-      <div className="mb-4 flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Data Centers</h1>
         <AddDatacenterDialog />
       </div>
