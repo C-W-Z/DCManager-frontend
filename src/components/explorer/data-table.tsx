@@ -43,6 +43,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   onDeleteRows?: (rows: Row<TData>[]) => void;
   onDeleteRow?: (id: string) => void;
+  onEditRow?: (row: TData) => void;
   getRowId: (row: TData) => string;
 }
 
@@ -51,6 +52,7 @@ export function DataTable<TData, TValue>({
   data,
   onDeleteRows,
   onDeleteRow,
+  onEditRow,
   getRowId,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -62,6 +64,9 @@ export function DataTable<TData, TValue>({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const rowsToDeleteRef = useRef<Row<TData>[]>([]);
   const [itemToDeleteName, setItemToDeleteName] = useState<string | undefined>(undefined);
+
+  // Edit state
+  // const [rowToEdit, setRowToEdit] = useState<TData | null>(null);
 
   const table = useReactTable({
     data,
@@ -85,11 +90,17 @@ export function DataTable<TData, TValue>({
     },
     getRowId: (row) => getRowId(row),
     meta: {
-      // Add a function to the table meta that can be called from cell renderers
+      // Add functions to the table meta that can be called from cell renderers
       openDeleteDialog: (row: Row<TData>, name?: string) => {
         rowsToDeleteRef.current = [row];
         setItemToDeleteName(name);
         setDeleteDialogOpen(true);
+      },
+      openEditDialog: (row: TData) => {
+        // setRowToEdit(row);
+        if (onEditRow) {
+          onEditRow(row);
+        }
       },
     },
   });
