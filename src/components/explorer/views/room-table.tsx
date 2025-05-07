@@ -7,6 +7,7 @@ import { getDC, deleteRoom } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { AddRoomDialog } from "../dialogs/add-room-dialog";
 import type { Row } from "@tanstack/react-table";
+import { RoomSummary } from "../summary/room-summary";
 
 interface RoomTableProps {
   datacenter: SimpleDatacenter;
@@ -46,9 +47,13 @@ export default function RoomTable({ datacenter, onSelect }: RoomTableProps) {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-end">
+      <RoomSummary datacenter={datacenter} />
+
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Rooms</h1>
         <AddRoomDialog currentDC={datacenter} />
       </div>
+
       <DataTable
         columns={columns}
         data={filteredRooms}

@@ -7,6 +7,7 @@ import { getAllDC, deleteDC } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { AddDatacenterDialog } from "@/components/explorer/dialogs/add-datacenter-dialog";
 import type { Row } from "@tanstack/react-table";
+import { Count, DataCenterSummary } from "@/components/explorer/summary/datacenter-summary";
 
 interface DataCenterTableProps {
   onSelect: (dc: SimpleDatacenter) => void;
@@ -14,11 +15,26 @@ interface DataCenterTableProps {
 
 export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
+  const [totalCounts, setTotalCounts] = useState<Count>({ dc: 0, room: 0, rack: 0, host: 0 });
 
   useEffect(() => {
     getAllDC()
       .then((dcs) => {
         setDataCenters(dcs);
+        let n_rooms = 0;
+        let n_racks = 0;
+        let n_hosts = 0;
+        dcs.forEach((dc: SimpleDatacenter) => {
+          n_rooms += dc.n_rooms;
+          n_racks += dc.n_racks;
+          n_hosts += dc.n_hosts;
+        });
+        setTotalCounts({
+          dc: dcs.length,
+          room: n_rooms,
+          rack: n_racks,
+          host: n_hosts,
+        });
       })
       .catch((error) => {
         console.error("Error fetching all dc data:", error);
@@ -45,10 +61,13 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-end">
+      <DataCenterSummary totalCount={totalCounts} />
+
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Data Centers</h1>
         <AddDatacenterDialog />
       </div>
-      <h1 className="mb-6 text-2xl font-bold">Data Centers</h1>
+
       <DataTable
         columns={columns}
         data={dataCenters}

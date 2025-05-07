@@ -7,6 +7,7 @@ import type { SimpleRoom, SimpleRack, SimpleDatacenter } from "@/lib/type";
 import { getRoom, deleteRack } from "@/lib/api";
 import { AddRackDialog } from "@/components/explorer/dialogs/add-rack-dialog";
 import type { Row } from "@tanstack/react-table";
+import { RackSummary } from "../summary/rack-summary";
 
 interface RackTableProps {
   datacenter: SimpleDatacenter;
@@ -47,9 +48,13 @@ export default function RackTable({ datacenter, room, onSelect }: RackTableProps
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-end">
+      <RackSummary room={room} />
+
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Racks</h1>
         <AddRackDialog currentDC={datacenter} currentRoom={room} />
       </div>
+
       <DataTable
         columns={columns}
         data={filteredRacks}
