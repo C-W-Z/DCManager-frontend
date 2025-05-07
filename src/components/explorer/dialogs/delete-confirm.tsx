@@ -28,8 +28,8 @@ export function DeleteConfirmation({
 
   const defaultDescription =
     itemCount > 1
-      ? `Are you sure you want to delete these ${itemCount} items? This action cannot be undone.`
-      : `Are you sure you want to delete this ${itemName || "item"}? This action cannot be undone.`;
+      ? `Are you sure you want to delete these ${itemCount} items?`
+      : `Are you sure you want to delete ${itemName || "this item"}?`;
 
   const handleConfirm = () => {
     onConfirm();
@@ -49,7 +49,8 @@ export function DeleteConfirmation({
             <Trash2 className="h-5 w-5" />
             {title || defaultTitle}
           </h2>
-          <p className="text-sm text-gray-500">{description || defaultDescription}</p>
+          <p className="text-sm text-black">{description || defaultDescription}</p>
+          <p className="text-sm text-red-600">This action cannot be undone. Everything inside will be delete too.</p>
         </div>
 
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
