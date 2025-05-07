@@ -93,7 +93,7 @@ export function rackColumns(onSelect: (rack: SimpleRack) => void): ColumnDef<Sim
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Left Capacity
+            Usage/Capacity
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
