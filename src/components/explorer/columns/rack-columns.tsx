@@ -86,6 +86,7 @@ export function rackColumns(onSelect: (rack: SimpleRack) => void): ColumnDef<Sim
     },
     {
       id: "capacity",
+      accessorFn: (row) => row.height - row.capacity,
       header: ({ column }) => {
         return (
           <Button
@@ -102,7 +103,7 @@ export function rackColumns(onSelect: (rack: SimpleRack) => void): ColumnDef<Sim
         const height: number = row.original.height;
         return (
           <div className="pl-4 text-left font-medium">
-            {capacity}/{height}U
+            {height - capacity}/{height}U
           </div>
         );
       },
