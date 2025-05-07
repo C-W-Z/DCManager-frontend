@@ -30,11 +30,15 @@ export default function RackDnD({ rack }: RackDnDProps) {
   }, [rack]);
 
   const constraintsRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const draggingItem = state.items.find((i) => i.id === state.dragging?.id);
 
   return (
-    <div className="h-[70vh] w-fit overflow-y-scroll rounded-lg border-2 border-gray-950 p-4">
+    <div
+      ref={scrollRef}
+      className="h-[70vh] w-fit overflow-y-scroll rounded-lg border-2 border-gray-950 p-4"
+    >
       <motion.div ref={constraintsRef} className="relative h-fit">
         <div
           className="flex h-fit flex-col-reverse items-end"
@@ -48,18 +52,17 @@ export default function RackDnD({ rack }: RackDnDProps) {
         {state.dragging && draggingItem && (
           <>
             <motion.div
-              className="absolute top-0 left-0 inline-flex w-[400px] items-center justify-center rounded-lg bg-gray-300 opacity-70"
+              className="absolute top-0 left-0 z-10 inline-flex w-[400px] items-center justify-center rounded-lg bg-gray-300 opacity-70"
               style={{
                 y:
                   (rack.height - state.dragging.initialPos - draggingItem.height) *
                   (HOST_HEIGHT + RACK_GAP),
                 height: draggingItem.height * (HOST_HEIGHT + RACK_GAP) - RACK_GAP,
-                zIndex: 10,
               }}
             />
             <motion.div
               className={cn(
-                "absolute top-0 left-0 inline-flex w-[400px] items-center justify-center rounded-lg opacity-70",
+                "absolute top-0 left-0 z-10 inline-flex w-[400px] items-center justify-center rounded-lg opacity-70",
                 state.dragging.valid ? "bg-green-300" : "bg-red-300",
               )}
               style={{
@@ -67,7 +70,6 @@ export default function RackDnD({ rack }: RackDnDProps) {
                   (rack.height - state.dragging.nextPos - draggingItem.height) *
                   (HOST_HEIGHT + RACK_GAP),
                 height: draggingItem.height * (HOST_HEIGHT + RACK_GAP) - RACK_GAP,
-                zIndex: 10,
               }}
             />
           </>
@@ -80,6 +82,7 @@ export default function RackDnD({ rack }: RackDnDProps) {
               host={host}
               rackHeight={rack.height}
               constraintsRef={constraintsRef}
+              scrollRef={scrollRef}
               draggingState={state.dragging}
               dispatch={dispatch}
             />

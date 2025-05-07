@@ -101,6 +101,8 @@ export function RackDnDReducer(state: RackDroppable, action: Action) {
         const index = nextState.items.findIndex((i) => i.id === host.id);
         nextState.items[index] = host;
 
+        nextState.dragging = undefined;
+
         return nextState;
       }
 
