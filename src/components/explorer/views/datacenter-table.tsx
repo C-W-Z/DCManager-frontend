@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { AddDatacenterDialog } from "@/components/explorer/dialogs/add-datacenter-dialog";
 import type { Row } from "@tanstack/react-table";
 import { Count, DataCenterSummary } from "@/components/explorer/summary/datacenter-summary";
+import { EditDatacenterDialog } from "../dialogs/edit-datacenter";
 
 interface DataCenterTableProps {
   onSelect: (dc: SimpleDatacenter) => void;
@@ -16,6 +17,8 @@ interface DataCenterTableProps {
 export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
   const [totalCounts, setTotalCounts] = useState<Count>({ dc: 0, room: 0, rack: 0, host: 0 });
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [currentDC, setCurrentDC] = useState<SimpleDatacenter | null>(null);
 
   useEffect(() => {
     getAllDC()
@@ -57,6 +60,16 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
     setDataCenters((prev) => prev.filter((dc) => !idsToDelete.includes(dc.id)));
   };
 
+  const handleEditDataCenter = (dc: SimpleDatacenter) => {
+    setCurrentDC(dc);
+    setEditDialogOpen(true);
+  };
+
+  const handleUpdateDataCenter = (/*updatedDC: SimpleDatacenter | null*/) => {
+    // TODO: udpate table ?
+    setEditDialogOpen(false);
+  };
+
   const columns = dataCenterColumns(onSelect);
 
   return (
@@ -73,8 +86,18 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
         data={dataCenters}
         onDeleteRows={handleDeleteMultiple}
         onDeleteRow={handleDeleteDataCenter}
+        onEditRow={handleEditDataCenter}
         getRowId={(row) => row.id}
       />
+
+      {currentDC && (
+        <EditDatacenterDialog
+          datacenter={currentDC}
+          onUpdate={handleUpdateDataCenter}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+        />
+      )}
     </div>
   );
 }

@@ -146,9 +146,10 @@ export function dataCenterColumns(
       cell: ({ row, table }) => {
         const dc = row.original;
 
-        // Access the openDeleteDialog function from table meta
-        const { openDeleteDialog } = table.options.meta as {
+        // Access the functions from table meta
+        const { openDeleteDialog, openEditDialog } = table.options.meta as {
           openDeleteDialog: (row: unknown, name?: string) => void;
+          openEditDialog: (row: SimpleDatacenter) => void;
         };
 
         return (
@@ -160,11 +161,12 @@ export function dataCenterColumns(
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => openEditDialog(dc)}>
                 <Edit className="mr-2 h-4 w-4" /> Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
+                className="text-red-600"
                 onClick={() => openDeleteDialog(row, dc.name)}
               >
                 <Trash2 className="mr-2 h-4 w-4" /> DELETE

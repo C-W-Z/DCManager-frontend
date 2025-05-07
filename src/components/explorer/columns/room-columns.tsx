@@ -82,7 +82,7 @@ export function roomColumns(onSelect: (room: SimpleRoom) => void): ColumnDef<Sim
       },
       cell: ({ row }) => {
         const height: number = Number.parseInt(row.getValue("height"));
-        return <div className="pl-4 text-left font-medium">{height}</div>;
+        return <div className="pl-4 text-left font-medium">{height}U</div>;
       },
     },
     {
@@ -126,9 +126,10 @@ export function roomColumns(onSelect: (room: SimpleRoom) => void): ColumnDef<Sim
       cell: ({ row, table }) => {
         const room = row.original;
 
-        // Access the openDeleteDialog function from table meta
-        const { openDeleteDialog } = table.options.meta as {
+        // Access the functions from table meta
+        const { openDeleteDialog, openEditDialog } = table.options.meta as {
           openDeleteDialog: (row: unknown, name?: string) => void;
+          openEditDialog: (row: SimpleRoom) => void;
         };
 
         return (
@@ -140,11 +141,12 @@ export function roomColumns(onSelect: (room: SimpleRoom) => void): ColumnDef<Sim
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => openEditDialog(room)}>
                 <Edit className="mr-2 h-4 w-4" /> Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
+                className="text-red-600"
                 onClick={() => openDeleteDialog(row, room.name)}
               >
                 <Trash2 className="mr-2 h-4 w-4" /> DELETE
