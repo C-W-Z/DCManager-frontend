@@ -10,14 +10,14 @@ export type Host = z.infer<typeof host_schema>;
 export const host_schema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-  height: z.number().int().min(1).max(60),
+  height: z.number().int(),
   status: z.enum(["running", "stopped", "idle"]),
   ip: z.string().ip(),
   service_id: z.string().uuid(),
   dc_id: z.string().uuid(),
   room_id: z.string().uuid(),
   rack_id: z.string().uuid(),
-  pos: z.number().int().min(1).max(60),
+  pos: z.number().int(),
 });
 
 export type SimpleHost = z.infer<typeof simple_host_schema>;

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getRack } from "@/lib/api";
 import { Rack } from "@/lib/type";
 import { Skeleton } from "@/components/ui/skeleton";
-import RackComponent from "@/components/rack/rack-component";
+import RackDnD from "@/components/rack/rack-dnd";
 
 interface RackViewProps {
   rackId: string;
@@ -26,7 +26,7 @@ export default function RackView({ rackId }: RackViewProps) {
     <div className="my-auto flex max-w-full flex-col items-center justify-center gap-10 p-8">
       {rack && (
         <div className="flex flex-row gap-10">
-          <RackComponent rack={rack} setRack={setRack} />
+          <RackDnD rack={rack} />
           <div className="flex w-[300px] flex-col items-end justify-start">
             <div>just some info</div>
           </div>
