@@ -44,7 +44,6 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -141,10 +140,19 @@
     color: white !important;
   }
 
+  [role="menuitem"]:has(svg.lucide-trash2) {
+    color: red !important;
+  }
+
   /* Delete/Remove menu items - red background on hover */
   [role="menuitem"]:has(svg.lucide-trash2):hover {
-    background-color: red !important; /* red-100 */
-    color: white !important; /* red-600 */
+    background-color: red !important;
+    color: white !important;
+  }
+
+  /* Ensure icons in dropdown menu items change color on hover */
+  [role="menuitem"] svg {
+    color: inherit !important;
   }
 
   button:hover {
@@ -156,12 +164,13 @@
   }
 
   /* Modern table styling */
+
   .modern-table {
-    @apply rounded-lg overflow-hidden;
+    @apply overflow-hidden rounded-lg;
   }
 
   .modern-table table {
-    @apply border-separate border-spacing-y-2 border-spacing-x-0;
+    @apply border-separate border-spacing-x-0 border-spacing-y-2;
     border-collapse: separate;
   }
 
@@ -170,11 +179,11 @@
   }
 
   .modern-table thead th {
-    @apply border-0 font-medium text-gray-600 px-4 py-3;
+    @apply border-0 px-4 py-3 font-medium text-gray-600;
   }
 
   .modern-table tbody tr {
-    @apply rounded-lg overflow-hidden shadow-sm;
+    @apply overflow-hidden rounded-lg shadow-sm;
   }
 
   .table-data-row {
@@ -235,5 +244,13 @@
 
   .scrollbar::-webkit-scrollbar-thumb:hover {
     background: #c0a0b9;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    overflow: hidden;
+  }
+  html {
+    overflow: hidden;
   }
 }

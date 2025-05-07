@@ -5,7 +5,7 @@ import DataCenterTable from "@/components/explorer/views/datacenter-table";
 import RoomTable from "@/components/explorer/views/room-table";
 import RackTable from "@/components/explorer/views/rack-table";
 import Breadcrumb from "../components/explorer/breadcrumb";
-import { SimpleDatacenter, SimpleRoom, SimpleRack } from "@/lib/type";
+import type { SimpleDatacenter, SimpleRoom, SimpleRack } from "@/lib/type";
 import RackView from "@/components/explorer/views/rack-view";
 
 export type ViewLevel = "datacenter-table" | "room-table" | "rack-table" | "rack";
@@ -46,8 +46,8 @@ export default function Explorer() {
   };
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="mt-8 flex items-center justify-between p-4">
+    <div className="flex h-full flex-col overflow-auto">
+      <div className="ml-4 mt-4 flex items-center justify-between p-4">
         <Breadcrumb
           currentView={currentView}
           dcName={selectedDataCenter ? selectedDataCenter.name : null}
@@ -57,7 +57,7 @@ export default function Explorer() {
         />
       </div>
 
-      <div className="flex-1 overflow-auto p-4">
+      <div className="flex-1 p-4">
         {currentView === "datacenter-table" && (
           <DataCenterTable onSelect={handleDataCenterSelect} />
         )}
