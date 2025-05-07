@@ -11,10 +11,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import type { SimpleRack } from "@/lib/type";
 
-export function rackColumns(onSelect: (room: SimpleRack) => void): ColumnDef<SimpleRack>[] {
+export function rackColumns(onSelect: (rack: SimpleRack) => void): ColumnDef<SimpleRack>[] {
   return [
     {
       id: "select",
@@ -131,9 +130,10 @@ export function rackColumns(onSelect: (room: SimpleRack) => void): ColumnDef<Sim
       cell: ({ row, table }) => {
         const rack = row.original;
 
-        // Access the openDeleteDialog function from table meta
-        const { openDeleteDialog } = table.options.meta as {
+        // Access the functions from table meta
+        const { openDeleteDialog, openEditDialog } = table.options.meta as {
           openDeleteDialog: (row: unknown, name?: string) => void;
+          openEditDialog: (row: SimpleRack) => void;
         };
 
         return (
@@ -145,11 +145,12 @@ export function rackColumns(onSelect: (room: SimpleRack) => void): ColumnDef<Sim
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => openEditDialog(rack)}>
                 <Edit className="mr-2 h-4 w-4" /> Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
+                className="text-red-600"
                 onClick={() => openDeleteDialog(row, rack.name)}
               >
                 <Trash2 className="mr-2 h-4 w-4" /> DELETE

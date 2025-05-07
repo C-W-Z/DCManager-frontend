@@ -13,31 +13,36 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Edit } from "lucide-react";
-import type { SimpleRoom } from "@/lib/type";
-import { modifyRoom } from "@/lib/api";
+import { Edit, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import type { SimpleRack } from "@/lib/type";
+import { modifyRack } from "@/lib/api";
 
-interface EditRoomDialogProps {
-  room: SimpleRoom;
-  onUpdate: (updatedRoom: SimpleRoom | null) => void;
+interface EditRackDialogProps {
+  rack: SimpleRack;
+  onUpdate: (updatedRack: SimpleRack | null) => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function EditRoomDialog({ room, onUpdate, open, onOpenChange }: EditRoomDialogProps) {
+export function EditRackDialog({ rack, onUpdate, open, onOpenChange }: EditRackDialogProps) {
   const [formData, setFormData] = useState({
     name: "",
+    service_name: "",
     height: "",
   });
 
+  const hasHosts = rack?.n_hosts > 0;
+
   useEffect(() => {
-    if (open && room) {
+    if (open && rack) {
       setFormData({
-        name: room.name,
-        height: room.height.toString(),
+        name: rack.name,
+        service_name: rack.service_name,
+        height: rack.height.toString(),
       });
     }
-  }, [open, room]);
+  }, [open, rack]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -48,17 +53,18 @@ export function EditRoomDialog({ room, onUpdate, open, onOpenChange }: EditRoomD
     e.preventDefault();
 
     try {
-      const updatedRoom = await modifyRoom(room.id, {
+      const updatedRack = await modifyRack(rack.id, {
         // TODO
         name: formData.name,
+        service_id: formData.service_name,
         height: Number.parseInt(formData.height),
-        dc_id: room.dc_id,
+        room_id: rack.room_id,
       });
 
-      onUpdate(updatedRoom);
+      onUpdate(updatedRack);
       onOpenChange(false);
     } catch (error) {
-      console.error("Error updating room:", error);
+      console.error("Error updating rack:", error);
     }
   };
 
@@ -67,9 +73,19 @@ export function EditRoomDialog({ room, onUpdate, open, onOpenChange }: EditRoomD
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-            <Edit className="h-5 w-5" /> 編輯房間
+            <Edit className="h-5 w-5" /> 編輯機架
           </DialogTitle>
         </DialogHeader>
+
+        {hasHosts && (
+          <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              此機架內有主機，無法修改高度。請先移除所有主機後再修改高度。
+            </AlertDescription>
+          </Alert>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
             <Label htmlFor="name">名稱</Label>
@@ -82,7 +98,16 @@ export function EditRoomDialog({ room, onUpdate, open, onOpenChange }: EditRoomD
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="height">標準高度 (U)</Label>
+            <Label htmlFor="service_name">服務名稱</Label>
+            <Input
+              id="service_name"
+              name="service_name"
+              value={formData.service_name}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="height">高度 (U)</Label>
             <Input
               id="height"
               name="height"
@@ -90,6 +115,7 @@ export function EditRoomDialog({ room, onUpdate, open, onOpenChange }: EditRoomD
               value={formData.height}
               onChange={handleChange}
               required
+              disabled={hasHosts}
             />
           </div>
           <DialogFooter>

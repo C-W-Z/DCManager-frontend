@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { DataTable } from "@/components/explorer/data-table";
 import { rackColumns } from "@/components/explorer/columns/rack-columns";
 import type { SimpleRoom, SimpleRack, SimpleDatacenter } from "@/lib/type";
 import { getRoom, deleteRack } from "@/lib/api";
 import { AddRackDialog } from "@/components/explorer/dialogs/add-rack-dialog";
+import { EditRackDialog } from "@/components/explorer/dialogs/edit-rack";
 import type { Row } from "@tanstack/react-table";
 import { RackSummary } from "../summary/rack-summary";
 
@@ -17,6 +18,8 @@ interface RackTableProps {
 
 export default function RackTable({ datacenter, room, onSelect }: RackTableProps) {
   const [filteredRacks, setFilteredRacks] = useState<SimpleRack[]>([]);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [currentRack, setCurrentRack] = useState<SimpleRack | null>(null);
 
   useEffect(() => {
     getRoom(room.id)
@@ -44,6 +47,16 @@ export default function RackTable({ datacenter, room, onSelect }: RackTableProps
     setFilteredRacks((prev) => prev.filter((rack) => !idsToDelete.includes(rack.id)));
   };
 
+  const handleEditRack = (rack: SimpleRack) => {
+    setCurrentRack(rack);
+    setEditDialogOpen(true);
+  };
+
+  const handleUpdateRack = (/*updatedRack: SimpleRack | null*/) => {
+    // TODO
+    setEditDialogOpen(false);
+  };
+
   const columns = rackColumns(onSelect);
 
   return (
@@ -60,8 +73,18 @@ export default function RackTable({ datacenter, room, onSelect }: RackTableProps
         data={filteredRacks}
         onDeleteRow={handleDeleteRack}
         onDeleteRows={handleDeleteMultiple}
+        onEditRow={handleEditRack}
         getRowId={(row) => row.id}
       />
+
+      {currentRack && (
+        <EditRackDialog
+          rack={currentRack}
+          onUpdate={handleUpdateRack}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+        />
+      )}
     </div>
   );
 }
