@@ -28,7 +28,7 @@ interface EditRackDialogProps {
 export function EditRackDialog({ rack, onUpdate, open, onOpenChange }: EditRackDialogProps) {
   const [formData, setFormData] = useState({
     name: "",
-    service_name: "",
+    service_name: "", // TODO: we need service ID
     height: "",
   });
 
@@ -54,9 +54,8 @@ export function EditRackDialog({ rack, onUpdate, open, onOpenChange }: EditRackD
 
     try {
       const updatedRack = await modifyRack(rack.id, {
-        // TODO
         name: formData.name,
-        service_id: formData.service_name,
+        service_id: formData.service_name, // TODO
         height: Number.parseInt(formData.height),
         room_id: rack.room_id,
       });
@@ -73,7 +72,7 @@ export function EditRackDialog({ rack, onUpdate, open, onOpenChange }: EditRackD
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-            <Edit className="h-5 w-5" /> 編輯機架
+            <Edit className="h-5 w-5" /> Edit Rack
           </DialogTitle>
         </DialogHeader>
 
@@ -88,7 +87,7 @@ export function EditRackDialog({ rack, onUpdate, open, onOpenChange }: EditRackD
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="name">名稱</Label>
+            <Label htmlFor="name">Name</Label>
             <Input
               id="name"
               name="name"
@@ -98,7 +97,7 @@ export function EditRackDialog({ rack, onUpdate, open, onOpenChange }: EditRackD
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="service_name">服務名稱</Label>
+            <Label htmlFor="service_name">Service</Label>
             <Input
               id="service_name"
               name="service_name"
@@ -107,7 +106,7 @@ export function EditRackDialog({ rack, onUpdate, open, onOpenChange }: EditRackD
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="height">高度 (U)</Label>
+            <Label htmlFor="height">Height (U)</Label>
             <Input
               id="height"
               name="height"
@@ -120,9 +119,9 @@ export function EditRackDialog({ rack, onUpdate, open, onOpenChange }: EditRackD
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              取消
+              Cancel
             </Button>
-            <Button type="submit">保存</Button>
+            <Button type="submit">Save</Button>
           </DialogFooter>
         </form>
       </DialogContent>

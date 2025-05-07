@@ -67,12 +67,12 @@ export function EditRoomDialog({ room, onUpdate, open, onOpenChange }: EditRoomD
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-            <Edit className="h-5 w-5" /> 編輯房間
+            <Edit className="h-5 w-5" /> Edit Room
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="name">名稱</Label>
+            <Label htmlFor="name">Name</Label>
             <Input
               id="name"
               name="name"
@@ -82,7 +82,7 @@ export function EditRoomDialog({ room, onUpdate, open, onOpenChange }: EditRoomD
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="height">標準高度 (U)</Label>
+            <Label htmlFor="height">Height (U)</Label>
             <Input
               id="height"
               name="height"
@@ -94,9 +94,9 @@ export function EditRoomDialog({ room, onUpdate, open, onOpenChange }: EditRoomD
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              取消
+              Cancel
             </Button>
-            <Button type="submit">保存</Button>
+            <Button type="submit">Save</Button>
           </DialogFooter>
         </form>
       </DialogContent>
