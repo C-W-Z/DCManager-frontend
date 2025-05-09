@@ -38,9 +38,8 @@ const form_schema = host_schema.pick({ name: true, height: true });
 interface AddHostDialogProps {
   rack: Rack;
   setRack: (rack: Rack) => void;
-  isUpdate: boolean;
 }
-export function AddHostDialog({ rack, setRack, isUpdate }: AddHostDialogProps) {
+export function AddHostDialog({ rack, setRack }: AddHostDialogProps) {
   const [open, setOpen] = useState(false);
   const [isRackFull, setIsRackFull] = useState(false);
 
@@ -87,7 +86,7 @@ export function AddHostDialog({ rack, setRack, isUpdate }: AddHostDialogProps) {
         setOpen(false);
         form.reset();
 
-        toast.success(`Host ${values.name} added successfully`);
+        toast.success(`Host ${values.name} added successfully to position ${new_host_pos}`);
       })
       .catch((error) => {
         setIsRackFull(false);
@@ -101,7 +100,6 @@ export function AddHostDialog({ rack, setRack, isUpdate }: AddHostDialogProps) {
         <Button
           className={cn(
             "flex h-fit min-w-[130px] flex-row items-center justify-start gap-3 py-3 text-sm font-bold",
-            isUpdate ? "pointer-events-none bg-gray-300" : "",
           )}
         >
           <Icon id="add" className="size-4 fill-white" />

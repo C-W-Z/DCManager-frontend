@@ -8,9 +8,10 @@ import HostDraggable from "./host-draggable";
 
 interface RackDnDProps {
   rack: Rack;
+  setRack: (rack: Rack) => void;
 }
 
-export default function RackDnD({ rack }: RackDnDProps) {
+export default function RackDnD({ rack, setRack }: RackDnDProps) {
   const initialRack: RackDroppable = {
     items: [],
     spaces: Array.from({ length: rack.height }, () => "space"),
@@ -55,7 +56,7 @@ export default function RackDnD({ rack }: RackDnDProps) {
               className="absolute top-0 left-0 z-10 inline-flex w-full items-center justify-center rounded-lg bg-gray-300 opacity-70"
               style={{
                 y:
-                  (rack.height - state.dragging.initialPos - draggingItem.height) *
+                  (rack.height - (state.dragging.initialPos - 1) - draggingItem.height) *
                   (HOST_HEIGHT + RACK_GAP),
                 height: draggingItem.height * (HOST_HEIGHT + RACK_GAP) - RACK_GAP,
               }}
@@ -67,7 +68,7 @@ export default function RackDnD({ rack }: RackDnDProps) {
               )}
               style={{
                 y:
-                  (rack.height - state.dragging.nextPos - draggingItem.height) *
+                  (rack.height - (state.dragging.nextPos - 1) - draggingItem.height) *
                   (HOST_HEIGHT + RACK_GAP),
                 height: draggingItem.height * (HOST_HEIGHT + RACK_GAP) - RACK_GAP,
               }}
@@ -80,7 +81,8 @@ export default function RackDnD({ rack }: RackDnDProps) {
             <HostDraggable
               key={index}
               host={host}
-              rackHeight={rack.height}
+              rack={rack}
+              setRack={setRack}
               constraintsRef={constraintsRef}
               scrollRef={scrollRef}
               draggingState={state.dragging}

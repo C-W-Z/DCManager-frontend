@@ -22,7 +22,7 @@ export function RackDnDReducer(state: RackDroppable, action: Action) {
   function clearHostFromSpaces(host: SimpleHost, spaces: string[]) {
     const next = [...spaces];
     for (let i = 0; i < host.height; i++) {
-      next[host.pos + i] = "space";
+      next[host.pos - 1 + i] = "space";
     }
     return next;
   }
@@ -30,14 +30,14 @@ export function RackDnDReducer(state: RackDroppable, action: Action) {
   function setHostToSpaces(host: SimpleHost, spaces: string[]) {
     const next = [...spaces];
     for (let i = 0; i < host.height; i++) {
-      next[host.pos + i] = host.id;
+      next[host.pos - 1 + i] = host.id;
     }
     return next;
   }
 
   function isHostFit(host: SimpleHost, pos: number, spaces: string[]) {
     for (let i = 0; i < host.height; i++) {
-      if (spaces[pos + i] !== "space" && spaces[pos + i] !== host.id) {
+      if (spaces[pos - 1 + i] !== "space" && spaces[pos - 1 + i] !== host.id) {
         return false;
       }
     }
@@ -52,7 +52,6 @@ export function RackDnDReducer(state: RackDroppable, action: Action) {
       // only add the host if it is not in the list
       const index = nextState.items.findIndex((i) => i.id === host.id);
       if (index == -1) {
-        host.pos -= 1; // adjust the position to be 0-based
         nextState.items.push(host);
       }
       nextState.spaces = setHostToSpaces(host, nextState.spaces);

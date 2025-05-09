@@ -4,7 +4,7 @@ import d from "./mock_data.json";
 
 const MockData = d as mytype.MockDataJson;
 
-export function addDC(body: Pick<mytype.Datacenter, "name" | "height">) {
+export function addDC(body: Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">) {
   console.log("addDC", body);
   return Promise.resolve(faker.string.uuid());
 }
@@ -112,15 +112,15 @@ export function getHost(host_id: string): Promise<mytype.Host> {
 
 export function modifyHost(
   host_id: string,
-  body: Pick<mytype.Host, "name" | "height" | "service_id" | "rack_id" | "pos">,
+  body: Pick<mytype.Host, "name" | "height" | "rack_id" | "pos">,
 ) {
   console.log("modifyHost", host_id, body);
-  return null;
+  return Promise.resolve("success");
 }
 
 export function deleteHost(host_id: string) {
   console.log("deleteHost", host_id);
-  return null;
+  return Promise.resolve("success");
 }
 
 export function addService(body: Pick<mytype.Service, "name" | "n_racks" | "total_ip">) {

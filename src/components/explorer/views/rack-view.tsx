@@ -3,6 +3,7 @@ import { getRack } from "@/lib/api";
 import { Rack } from "@/lib/type";
 import { Skeleton } from "@/components/ui/skeleton";
 import RackDnD from "@/components/rack/rack-dnd";
+import { AddHostDialog } from "../dialogs/add-host-dialog";
 
 interface RackViewProps {
   rackId: string;
@@ -23,19 +24,17 @@ export default function RackView({ rackId }: RackViewProps) {
   }, [rackId]);
 
   return (
-    <div className="my-auto flex max-w-full flex-col items-center justify-center gap-10 p-8">
+    <div>
       {rack && (
-        <div className="flex flex-row gap-10">
-          <RackDnD rack={rack} />
-          <div className="flex w-[300px] flex-col items-end justify-start">
-            <div>just some info</div>
-          </div>
+        <div className="mx-auto flex max-w-6xl items-center justify-between p-4">
+          <RackDnD rack={rack} setRack={setRack} />
+          <AddHostDialog rack={rack} setRack={setRack} />
         </div>
       )}
+
       {!rack && (
-        <div className="flex flex-row gap-10">
-          <Skeleton className="h-[70vh] w-full" />
-          <Skeleton className="h-[70vh] w-[300px]" />
+        <div className="flex w-full items-center justify-center">
+          <Skeleton className="h-96 w-96" />
         </div>
       )}
     </div>
