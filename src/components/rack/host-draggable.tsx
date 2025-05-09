@@ -77,7 +77,7 @@ export default function HostDraggable({
       const rect = container.getBoundingClientRect();
       const pointerY = info.point.y - rect.top;
       const threshold = 100; // pixels from the top/bottom to start scrolling
-      const speed = 2;
+      const speed = 0.5;
 
       if (pointerY < threshold && pointerY > 0 && container.scrollTop > 0) {
         container.scrollBy({ top: -speed, behavior: "auto" });
