@@ -1,9 +1,10 @@
 import { SimpleHost } from "@/lib/type";
-import { motion, PanInfo, useAnimation } from "framer-motion";
-import { height2Px, pos2Ytranslate, HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
+import { motion, PanInfo, useMotionValue, useMotionValueEvent } from "motion/react";
+import { height2Px, pos2translateY, HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRackContext } from "./rack-context";
+import { useRef } from "react";
 
 interface HostDraggableProps {
   host: SimpleHost;
@@ -11,15 +12,27 @@ interface HostDraggableProps {
   scrollRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export default function HostDraggable({ host, constraintsRef }: HostDraggableProps) {
+export default function HostDraggable({
+  host,
+  constraintsRef,
+  scrollRef,
+}: HostDraggableProps) {
   const { state, dispatch } = useRackContext();
 
-  const controls = useAnimation();
-  // const [scrollY, setScrollY] = useState<number>(0);
+  const translateY = useMotionValue(pos2translateY(host.pos, host.height, state.rack.height));
+
+  const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  function clearScrollInterval() {
+    if (scrollIntervalRef.current !== null) {
+      clearInterval(scrollIntervalRef.current);
+      scrollIntervalRef.current = null;
+    }
+  }
 
   function handleOnDrag(_: MouseEvent, info: PanInfo) {
-    // update pos
     if (state.dragging && state.dragging.id === host.id) {
+      // update pos
       const y = host.pos * (HOST_HEIGHT + RACK_GAP) - info.offset.y;
       const pos = Math.min(
         Math.max(Math.round(y / (HOST_HEIGHT + RACK_GAP)), 1),
@@ -33,28 +46,49 @@ export default function HostDraggable({ host, constraintsRef }: HostDraggablePro
           payload: { host, pos },
         });
       }
+
+      // auto scroll
+      const scrollBox = scrollRef.current;
+      if (!scrollBox) return;
+
+      const scrollRect = scrollBox.getBoundingClientRect();
+      const topEdge = scrollRect.y;
+      const bottomEdge = scrollRect.y + scrollRect.height;
+      const threshold = 100;
+      const maxSpeed = 10;
+
+      let direction = 0;
+      let distance = 0;
+
+      if (
+        info.point.y < topEdge + threshold &&
+        info.point.y > topEdge &&
+        scrollBox.scrollTop > 0
+      ) {
+        direction = -1;
+        distance = info.point.y - topEdge;
+      } else if (
+        info.point.y > bottomEdge - threshold &&
+        info.point.y < bottomEdge &&
+        scrollBox.scrollTop + scrollBox.clientHeight < scrollBox.scrollHeight
+      ) {
+        direction = 1;
+        distance = bottomEdge - info.point.y;
+      }
+
+      if (direction !== 0) {
+        const speed = Math.round((distance / threshold) * maxSpeed);
+
+        if (scrollIntervalRef.current === null) {
+          scrollIntervalRef.current = setInterval(() => {
+            scrollBox.scrollBy({ top: speed * direction, behavior: "auto" });
+            translateY.set(translateY.get() + speed * direction);
+          }, 16);
+        }
+      } else {
+        clearScrollInterval();
+      }
     }
-
-    // auto scroll
-    // const container = scrollRef.current;
-    // if (container) {
-    //   const rect = container.getBoundingClientRect();
-    //   const pointerY = info.point.y - rect.top;
-    //   const threshold = 100; // pixels from the top/bottom to start scrolling
-    //   const speed = 0.5;
-
-    //   if (pointerY < threshold && pointerY > 0 && container.scrollTop > 0) {
-    //     container.scrollBy({ top: -speed, behavior: "auto" });
-    //     setScrollY((prev) => prev - speed);
-    //   } else if (
-    //     pointerY > rect.height - threshold &&
-    //     pointerY < rect.height &&
-    //     container.scrollTop < container.scrollHeight - rect.height - 10
-    //   ) {
-    //     container.scrollBy({ top: speed, behavior: "auto" });
-    //     setScrollY((prev) => prev + speed);
-    //   }
-    // }
   }
 
   function handleDragEnd() {
@@ -70,12 +104,17 @@ export default function HostDraggable({ host, constraintsRef }: HostDraggablePro
       }
 
       const newPos = state.dragging.valid ? state.dragging.nextPos : state.dragging.initialPos;
-      controls.start({
-        y: pos2Ytranslate(newPos, host.height, state.rack.height),
-        transition: { ease: "easeInOut" },
-      });
+      translateY.set(pos2translateY(newPos, host.height, state.rack.height));
     }
+
+    clearScrollInterval();
   }
+
+  useMotionValueEvent(translateY, "animationComplete", () =>
+    dispatch({
+      type: "ANIMATION_ENDED",
+    }),
+  );
 
   return (
     <>
@@ -87,17 +126,11 @@ export default function HostDraggable({ host, constraintsRef }: HostDraggablePro
         onDrag={handleOnDrag}
         onDragEnd={handleDragEnd}
         initial={false}
-        animate={controls}
-        onAnimationComplete={() =>
-          dispatch({
-            type: "ANIMATION_ENDED",
-          })
-        }
         className={
           "absolute top-0 left-0 flex w-full flex-row items-center justify-between rounded-lg border-3 border-gray-950 bg-white px-4 py-2 hover:bg-blue-100"
         }
         style={{
-          y: pos2Ytranslate(host.pos, host.height, state.rack.height),
+          y: translateY,
           height: height2Px(host.height),
           zIndex: state.dragging?.id === host.id ? 99 : 1,
         }}

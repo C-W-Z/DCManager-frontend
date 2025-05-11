@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
-import { HOST_HEIGHT, RACK_GAP, pos2Ytranslate, height2Px } from "@/lib/constant";
+import { HOST_HEIGHT, RACK_GAP, pos2translateY, height2Px } from "@/lib/constant";
 import HostDraggable from "./host-draggable";
 import { useRackContext } from "./rack-context";
 
@@ -41,7 +41,7 @@ export default function RackDnD() {
             <motion.div
               className="absolute top-0 left-0 z-10 inline-flex w-full items-center justify-center rounded-lg bg-gray-300 opacity-70"
               style={{
-                y: pos2Ytranslate(
+                y: pos2translateY(
                   state.dragging.initialPos,
                   draggingItem.height,
                   state.rack.height,
@@ -55,7 +55,7 @@ export default function RackDnD() {
                 state.dragging.valid ? "bg-green-300" : "bg-red-300",
               )}
               style={{
-                y: pos2Ytranslate(
+                y: pos2translateY(
                   state.dragging.nextPos,
                   draggingItem.height,
                   state.rack.height,
