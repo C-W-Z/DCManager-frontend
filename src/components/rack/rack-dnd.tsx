@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
-import { HOST_HEIGHT, RACK_GAP, pos2translateY, height2Px } from "@/lib/constant";
+import { HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
 import HostDraggable from "./host-draggable";
 import { useRackContext } from "./rack-context";
 
@@ -11,8 +11,6 @@ export default function RackDnD() {
   const constraintsRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const draggingItem = state.rack.hosts.find((i) => i.id === state.dragging?.id);
-
   return (
     <div
       ref={scrollRef}
@@ -20,7 +18,7 @@ export default function RackDnD() {
     >
       <motion.div ref={constraintsRef} className="relative h-fit w-[400px]">
         <div
-          className="flex h-fit flex-col-reverse items-end"
+          className="flex h-fit flex-col-reverse items-end select-none"
           style={{ gap: `${RACK_GAP}px` }}
         >
           {state.spaces.map((_, index) => (
@@ -35,36 +33,6 @@ export default function RackDnD() {
             </div>
           ))}
         </div>
-
-        {state.dragging && draggingItem && (
-          <>
-            <motion.div
-              className="absolute top-0 left-0 z-10 inline-flex w-full items-center justify-center rounded-lg bg-gray-300 opacity-70"
-              style={{
-                y: pos2translateY(
-                  state.dragging.initialPos,
-                  draggingItem.height,
-                  state.rack.height,
-                ),
-                height: height2Px(draggingItem.height),
-              }}
-            />
-            <motion.div
-              className={cn(
-                "absolute top-0 left-0 z-10 inline-flex w-full items-center justify-center rounded-lg opacity-70",
-                state.dragging.valid ? "bg-green-300" : "bg-red-300",
-              )}
-              style={{
-                y: pos2translateY(
-                  state.dragging.nextPos,
-                  draggingItem.height,
-                  state.rack.height,
-                ),
-                height: height2Px(draggingItem.height),
-              }}
-            />
-          </>
-        )}
 
         {state.rack.hosts.map((host, index) => {
           return (

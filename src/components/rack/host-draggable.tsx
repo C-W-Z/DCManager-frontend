@@ -4,7 +4,6 @@ import { height2Px, pos2translateY, HOST_HEIGHT, RACK_GAP } from "@/lib/constant
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRackContext } from "./rack-context";
-import { useRef } from "react";
 
 interface HostDraggableProps {
   host: SimpleHost;
@@ -19,21 +18,14 @@ export default function HostDraggable({
 }: HostDraggableProps) {
   const { state, dispatch } = useRackContext();
 
-  const translateY = useMotionValue(pos2translateY(host.pos, host.height, state.rack.height));
+  const dragY = useMotionValue(pos2translateY(host.pos, host.height, state.rack.height));
 
-  const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  function clearScrollInterval() {
-    if (scrollIntervalRef.current !== null) {
-      clearInterval(scrollIntervalRef.current);
-      scrollIntervalRef.current = null;
-    }
-  }
+  const translateY = useMotionValue(0);
 
   function handleOnDrag(_: MouseEvent, info: PanInfo) {
-    if (state.dragging && state.dragging.id === host.id) {
+    if (state.dragging?.id === host.id) {
       // update pos
-      const y = host.pos * (HOST_HEIGHT + RACK_GAP) - info.offset.y;
+      const y = host.pos * (HOST_HEIGHT + RACK_GAP) - info.offset.y - translateY.get();
       const pos = Math.min(
         Math.max(Math.round(y / (HOST_HEIGHT + RACK_GAP)), 1),
         state.rack.height - host.height + 1,
@@ -55,38 +47,22 @@ export default function HostDraggable({
       const topEdge = scrollRect.y;
       const bottomEdge = scrollRect.y + scrollRect.height;
       const threshold = 100;
-      const maxSpeed = 10;
-
-      let direction = 0;
-      let distance = 0;
+      const speed = 5;
 
       if (
         info.point.y < topEdge + threshold &&
         info.point.y > topEdge &&
         scrollBox.scrollTop > 0
       ) {
-        direction = -1;
-        distance = info.point.y - topEdge;
+        scrollBox.scrollBy({ top: -speed, behavior: "auto" });
+        translateY.set(translateY.get() - speed * 0.95);
       } else if (
         info.point.y > bottomEdge - threshold &&
         info.point.y < bottomEdge &&
         scrollBox.scrollTop + scrollBox.clientHeight < scrollBox.scrollHeight
       ) {
-        direction = 1;
-        distance = bottomEdge - info.point.y;
-      }
-
-      if (direction !== 0) {
-        const speed = Math.round((distance / threshold) * maxSpeed);
-
-        if (scrollIntervalRef.current === null) {
-          scrollIntervalRef.current = setInterval(() => {
-            scrollBox.scrollBy({ top: speed * direction, behavior: "auto" });
-            translateY.set(translateY.get() + speed * direction);
-          }, 16);
-        }
-      } else {
-        clearScrollInterval();
+        scrollBox.scrollBy({ top: speed, behavior: "auto" });
+        translateY.set(translateY.get() + speed * 0.95);
       }
     }
   }
@@ -94,7 +70,7 @@ export default function HostDraggable({
   function handleDragEnd() {
     dispatch({ type: "DRAG_ENDED", payload: { host } });
 
-    if (state.dragging && state.dragging.id === host.id) {
+    if (state.dragging?.id === host.id) {
       if (state.dragging.valid) {
         toast.success(
           `Host ${host.name} successfully moved to position ${state.dragging.nextPos}`,
@@ -104,13 +80,13 @@ export default function HostDraggable({
       }
 
       const newPos = state.dragging.valid ? state.dragging.nextPos : state.dragging.initialPos;
-      translateY.set(pos2translateY(newPos, host.height, state.rack.height));
+      dragY.set(pos2translateY(newPos, host.height, state.rack.height));
     }
 
-    clearScrollInterval();
+    translateY.set(0);
   }
 
-  useMotionValueEvent(translateY, "animationComplete", () =>
+  useMotionValueEvent(dragY, "animationComplete", () =>
     dispatch({
       type: "ANIMATION_ENDED",
     }),
@@ -119,7 +95,8 @@ export default function HostDraggable({
   return (
     <>
       <motion.div
-        drag
+        drag="y"
+        dragElastic={0.1}
         dragMomentum={false}
         dragConstraints={constraintsRef}
         onDragStart={() => dispatch({ type: "DRAG_STARTED", payload: { host } })}
@@ -130,7 +107,8 @@ export default function HostDraggable({
           "absolute top-0 left-0 flex w-full flex-row items-center justify-between rounded-lg border-3 border-gray-950 bg-white px-4 py-2 hover:bg-blue-100"
         }
         style={{
-          y: translateY,
+          y: dragY,
+          translateY: translateY,
           height: height2Px(host.height),
           zIndex: state.dragging?.id === host.id ? 99 : 1,
         }}
@@ -147,6 +125,27 @@ export default function HostDraggable({
           )}
         ></div>
       </motion.div>
+      {state.dragging?.id === host.id && (
+        <>
+          <motion.div
+            className="absolute top-0 left-0 z-10 inline-flex w-full items-center justify-center rounded-lg bg-gray-300 opacity-70"
+            style={{
+              y: pos2translateY(state.dragging.initialPos, host.height, state.rack.height),
+              height: height2Px(host.height),
+            }}
+          />
+          <motion.div
+            className={cn(
+              "absolute top-0 left-0 z-10 inline-flex w-full items-center justify-center rounded-lg opacity-70",
+              state.dragging.valid ? "bg-green-300" : "bg-red-300",
+            )}
+            style={{
+              y: pos2translateY(state.dragging.nextPos, host.height, state.rack.height),
+              height: height2Px(host.height),
+            }}
+          />
+        </>
+      )}
     </>
   );
 }
