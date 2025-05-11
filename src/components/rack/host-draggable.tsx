@@ -1,24 +1,19 @@
 import { SimpleHost } from "@/lib/type";
 import { motion, PanInfo, useAnimation } from "framer-motion";
-import { Action, RackDroppable } from "./rack-dnd-reducer";
 import { height2Px, pos2Ytranslate, HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useRackContext } from "./rack-context";
 
 interface HostDraggableProps {
   host: SimpleHost;
   constraintsRef: React.RefObject<HTMLDivElement | null>;
   scrollRef: React.RefObject<HTMLDivElement | null>;
-  state: RackDroppable;
-  dispatch: React.ActionDispatch<[action: Action]>;
 }
 
-export default function HostDraggable({
-  host,
-  constraintsRef,
-  state,
-  dispatch,
-}: HostDraggableProps) {
+export default function HostDraggable({ host, constraintsRef }: HostDraggableProps) {
+  const { state, dispatch } = useRackContext();
+
   const controls = useAnimation();
   // const [scrollY, setScrollY] = useState<number>(0);
 
@@ -28,13 +23,11 @@ export default function HostDraggable({
       const y = host.pos * (HOST_HEIGHT + RACK_GAP) - info.offset.y;
       const pos = Math.min(
         Math.max(Math.round(y / (HOST_HEIGHT + RACK_GAP)), 1),
-        state.rack.height - host.height,
+        state.rack.height - host.height + 1,
       );
 
       const { nextPos } = state.dragging;
       if (pos !== nextPos) {
-        console.log("dispatching drag moved", pos);
-
         dispatch({
           type: "DRAG_MOVED",
           payload: { host, pos },
@@ -73,7 +66,7 @@ export default function HostDraggable({
           `Host ${host.name} successfully moved to position ${state.dragging.nextPos}`,
         );
       } else {
-        toast.warning(`Host ${host.name} cannot be moved here`);
+        toast.warning(`Host cannot be moved here`);
       }
 
       const newPos = state.dragging.valid ? state.dragging.nextPos : state.dragging.initialPos;
@@ -113,7 +106,11 @@ export default function HostDraggable({
         <div
           className={cn(
             "h-3 w-3 rounded-full",
-            host.status == "running" ? "bg-green-600" : "bg-red-400",
+            host.status === "running"
+              ? "bg-green-600"
+              : host.status === "idle"
+                ? "bg-gray-400"
+                : "bg-red-400",
           )}
         ></div>
       </motion.div>

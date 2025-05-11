@@ -9,7 +9,6 @@ export type RackDroppable = {
     nextPos: number;
     valid: boolean;
   };
-  addHostSuccess: boolean;
 };
 
 export type Action =
@@ -50,28 +49,12 @@ export function RackDnDReducer(state: RackDroppable, action: Action) {
       const nextState = { ...state };
       const { host } = action.payload;
 
-      const newHost = { ...host };
+      nextState.rack.hosts.push(host);
+      nextState.rack.n_hosts += 1;
+      nextState.spaces = setHostToSpaces(host, nextState.spaces);
 
-      let currentTop = nextState.rack.height;
-      for (let i = nextState.rack.hosts.length - 1; i >= 0; i--) {
-        const host = nextState.rack.hosts[i];
-        const host_top = host.pos + host.height - 1;
-        const space = currentTop - host_top;
+      console.log("add host state", nextState);
 
-        if (space >= newHost.height) {
-          newHost.pos = currentTop - newHost.height + 1;
-
-          // update the state
-          nextState.rack.hosts.push(newHost);
-          nextState.spaces = setHostToSpaces(newHost, nextState.spaces);
-          nextState.addHostSuccess = true;
-          return nextState;
-        }
-
-        currentTop = host.pos - 1;
-      }
-
-      nextState.addHostSuccess = false;
       return nextState;
     }
     case "DRAG_STARTED": {
@@ -118,8 +101,6 @@ export function RackDnDReducer(state: RackDroppable, action: Action) {
         host.pos = newPos;
         nextState.spaces = setHostToSpaces(host, nextState.spaces);
       }
-
-      console.log("drag ended state", nextState);
 
       return nextState;
     }

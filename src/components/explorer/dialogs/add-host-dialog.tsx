@@ -31,58 +31,54 @@ import { cn } from "@/lib/utils";
 import { Rack, SimpleHost, host_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addHost } from "@/lib/api";
+import { useRackContext } from "@/components/rack/rack-context";
 import Icon from "@/components/icon";
-import { Action } from "@/components/rack/rack-dnd-reducer";
 
 const form_schema = host_schema.pick({ name: true, height: true });
 
-interface AddHostDialogProps {
-  dispatch: React.ActionDispatch<[action: Action]>;
-}
-export function AddHostDialog({ dispatch }: AddHostDialogProps) {
+export function AddHostDialog() {
+  const { state, dispatch } = useRackContext();
+
   const [open, setOpen] = useState(false);
-  const [isRackFull, setIsRackFull] = useState(false);
 
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
   });
 
   function onSubmit(values: z.infer<typeof form_schema>) {
-    if (new_host_index === null || new_host_pos === null) {
-      setIsRackFull(true);
+    const newPos = isHostFit(values.height, state.rack);
+
+    if (newPos === null) {
+      toast.error("Rack don't have enough space!");
+      setOpen(false);
       return;
     }
 
     addHost({
       name: values.name,
       height: values.height,
-      rack_id: rack.id,
-      room_id: rack.room_id,
-      dc_id: rack.dc_id,
-      pos: new_host_pos,
+      pos: newPos,
+      rack_id: state.rack.id,
+      room_id: state.rack.room_id,
+      dc_id: state.rack.dc_id,
     })
-      .then((new_host_id) => {
-        const new_host = {
-          id: new_host_id,
+      .then((hostId) => {
+        const newHost: SimpleHost = {
+          id: hostId,
           name: values.name,
           height: values.height,
           status: "idle",
-          rack_id: rack.id,
-          pos: new_host_pos,
-        } as SimpleHost;
+          rack_id: state.rack.id,
+          pos: newPos,
+        };
 
-        const new_hosts = [...rack.hosts];
-        new_hosts.splice(new_host_index, 0, new_host);
-
-        setIsRackFull(false);
+        dispatch({ type: "ADD_HOST", payload: { host: newHost } });
+        toast.success("Host added successfully!");
         setOpen(false);
-        form.reset();
-
-        toast.success(`Host ${values.name} added successfully to position ${new_host_pos}`);
       })
       .catch((error) => {
-        setIsRackFull(false);
-        toast.error(`Failed to add host: ${error.message}`);
+        console.error("Error adding host:", error);
+        toast.error("Failed to add host");
       });
   }
 
@@ -142,7 +138,6 @@ export function AddHostDialog({ dispatch }: AddHostDialogProps) {
                 </FormItem>
               )}
             />
-            {isRackFull && <div className="text-red-500">Rack don't have enough space!</div>}
             <Button type="submit" className="w-full">
               Add
             </Button>
@@ -151,4 +146,23 @@ export function AddHostDialog({ dispatch }: AddHostDialogProps) {
       </DialogContent>
     </Dialog>
   );
+}
+
+function isHostFit(hostHeight: number, rack: Rack) {
+  const sortedHosts = [...rack.hosts].sort((a, b) => a.pos - b.pos);
+  let currentTop = rack.height;
+
+  for (let i = sortedHosts.length - 1; i >= 0; i--) {
+    const host = sortedHosts[i];
+    const host_top = host.pos + host.height - 1;
+    const space = currentTop - host_top;
+
+    if (space >= hostHeight) {
+      return currentTop - hostHeight + 1;
+    }
+
+    currentTop = host.pos - 1;
+  }
+
+  return null;
 }
