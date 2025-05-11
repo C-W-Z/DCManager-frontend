@@ -45,7 +45,7 @@ export default function HostDraggable({
 
       const scrollRect = scrollBox.getBoundingClientRect();
       const topEdge = scrollRect.y;
-      const bottomEdge = scrollRect.y + scrollRect.height;
+      const bottomEdge = scrollRect.y + scrollBox.clientHeight;
       const threshold = 100;
       const speed = 5;
 
@@ -59,7 +59,8 @@ export default function HostDraggable({
       } else if (
         info.point.y > bottomEdge - threshold &&
         info.point.y < bottomEdge &&
-        scrollBox.scrollTop + scrollBox.clientHeight < scrollBox.scrollHeight
+        scrollBox.scrollTop + scrollBox.clientHeight < scrollBox.scrollHeight &&
+        scrollBox.scrollHeight < (state.rack.height + 1) * (HOST_HEIGHT + RACK_GAP) - RACK_GAP
       ) {
         scrollBox.scrollBy({ top: speed, behavior: "auto" });
         translateY.set(translateY.get() + speed * 0.95);
@@ -96,7 +97,6 @@ export default function HostDraggable({
     <>
       <motion.div
         drag="y"
-        dragElastic={0.1}
         dragMomentum={false}
         dragConstraints={constraintsRef}
         onDragStart={() => dispatch({ type: "DRAG_STARTED", payload: { host } })}
