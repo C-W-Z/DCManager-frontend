@@ -1,7 +1,7 @@
-import { SimpleHost } from "@/lib/type";
+import { Rack, SimpleHost } from "@/lib/type";
 
 export type RackDroppable = {
-  items: SimpleHost[];
+  rack: Rack;
   spaces: string[];
   dragging?: {
     id: string;
@@ -9,6 +9,7 @@ export type RackDroppable = {
     nextPos: number;
     valid: boolean;
   };
+  addHostSuccess: boolean;
 };
 
 export type Action =
@@ -20,19 +21,19 @@ export type Action =
 
 export function RackDnDReducer(state: RackDroppable, action: Action) {
   function clearHostFromSpaces(host: SimpleHost, spaces: string[]) {
-    const next = [...spaces];
+    const newSpace = [...spaces];
     for (let i = 0; i < host.height; i++) {
-      next[host.pos - 1 + i] = "space";
+      newSpace[host.pos - 1 + i] = "space";
     }
-    return next;
+    return newSpace;
   }
 
   function setHostToSpaces(host: SimpleHost, spaces: string[]) {
-    const next = [...spaces];
+    const newSpace = [...spaces];
     for (let i = 0; i < host.height; i++) {
-      next[host.pos - 1 + i] = host.id;
+      newSpace[host.pos - 1 + i] = host.id;
     }
-    return next;
+    return newSpace;
   }
 
   function isHostFit(host: SimpleHost, pos: number, spaces: string[]) {
@@ -49,13 +50,28 @@ export function RackDnDReducer(state: RackDroppable, action: Action) {
       const nextState = { ...state };
       const { host } = action.payload;
 
-      // only add the host if it is not in the list
-      const index = nextState.items.findIndex((i) => i.id === host.id);
-      if (index == -1) {
-        nextState.items.push(host);
-      }
-      nextState.spaces = setHostToSpaces(host, nextState.spaces);
+      const newHost = { ...host };
 
+      let currentTop = nextState.rack.height;
+      for (let i = nextState.rack.hosts.length - 1; i >= 0; i--) {
+        const host = nextState.rack.hosts[i];
+        const host_top = host.pos + host.height - 1;
+        const space = currentTop - host_top;
+
+        if (space >= newHost.height) {
+          newHost.pos = currentTop - newHost.height + 1;
+
+          // update the state
+          nextState.rack.hosts.push(newHost);
+          nextState.spaces = setHostToSpaces(newHost, nextState.spaces);
+          nextState.addHostSuccess = true;
+          return nextState;
+        }
+
+        currentTop = host.pos - 1;
+      }
+
+      nextState.addHostSuccess = false;
       return nextState;
     }
     case "DRAG_STARTED": {
@@ -77,7 +93,6 @@ export function RackDnDReducer(state: RackDroppable, action: Action) {
 
       if (nextState.dragging) {
         nextState.dragging.nextPos = pos;
-
         nextState.dragging.valid = isHostFit(host, pos, nextState.spaces);
       }
 
@@ -88,22 +103,23 @@ export function RackDnDReducer(state: RackDroppable, action: Action) {
       const { host } = action.payload;
 
       if (nextState.dragging) {
-        const { valid, initialPos, nextPos } = nextState.dragging;
-        const pos = valid ? nextPos : initialPos;
-
         nextState.spaces = clearHostFromSpaces(host, nextState.spaces);
 
-        host.pos = pos;
+        let newPos = nextState.dragging.initialPos;
 
+        if (nextState.dragging.valid) {
+          newPos = nextState.dragging.nextPos;
+
+          const hostIndex = nextState.rack.hosts.findIndex((h) => h.id === host.id);
+          nextState.rack.hosts[hostIndex].pos = newPos;
+          // nextState.rack.hosts.sort((a, b) => a.pos - b.pos);
+        }
+
+        host.pos = newPos;
         nextState.spaces = setHostToSpaces(host, nextState.spaces);
-
-        const index = nextState.items.findIndex((i) => i.id === host.id);
-        nextState.items[index] = host;
-
-        nextState.dragging = undefined;
-
-        return nextState;
       }
+
+      console.log("drag ended state", nextState);
 
       return nextState;
     }

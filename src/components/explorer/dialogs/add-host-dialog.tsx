@@ -32,14 +32,14 @@ import { Rack, SimpleHost, host_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addHost } from "@/lib/api";
 import Icon from "@/components/icon";
+import { Action } from "@/components/rack/rack-dnd-reducer";
 
 const form_schema = host_schema.pick({ name: true, height: true });
 
 interface AddHostDialogProps {
-  rack: Rack;
-  setRack: (rack: Rack) => void;
+  dispatch: React.ActionDispatch<[action: Action]>;
 }
-export function AddHostDialog({ rack, setRack }: AddHostDialogProps) {
+export function AddHostDialog({ dispatch }: AddHostDialogProps) {
   const [open, setOpen] = useState(false);
   const [isRackFull, setIsRackFull] = useState(false);
 
@@ -48,8 +48,6 @@ export function AddHostDialog({ rack, setRack }: AddHostDialogProps) {
   });
 
   function onSubmit(values: z.infer<typeof form_schema>) {
-    const [new_host_index, new_host_pos] = calculateNewHostPos(rack, values);
-
     if (new_host_index === null || new_host_pos === null) {
       setIsRackFull(true);
       return;
@@ -75,12 +73,6 @@ export function AddHostDialog({ rack, setRack }: AddHostDialogProps) {
 
         const new_hosts = [...rack.hosts];
         new_hosts.splice(new_host_index, 0, new_host);
-
-        setRack({
-          ...rack,
-          hosts: new_hosts,
-          n_hosts: rack.n_hosts + 1,
-        });
 
         setIsRackFull(false);
         setOpen(false);
@@ -159,25 +151,4 @@ export function AddHostDialog({ rack, setRack }: AddHostDialogProps) {
       </DialogContent>
     </Dialog>
   );
-}
-
-function calculateNewHostPos(rack: Rack, new_host: z.infer<typeof form_schema>) {
-  let new_host_pos;
-  let current_top = rack.height;
-
-  for (let i = rack.hosts.length - 1; i >= 0; i--) {
-    const host = rack.hosts[i];
-    const host_top = host.pos + host.height - 1;
-    const space = current_top - host_top;
-
-    if (space >= new_host.height) {
-      new_host_pos = current_top - new_host.height + 1;
-
-      return [i + 1, new_host_pos];
-    }
-
-    current_top = host.pos - 1;
-  }
-
-  return [null, null]; // No space found
 }
