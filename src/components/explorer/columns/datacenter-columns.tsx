@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal, Trash2 } from "lucide-react";
+import { ArrowUpDown, Edit, MoreHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -11,12 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import type { SimpleDatacenter } from "@/lib/type";
-import { EditDatacenterDialog } from "../dialogs/edit-datacenter";
 
 export function dataCenterColumns(
   onSelect: (dc: SimpleDatacenter) => void,
-  onUpdate?: (dc: SimpleDatacenter) => void,
 ): ColumnDef<SimpleDatacenter>[] {
   return [
     {
@@ -147,9 +146,10 @@ export function dataCenterColumns(
       cell: ({ row, table }) => {
         const dc = row.original;
 
-        // Access the openDeleteDialog function from table meta
-        const { openDeleteDialog } = table.options.meta as {
+        // Access the functions from table meta
+        const { openDeleteDialog, openEditDialog } = table.options.meta as {
           openDeleteDialog: (row: unknown, name?: string) => void;
+          openEditDialog: (row: SimpleDatacenter) => void;
         };
 
         return (
@@ -161,9 +161,9 @@ export function dataCenterColumns(
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {/* 直接在这里使用EditDatacenterDialog组件 */}
-              <EditDatacenterDialog datacenter={dc} onUpdate={onUpdate} />
-
+              <DropdownMenuItem onClick={() => openEditDialog(dc)}>
+                <Edit className="mr-2 h-4 w-4" /> Edit
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-red-600"
