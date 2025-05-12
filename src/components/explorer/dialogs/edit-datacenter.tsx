@@ -25,7 +25,7 @@ interface IPRange {
 
 // 修改组件接口，移除 open 和 onOpenChange 参数
 interface EditDatacenterDialogProps {
-  datacenter: SimpleDatacenter;
+  datacenter: SimpleDatacenter | null;
   onUpdate: (updatedDC: SimpleDatacenter | null) => void;
 }
 
@@ -43,37 +43,36 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
 
   // 当 datacenter 变化时，如果有值则打开对话框
   useEffect(() => {
-    if (datacenter) {
-      setOpen(true);
-      setLoading(true);
-      setError(null);
-      getDC(datacenter.id)
-        .then((dc: Datacenter) => {
-          setFormData({
-            name: dc.name,
-            height: dc.height.toString(),
-          });
-          // 如果API返回的数据中有IP范围，则设置它
-          if (dc.ip_ranges && Array.isArray(dc.ip_ranges)) {
-            setIpRanges(dc.ip_ranges);
-          } else {
-            setIpRanges([]);
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching datacenter data:", error);
-          setFormData({
-            name: datacenter.name,
-            height: datacenter.height.toString(),
-          });
-          setIpRanges([]);
-          setError("Unable to retrieve data center details, please try again later.");
-        })
-        .finally(() => {
-          setLoading(false);
+    setLoading(true);
+    if (!datacenter) return;
+    setOpen(true);
+    setError(null);
+    getDC(datacenter.id)
+      .then((dc: Datacenter) => {
+        setFormData({
+          name: dc.name,
+          height: dc.height.toString(),
         });
-    }
-  }, [open, datacenter]);
+        // 如果API返回的数据中有IP范围，则设置它
+        if (dc.ip_ranges && Array.isArray(dc.ip_ranges)) {
+          setIpRanges(dc.ip_ranges);
+        } else {
+          setIpRanges([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching datacenter data:", error);
+        setFormData({
+          name: datacenter.name,
+          height: datacenter.height.toString(),
+        });
+        setIpRanges([]);
+        setError("Unable to retrieve data center details, please try again later.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [datacenter]);
 
   // 检查是否有空的IP范围
   useEffect(() => {
@@ -103,6 +102,7 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    if (!datacenter) return;
     e.preventDefault();
 
     // 检查是否有空的IP范围
@@ -255,6 +255,9 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
             </div>
 
             <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                取消
+              </Button>
               <Button type="submit" disabled={loading || hasEmptyIpRange}>
                 {loading ? "保存中..." : "保存"}
               </Button>
