@@ -13,9 +13,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Edit, Plus, Trash2 } from "lucide-react";
+import { Edit, Plus, Trash2, AlertCircle } from "lucide-react";
 import type { Datacenter, SimpleDatacenter } from "@/lib/type";
 import { getDC, modifyDC } from "@/lib/api";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface IPRange {
   start_ip: string;
@@ -41,10 +42,13 @@ export function EditDatacenterDialog({
   });
   const [ipRanges, setIpRanges] = useState<IPRange[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasEmptyIpRange, setHasEmptyIpRange] = useState(false);
 
   useEffect(() => {
     if (open && datacenter) {
       setLoading(true);
+      setError(null);
       getDC(datacenter.id)
         .then((dc: Datacenter) => {
           setFormData({
@@ -65,12 +69,19 @@ export function EditDatacenterDialog({
             height: datacenter.height.toString(),
           });
           setIpRanges([]);
+          setError("Unable to retrieve data center details, please try again later.");
         })
         .finally(() => {
           setLoading(false);
         });
     }
   }, [open, datacenter]);
+
+  // 检查是否有空的IP范围
+  useEffect(() => {
+    const hasEmpty = ipRanges.some((range) => !range.start_ip || !range.end_ip);
+    setHasEmptyIpRange(hasEmpty);
+  }, [ipRanges]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -96,26 +107,52 @@ export function EditDatacenterDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // 检查是否有空的IP范围
+    if (hasEmptyIpRange) {
+      setError("Please fill in all IP ranges or delete the blanks");
+      return;
+    }
+
+    setError(null);
+    setLoading(true);
+
     try {
-      const updatedDC = await modifyDC(datacenter.id, {
+      // 过滤掉空的IP范围
+      const validIpRanges = ipRanges.filter((range) => range.start_ip && range.end_ip);
+
+      const success = await modifyDC(datacenter.id, {
         name: formData.name,
         height: Number.parseInt(formData.height),
-        ip_ranges: ipRanges,
+        ip_ranges: validIpRanges,
       });
 
-      onUpdate(updatedDC);
-      onOpenChange(false);
+      if (success) {
+        // 如果修改成功，更新父组件中的数据
+        // 由于modifyDC只返回布尔值，我们需要构造一个更新后的对象
+        const updatedDC: SimpleDatacenter = {
+          ...datacenter,
+          name: formData.name,
+          height: Number.parseInt(formData.height),
+        };
+        onUpdate(updatedDC);
+        onOpenChange(false);
+      } else {
+        setError("Failed to update data center, please try again later.");
+      }
     } catch (error) {
       console.error("Error updating datacenter:", error);
+      setError("An error occurred while updating the data center.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-            <Edit className="h-5 w-5" /> 編輯數據中心
+            <Edit className="h-5 w-5" /> Edit Data Center
           </DialogTitle>
         </DialogHeader>
         {loading ? (
@@ -124,9 +161,16 @@ export function EditDatacenterDialog({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6 pt-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">名稱</Label>
+                <Label htmlFor="name">Name</Label>
                 <Input
                   id="name"
                   name="name"
@@ -136,7 +180,7 @@ export function EditDatacenterDialog({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="height">標準高度 (U)</Label>
+                <Label htmlFor="height">Height (U)</Label>
                 <Input
                   id="height"
                   name="height"
@@ -150,7 +194,7 @@ export function EditDatacenterDialog({
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label>IP 範圍</Label>
+                <Label>IP Ranges</Label>
                 <Button
                   type="button"
                   variant="outline"
@@ -158,37 +202,39 @@ export function EditDatacenterDialog({
                   onClick={addIpRange}
                   className="h-8"
                 >
-                  <Plus className="mr-1 h-4 w-4" /> 添加範圍
+                  <Plus className="mr-1 h-4 w-4" /> Add IP Range
                 </Button>
               </div>
 
               {ipRanges.length === 0 ? (
                 <div className="rounded-md border border-dashed p-4 text-center text-sm text-gray-500">
-                  尚未設定 IP 範圍。點擊上方按鈕添加。
+                  No IP range has been set. Click the button above to add one.
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="max-h-[300px] space-y-3 overflow-y-auto pr-2">
                   {ipRanges.map((range, index) => (
                     <div key={index} className="flex items-center gap-2">
                       <div className="flex-1">
                         <Input
-                          placeholder="起始 IP"
+                          placeholder="Starting IP"
                           value={range.start_ip}
                           onChange={(e) =>
                             handleIpRangeChange(index, "start_ip", e.target.value)
                           }
+                          className={!range.start_ip ? "border-red-300" : ""}
                         />
                       </div>
                       <div className="flex w-8 items-center justify-center">
-                        <span className="text-gray-500">至</span>
+                        <span className="text-gray-500">to</span>
                       </div>
                       <div className="flex-1">
                         <Input
-                          placeholder="結束 IP"
+                          placeholder="Ending IP"
                           value={range.end_ip}
                           onChange={(e) =>
                             handleIpRangeChange(index, "end_ip", e.target.value)
                           }
+                          className={!range.end_ip ? "border-red-300" : ""}
                         />
                       </div>
                       <Button
@@ -204,13 +250,19 @@ export function EditDatacenterDialog({
                   ))}
                 </div>
               )}
+
+              {hasEmptyIpRange && (
+                <p className="text-sm text-red-500">Please fill in all IP ranges or delete the blanks</p>
+              )}
             </div>
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                取消
+                Cancel
               </Button>
-              <Button type="submit">保存</Button>
+              <Button type="submit" disabled={loading || hasEmptyIpRange}>
+                {loading ? "Saving..." : "Save"}
+              </Button>
             </DialogFooter>
           </form>
         )}
