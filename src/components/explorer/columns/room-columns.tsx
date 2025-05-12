@@ -125,7 +125,7 @@ export function roomColumns(
           row={row}
           onUpdateSuccess={onUpdateSuccess}
           onDeleteSuccess={onDeleteSuccess}
-        ></RoomRowActions>
+        />
       ),
     },
   ];

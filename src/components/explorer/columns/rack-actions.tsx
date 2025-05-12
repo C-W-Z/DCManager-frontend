@@ -10,34 +10,34 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EditRoomDialog } from "../dialogs/edit-room";
+import { EditRackDialog } from "../dialogs/edit-rack";
 import { DeleteConfirmation } from "../dialogs/delete-confirm";
 import { Row } from "@tanstack/react-table";
-import type { SimpleRoom } from "@/lib/type";
+import type { SimpleRack } from "@/lib/type";
 
-interface RoomRowActionsProps {
-  row: Row<SimpleRoom>;
-  onUpdateSuccess: (room: SimpleRoom) => void;
+interface RackRowActionsProps {
+  row: Row<SimpleRack>;
+  onUpdateSuccess: (rack: SimpleRack) => void;
   onDeleteSuccess: (ids: string[]) => void;
 }
 
-export function RoomRowActions({ row, onUpdateSuccess, onDeleteSuccess }: RoomRowActionsProps) {
-  const room = row.original;
+export function RackRowActions({ row, onUpdateSuccess, onDeleteSuccess }: RackRowActionsProps) {
+  const rack = row.original;
 
-  const [currentRoom, setCurrentRoom] = useState<SimpleRoom | null>(null);
+  const [currentRack, setCurrentRack] = useState<SimpleRack | null>(null);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
-  const handleEditDataCenter = (room: SimpleRoom) => {
+  const handleEditDataCenter = (rack: SimpleRack) => {
     // 先设置为 null，强制 useEffect 在下一次设置时触发
-    setCurrentRoom(null);
-    // 使用 setTimeout 确保在下一个渲染周期设置 currentRoom
+    setCurrentRack(null);
+    // 使用 setTimeout 确保在下一个渲染周期设置 currentRack
     setTimeout(() => {
-      setCurrentRoom(room);
+      setCurrentRack(rack);
     }, 0);
   };
 
-  const handleDeleteDataCenter = (room: SimpleRoom) => {
-    setIdsToDelete([room.id]);
+  const handleDeleteDataCenter = (rack: SimpleRack) => {
+    setIdsToDelete([rack.id]);
   };
 
   const handleDeleteSuccess = (ids: string[]) => {
@@ -55,25 +55,25 @@ export function RoomRowActions({ row, onUpdateSuccess, onDeleteSuccess }: RoomRo
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => handleEditDataCenter(room)}>
+          <DropdownMenuItem onClick={() => handleEditDataCenter(rack)}>
             <Edit className="mr-2 h-4 w-4" /> EDIT
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-red-600"
-            onClick={() => handleDeleteDataCenter(room)}
+            onClick={() => handleDeleteDataCenter(rack)}
           >
             <Trash2 className="mr-2 h-4 w-4" /> DELETE
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <EditRoomDialog room={currentRoom} onUpdateSuccess={onUpdateSuccess} />
+      <EditRackDialog rack={currentRack} onUpdateSuccess={onUpdateSuccess} />
 
       <DeleteConfirmation
         ids={idsToDelete}
-        type="room"
-        itemNames={idsToDelete && idsToDelete.length === 1 ? [room.name] : undefined}
+        type="rack"
+        itemNames={idsToDelete && idsToDelete.length === 1 ? [rack.name] : undefined}
         onSuccess={handleDeleteSuccess}
       />
     </>

@@ -103,14 +103,24 @@ export function getRack(rack_id: string): Promise<mytype.Rack> {
 export function modifyRack(
   rack_id: string,
   body: Partial<Pick<mytype.Rack, "name" | "height" | "room_id" | "service_id">>,
-) {
+): Promise<boolean> {
   console.log("modifyRack", rack_id, body);
-  return null;
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Failed to edit room with id ${rack_id}`))
+    }, 300)
+    resolve(true) // return true
+  })
 }
 
-export function deleteRack(rack_id: string) {
+export function deleteRack(rack_id: string): Promise<boolean> {
   console.log("deleteRack", rack_id);
-  return null;
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Failed to delete room with id ${rack_id}`))
+    }, 300)
+    resolve(true) // return true
+  })
 }
 
 export function addHost(

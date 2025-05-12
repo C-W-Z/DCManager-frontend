@@ -25,11 +25,11 @@ interface EditRoomDialogProps {
 
 export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     height: "",
   });
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!room) return;
@@ -86,7 +86,7 @@ export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>

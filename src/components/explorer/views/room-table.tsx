@@ -24,7 +24,7 @@ export default function RoomTable({ datacenter, onSelect }: RoomTableProps) {
         setRooms(dc.rooms);
       })
       .catch((error) => {
-        console.error("Error fetching room data:", error);
+        console.error("Error fetching rooms data from datacenter:", error);
         setRooms([]);
       })
       .finally(() => {
@@ -48,7 +48,7 @@ export default function RoomTable({ datacenter, onSelect }: RoomTableProps) {
   };
 
   const onDeleteSuccess = (idsToDelete: string[]) => {
-    const updatedRooms = rooms.filter((dc) => !idsToDelete.includes(dc.id));
+    const updatedRooms = rooms.filter((room) => !idsToDelete.includes(room.id));
     setRooms(updatedRooms);
     // 重新加载数据
     // loadRooms();

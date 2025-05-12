@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DataTable } from "@/components/explorer/data-table";
 import { rackColumns } from "@/components/explorer/columns/rack-columns";
 import type { SimpleRoom, SimpleRack, SimpleDatacenter } from "@/lib/type";
-import { getRoom, deleteRack } from "@/lib/api";
+import { getRoom } from "@/lib/api";
 import { AddRackDialog } from "@/components/explorer/dialogs/add-rack-dialog";
-import { EditRackDialog } from "@/components/explorer/dialogs/edit-rack";
-import type { Row } from "@tanstack/react-table";
 import { RackSummary } from "../summary/rack-summary";
 
 interface RackTableProps {
@@ -14,47 +12,51 @@ interface RackTableProps {
 }
 
 export default function RackTable({ datacenter, room }: RackTableProps) {
-  const [filteredRacks, setFilteredRacks] = useState<SimpleRack[]>([]);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [currentRack, setCurrentRack] = useState<SimpleRack | null>(null);
+  const [racks, setRacks] = useState<SimpleRack[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    getRoom(room.id)
-      .then((room) => {
-        setFilteredRacks(room.racks);
-      })
-      .catch((error) => {
-        console.error("Error fetching room data:", error);
-        setFilteredRacks([]);
-      });
-  }, [room.id]);
+  const loadRacks = useCallback((room_id: string) => {
+      setLoading(true);
+      getRoom(room_id)
+        .then((room) => {
+          setRacks(room.racks);
+        })
+        .catch((error) => {
+          console.error("Error fetching racks data from room:", error);
+          setRacks([]);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, []);
 
-  const handleDeleteRack = (id: string) => {
-    // Call API to delete rack
-    deleteRack(id);
-    // Update local state
-    setFilteredRacks((prev) => prev.filter((rack) => rack.id !== id));
+    useEffect(() => {
+    loadRacks(room.id)
+    }, [loadRacks, room.id]);
+
+  const onUpdateSuccess = (updatedRack: SimpleRack) => {
+    if (updatedRack) {
+      // 如果更新成功，更新本地状态中的数据中心
+      setRacks((prev) =>
+        prev.map((rack) => (rack.id === updatedRack.id ? updatedRack : rack)),
+      );
+      // 重新加载数据以确保一致性
+      // loadRacks();
+    }
   };
 
-  const handleDeleteMultiple = (rows: Row<SimpleRack>[]) => {
-    const idsToDelete = rows.map((row) => row.original.id);
-    // Call API to delete racks
-    idsToDelete.forEach((id) => deleteRack(id));
-    // Update local state
-    setFilteredRacks((prev) => prev.filter((rack) => !idsToDelete.includes(rack.id)));
+  const onDeleteSuccess = (idsToDelete: string[]) => {
+    const updatedRooms = racks.filter((rack) => !idsToDelete.includes(rack.id));
+    setRacks(updatedRooms);
+    // 重新加载数据
+    // loadRacks();
   };
 
-  const handleEditRack = (rack: SimpleRack) => {
-    setCurrentRack(rack);
-    setEditDialogOpen(true);
+  const handleRefresh = () => {
+    loadRacks(datacenter.id);
   };
 
-  const handleUpdateRack = (/*updatedRack: SimpleRack | null*/) => {
-    // TODO
-    setEditDialogOpen(false);
-  };
-
-  const columns = rackColumns();
+  const columns = rackColumns(onUpdateSuccess, onDeleteSuccess);
 
   return (
     <div>
@@ -62,26 +64,26 @@ export default function RackTable({ datacenter, room }: RackTableProps) {
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Racks</h1>
-        <AddRackDialog currentDC={datacenter} currentRoom={room} />
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleRefresh}
+            className="rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Refresh"}
+          </button>
+          <AddRackDialog currentDC={datacenter} currentRoom={room} />
+        </div>
       </div>
 
       <DataTable
         columns={columns}
-        data={filteredRacks}
-        onDeleteRow={handleDeleteRack}
-        onDeleteRows={handleDeleteMultiple}
-        onEditRow={handleEditRack}
+        data={racks}
         getRowId={(row) => row.id}
+        loading={loading}
+        onDeleteSuccess={onDeleteSuccess}
       />
-
-      {currentRack && (
-        <EditRackDialog
-          rack={currentRack}
-          onUpdate={handleUpdateRack}
-          open={editDialogOpen}
-          onOpenChange={setEditDialogOpen}
-        />
-      )}
     </div>
   );
 }
