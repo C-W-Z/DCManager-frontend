@@ -16,23 +16,23 @@ export default function RackTable({ datacenter, room }: RackTableProps) {
   const [loading, setLoading] = useState(false);
 
   const loadRacks = useCallback((room_id: string) => {
-      setLoading(true);
-      getRoom(room_id)
-        .then((room) => {
-          setRacks(room.racks);
-        })
-        .catch((error) => {
-          console.error("Error fetching racks data from room:", error);
-          setRacks([]);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }, []);
+    setLoading(true);
+    getRoom(room_id)
+      .then((room) => {
+        setRacks(room.racks);
+      })
+      .catch((error) => {
+        console.error("Error fetching racks data from room:", error);
+        setRacks([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
-    useEffect(() => {
-    loadRacks(room.id)
-    }, [loadRacks, room.id]);
+  useEffect(() => {
+    loadRacks(room.id);
+  }, [loadRacks, room.id]);
 
   const onUpdateSuccess = (updatedRack: SimpleRack) => {
     if (updatedRack) {

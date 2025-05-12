@@ -33,7 +33,7 @@ export default function RoomTable({ datacenter, onSelect }: RoomTableProps) {
   }, []);
 
   useEffect(() => {
-    loadRooms(datacenter.id)
+    loadRooms(datacenter.id);
   }, [loadRooms, datacenter.id]);
 
   const onUpdateSuccess = (updatedRoom: SimpleRoom) => {

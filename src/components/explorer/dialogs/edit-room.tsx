@@ -20,7 +20,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface EditRoomDialogProps {
   room: SimpleRoom | null;
-  onUpdateSuccess: (updatedRoom: SimpleRoom) => void;
+  onUpdateSuccess?: (updatedRoom: SimpleRoom) => void;
 }
 
 export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
@@ -65,7 +65,7 @@ export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
           name: formData.name,
           height: Number.parseInt(formData.height),
         };
-        onUpdateSuccess(updatedRoom);
+        if (onUpdateSuccess) onUpdateSuccess(updatedRoom);
         setOpen(false);
       } else {
         setError("Failed to edit Room.");

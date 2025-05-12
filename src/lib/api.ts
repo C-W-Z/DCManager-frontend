@@ -31,20 +31,20 @@ export async function modifyDC(
   console.log("modifyDC", dc_id, body);
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      reject(new Error(`Failed to edit datacenter with id ${dc_id}`))
-    }, 300)
-    resolve(true) // return true
-  })
+      reject(new Error(`Failed to edit datacenter with id ${dc_id}`));
+    }, 300);
+    resolve(true); // return true
+  });
 }
 
 export async function deleteDC(dc_id: string): Promise<boolean> {
   console.log("deleteDC", dc_id);
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      reject(new Error(`Failed to delete datacenter with id ${dc_id}`))
-    }, 300)
-    resolve(true) // return true
-  })
+      reject(new Error(`Failed to delete datacenter with id ${dc_id}`));
+    }, 300);
+    resolve(true); // return true
+  });
 }
 
 export function addRoom(body: Pick<mytype.Room, "name" | "height" | "dc_id">) {
@@ -69,20 +69,20 @@ export async function modifyRoom(
   console.log("modifyRoom", room_id, body);
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      reject(new Error(`Failed to edit room with id ${room_id}`))
-    }, 300)
-    resolve(true) // return true
-  })
+      reject(new Error(`Failed to edit room with id ${room_id}`));
+    }, 300);
+    resolve(true); // return true
+  });
 }
 
 export async function deleteRoom(room_id: string): Promise<boolean> {
   console.log("deleteRoom", room_id);
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      reject(new Error(`Failed to delete room with id ${room_id}`))
-    }, 300)
-    resolve(true) // return true
-  })
+      reject(new Error(`Failed to delete room with id ${room_id}`));
+    }, 300);
+    resolve(true); // return true
+  });
 }
 
 export function addRack(body: Pick<mytype.Rack, "name" | "height" | "room_id" | "dc_id">) {
@@ -107,20 +107,20 @@ export function modifyRack(
   console.log("modifyRack", rack_id, body);
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      reject(new Error(`Failed to edit room with id ${rack_id}`))
-    }, 300)
-    resolve(true) // return true
-  })
+      reject(new Error(`Failed to edit room with id ${rack_id}`));
+    }, 300);
+    resolve(true); // return true
+  });
 }
 
 export function deleteRack(rack_id: string): Promise<boolean> {
   console.log("deleteRack", rack_id);
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      reject(new Error(`Failed to delete room with id ${rack_id}`))
-    }, 300)
-    resolve(true) // return true
-  })
+      reject(new Error(`Failed to delete room with id ${rack_id}`));
+    }, 300);
+    resolve(true); // return true
+  });
 }
 
 export function addHost(

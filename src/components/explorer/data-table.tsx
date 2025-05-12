@@ -49,7 +49,7 @@ interface DataTableProps<TData, TValue> {
   getRowId: (row: TData) => string;
   loading?: boolean;
   onDeleteSuccess?: (ids: string[]) => void;
-  type: DeleteType,
+  type: DeleteType;
 }
 
 export function DataTable<TData extends WithID, TValue>({
@@ -102,8 +102,7 @@ export function DataTable<TData extends WithID, TValue>({
   };
 
   const handleMultipleDeleteSuccess = (idsToDelete: string[]) => {
-    if (onDeleteSuccess)
-      onDeleteSuccess(idsToDelete)
+    if (onDeleteSuccess) onDeleteSuccess(idsToDelete);
     setMultipleIdsToDelete([]);
     table.resetRowSelection();
   };

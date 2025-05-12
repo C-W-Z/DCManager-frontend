@@ -21,7 +21,11 @@ interface RackRowActionsProps {
   onDeleteSuccess: (ids: string[]) => void;
 }
 
-export function RackRowActions({ row, onUpdateSuccess, onDeleteSuccess }: RackRowActionsProps) {
+export function RackRowActions({
+  row,
+  onUpdateSuccess,
+  onDeleteSuccess,
+}: RackRowActionsProps) {
   const rack = row.original;
 
   const [currentRack, setCurrentRack] = useState<SimpleRack | null>(null);

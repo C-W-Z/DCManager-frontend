@@ -135,7 +135,9 @@ export function DeleteConfirmation({
           <p className="text-sm text-black">{description}</p>
           <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>This action cannot be undone. All associated content will also be deleted.</AlertDescription>
+            <AlertDescription>
+              This action cannot be undone. All associated content will also be deleted.
+            </AlertDescription>
           </Alert>
         </div>
 

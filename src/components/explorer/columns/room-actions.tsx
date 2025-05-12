@@ -21,7 +21,11 @@ interface RoomRowActionsProps {
   onDeleteSuccess: (ids: string[]) => void;
 }
 
-export function RoomRowActions({ row, onUpdateSuccess, onDeleteSuccess }: RoomRowActionsProps) {
+export function RoomRowActions({
+  row,
+  onUpdateSuccess,
+  onDeleteSuccess,
+}: RoomRowActionsProps) {
   const room = row.original;
 
   const [currentRoom, setCurrentRoom] = useState<SimpleRoom | null>(null);

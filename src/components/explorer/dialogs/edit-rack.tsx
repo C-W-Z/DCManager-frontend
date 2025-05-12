@@ -20,7 +20,7 @@ import { modifyRack } from "@/lib/api";
 
 interface EditRackDialogProps {
   rack: SimpleRack | null;
-  onUpdateSuccess: (updatedRack: SimpleRack) => void;
+  onUpdateSuccess?: (updatedRack: SimpleRack) => void;
 }
 
 export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
@@ -68,7 +68,7 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
           name: formData.name,
           height: Number.parseInt(formData.height),
         };
-        onUpdateSuccess(updatedRack);
+        if (onUpdateSuccess) onUpdateSuccess(updatedRack);
         setOpen(false);
       } else {
         setError("Failed to edit Rack.");
@@ -92,7 +92,8 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
           <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              There are hosts in this rack, so the height cannot be changed. Please remove all hosts before changing the height.
+              There are hosts in this rack, so the height cannot be changed. Please remove all
+              hosts before changing the height.
             </AlertDescription>
           </Alert>
         )}

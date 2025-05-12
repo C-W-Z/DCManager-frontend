@@ -25,10 +25,13 @@ interface IPRange {
 
 interface EditDatacenterDialogProps {
   datacenter: SimpleDatacenter | null;
-  onUpdateSuccess: (updatedDC: SimpleDatacenter) => void;
+  onUpdateSuccess?: (updatedDC: SimpleDatacenter) => void;
 }
 
-export function EditDatacenterDialog({ datacenter, onUpdateSuccess }: EditDatacenterDialogProps) {
+export function EditDatacenterDialog({
+  datacenter,
+  onUpdateSuccess,
+}: EditDatacenterDialogProps) {
   // 添加内部状态管理打开/关闭状态
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -131,7 +134,7 @@ export function EditDatacenterDialog({ datacenter, onUpdateSuccess }: EditDatace
           name: formData.name,
           height: Number.parseInt(formData.height),
         };
-        onUpdateSuccess(updatedDC);
+        if (onUpdateSuccess) onUpdateSuccess(updatedDC);
         setOpen(false);
       } else {
         setError("Failed to edit Datacenter.");
@@ -249,7 +252,9 @@ export function EditDatacenterDialog({ datacenter, onUpdateSuccess }: EditDatace
               )}
 
               {hasEmptyIpRange && (
-                <p className="text-sm text-red-500">Please fill in all IP ranges or delete the blanks</p>
+                <p className="text-sm text-red-500">
+                  Please fill in all IP ranges or delete the blanks
+                </p>
               )}
             </div>
 

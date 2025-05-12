@@ -21,7 +21,11 @@ interface DCRowActionsProps {
   onDeleteSuccess: (ids: string[]) => void;
 }
 
-export function DatacenterRowActions({ row, onUpdateSuccess, onDeleteSuccess }: DCRowActionsProps) {
+export function DatacenterRowActions({
+  row,
+  onUpdateSuccess,
+  onDeleteSuccess,
+}: DCRowActionsProps) {
   const dc = row.original;
 
   const [currentDC, setCurrentDC] = useState<SimpleDatacenter | null>(null);
