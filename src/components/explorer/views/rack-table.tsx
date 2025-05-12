@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { DataTable } from "@/components/explorer/data-table";
 import { rackColumns } from "@/components/explorer/columns/rack-columns";
@@ -13,10 +11,9 @@ import { RackSummary } from "../summary/rack-summary";
 interface RackTableProps {
   datacenter: SimpleDatacenter;
   room: SimpleRoom;
-  onSelect: (room: SimpleRack) => void;
 }
 
-export default function RackTable({ datacenter, room, onSelect }: RackTableProps) {
+export default function RackTable({ datacenter, room }: RackTableProps) {
   const [filteredRacks, setFilteredRacks] = useState<SimpleRack[]>([]);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [currentRack, setCurrentRack] = useState<SimpleRack | null>(null);
@@ -57,7 +54,7 @@ export default function RackTable({ datacenter, room, onSelect }: RackTableProps
     setEditDialogOpen(false);
   };
 
-  const columns = rackColumns(onSelect);
+  const columns = rackColumns();
 
   return (
     <div>

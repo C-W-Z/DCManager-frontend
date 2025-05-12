@@ -7,7 +7,6 @@ interface BreadcrumbProps {
   currentView: ViewLevel;
   dcName: string | null;
   roomName: string | null;
-  rackName: string | null;
   onNavigate: (level: ViewLevel) => void;
 }
 
@@ -15,7 +14,6 @@ export default function Breadcrumb({
   currentView,
   dcName,
   roomName,
-  rackName,
   onNavigate,
 }: BreadcrumbProps) {
   return (
@@ -47,18 +45,6 @@ export default function Breadcrumb({
             className={`hover:underline ${currentView === "rack-table" ? "font-bold" : ""}`}
           >
             {roomName}
-          </button>
-        </>
-      )}
-
-      {rackName && (
-        <>
-          <ChevronRight className="mx-1 h-4 w-6 text-gray-400" />
-          <button
-            onClick={() => onNavigate("rack")}
-            className={`hover:underline ${currentView === "rack" ? "font-bold" : ""}`}
-          >
-            {rackName}
           </button>
         </>
       )}
