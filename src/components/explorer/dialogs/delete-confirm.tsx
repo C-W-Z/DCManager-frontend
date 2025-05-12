@@ -1,43 +1,126 @@
 "use client";
-import { Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { AlertCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { deleteDC, deleteRoom, deleteRack, deleteHost } from "@/lib/api";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+export type DeleteType = "datacenter" | "room" | "rack" | "host";
 
 interface DeleteConfirmationProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title?: string;
-  description?: string;
-  itemName?: string;
-  itemCount?: number;
+  ids: string[];
+  type: DeleteType;
+  itemNames?: string[];
+  onSuccess?: (ids: string[]) => void;
 }
 
 export function DeleteConfirmation({
-  isOpen,
-  onClose,
-  onConfirm,
-  title,
-  description,
-  itemName,
-  itemCount = 1,
+  ids,
+  type,
+  itemNames,
+  onSuccess,
 }: DeleteConfirmationProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // 当 ids 变化时，如果有值则打开对话框
+  useEffect(() => {
+    if (ids && ids.length > 0) {
+      setIsOpen(true);
+    }
+  }, [ids]);
+
+  const onClose = () => {
+    setIsOpen(false);
+  };
+
+  const onConfirm = async () => {
+    if (!ids || ids.length === 0) return;
+
+    setLoading(true);
+
+    try {
+      // 根据类型选择不同的删除函数
+      const deleteFunction = getDeleteFunction(type);
+
+      // 创建所有删除操作的Promise数组
+      const deletePromises = ids.map((id) => deleteFunction(id));
+
+      // 执行所有删除操作
+      const results = await Promise.all(deletePromises);
+
+      // 检查是否所有删除操作都成功
+      const allSuccessful = results.every((result) => result === true || result === undefined);
+
+      if (allSuccessful) {
+        // 如果所有删除都成功，通知父组件
+        if (onSuccess) {
+          onSuccess(ids);
+        }
+      } else {
+        console.error("Some delete operations failed");
+      }
+    } catch (error) {
+      console.error(`Error deleting ${type}:`, error);
+    } finally {
+      setLoading(false);
+      setIsOpen(false);
+    }
+  };
+
+  // 根据类型获取对应的删除函数
+  const getDeleteFunction = (type: DeleteType) => {
+    switch (type) {
+      case "datacenter":
+        return deleteDC;
+      case "room":
+        return deleteRoom;
+      case "rack":
+        return deleteRack;
+      case "host":
+        // 假设有一个 deleteHost 函数
+        return deleteHost;
+      default:
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        return (_id: string) => Promise.resolve(false);
+    }
+  };
+
+  // 获取类型的显示名称
+  const getTypeName = (type: DeleteType): string => {
+    switch (type) {
+      case "datacenter":
+        return "Data Center";
+      case "room":
+        return "Room";
+      case "rack":
+        return "Rack";
+      case "host":
+        return "Host";
+      default:
+        return "Item";
+    }
+  };
+
   if (!isOpen) return null;
 
-  const defaultTitle =
-    itemCount > 1 ? `Delete ${itemCount} items` : `Delete ${itemName || "item"}`;
+  const itemCount = ids?.length || 0;
+  const typeName = getTypeName(type);
 
-  const defaultDescription =
+  // 如果提供了具体的项目名称，则使用它
+  const itemName = itemNames && itemNames.length > 0 ? itemNames[0] : typeName;
+
+  const title =
+    itemCount > 1 ? `Delete ${itemCount} ${typeName}s` : `Delete ${itemName || "item"}`;
+
+  const description =
     itemCount > 1
-      ? `Are you sure you want to delete these ${itemCount} items?`
+      ? `Are you sure you want to delete these ${itemCount} ${typeName}s?`
       : `Are you sure you want to delete ${itemName || "this item"}?`;
-
-  const handleConfirm = () => {
-    onConfirm();
-  };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 text-pretty"
       onClick={onClose}
     >
       <div
@@ -47,18 +130,25 @@ export function DeleteConfirmation({
         <div className="mb-4 flex flex-col space-y-2 text-center sm:text-left">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-red-600">
             <Trash2 className="h-5 w-5" />
-            {title || defaultTitle}
+            {title}
           </h2>
-          <p className="text-sm text-black">{description || defaultDescription}</p>
-          <p className="text-sm text-red-600">This action cannot be undone. Everything inside will be delete too.</p>
+          <p className="text-sm text-black">{description}</p>
+          <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>This action cannot be undone. All associated content will also be deleted.</AlertDescription>
+          </Alert>
         </div>
 
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
           <Button variant="outline" onClick={onClose} className="mt-2 sm:mt-0">
             Cancel
           </Button>
-          <Button onClick={handleConfirm} className="bg-red-600 text-white hover:bg-red-700">
-            Delete
+          <Button
+            onClick={onConfirm}
+            className="bg-red-600 text-white hover:bg-red-700"
+            disabled={loading}
+          >
+            {loading ? "Deleting..." : "Delete"}
           </Button>
         </div>
       </div>

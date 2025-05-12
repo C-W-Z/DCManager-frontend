@@ -19,30 +19,30 @@ import type { SimpleRack } from "@/lib/type";
 import { modifyRack } from "@/lib/api";
 
 interface EditRackDialogProps {
-  rack: SimpleRack;
-  onUpdate: (updatedRack: SimpleRack | null) => void;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  rack: SimpleRack | null;
+  onUpdateSuccess: (updatedRack: SimpleRack) => void;
 }
 
-export function EditRackDialog({ rack, onUpdate, open, onOpenChange }: EditRackDialogProps) {
+export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     service_name: "", // TODO: we need service ID
     height: "",
   });
 
-  const hasHosts = rack?.n_hosts > 0;
+  const hasHosts = rack ? rack.n_hosts > 0 : false;
 
   useEffect(() => {
-    if (open && rack) {
-      setFormData({
-        name: rack.name,
-        service_name: rack.service_name,
-        height: rack.height.toString(),
-      });
-    }
-  }, [open, rack]);
+    if (!rack) return;
+    setOpen(true);
+    setFormData({
+      name: rack.name,
+      service_name: rack.service_name,
+      height: rack.height.toString(),
+    });
+  }, [rack]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -50,25 +50,37 @@ export function EditRackDialog({ rack, onUpdate, open, onOpenChange }: EditRackD
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    if (!rack) return;
     e.preventDefault();
+    setError(null);
 
     try {
-      const updatedRack = await modifyRack(rack.id, {
+      const success = await modifyRack(rack.id, {
         name: formData.name,
         service_id: formData.service_name, // TODO
         height: Number.parseInt(formData.height),
         room_id: rack.room_id,
       });
 
-      onUpdate(updatedRack);
-      onOpenChange(false);
+      if (success) {
+        const updatedRack: SimpleRack = {
+          ...rack,
+          name: formData.name,
+          height: Number.parseInt(formData.height),
+        };
+        onUpdateSuccess(updatedRack);
+        setOpen(false);
+      } else {
+        setError("Failed to edit Rack.");
+      }
     } catch (error) {
       console.error("Error updating rack:", error);
+      setError("Failed to edit Rack.");
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
@@ -80,8 +92,15 @@ export function EditRackDialog({ rack, onUpdate, open, onOpenChange }: EditRackD
           <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              此機架內有主機，無法修改高度。請先移除所有主機後再修改高度。
+              There are hosts in this rack, so the height cannot be changed. Please remove all hosts before changing the height.
             </AlertDescription>
+          </Alert>
+        )}
+
+        {error && (
+          <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
@@ -118,7 +137,7 @@ export function EditRackDialog({ rack, onUpdate, open, onOpenChange }: EditRackD
             />
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button type="submit">Save</Button>

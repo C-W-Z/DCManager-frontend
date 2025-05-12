@@ -24,18 +24,10 @@ export function getDC(dc_id: string): Promise<mytype.Datacenter> {
   return Promise.resolve(dc);
 }
 
-// export function modifyDC(
-//   dc_id: string,
-//   body: Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">,
-// ) {
-//   console.log("modifyDC", dc_id, body);
-//   return true;
-// }
-
-export function modifyDC(
+export async function modifyDC(
   dc_id: string,
   body: Partial<Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">>,
-) {
+): Promise<boolean> {
   console.log("modifyDC", dc_id, body);
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -44,11 +36,6 @@ export function modifyDC(
     resolve(true) // return true
   })
 }
-
-// export function deleteDC(dc_id: string) {
-//   console.log("deleteDC", dc_id);
-//   return true;
-// }
 
 export async function deleteDC(dc_id: string): Promise<boolean> {
   console.log("deleteDC", dc_id);
@@ -75,17 +62,27 @@ export function getRoom(room_id: string): Promise<mytype.Room> {
   return Promise.resolve(room);
 }
 
-export function modifyRoom(
+export async function modifyRoom(
   room_id: string,
   body: Partial<Pick<mytype.Room, "name" | "height" | "dc_id">>,
-) {
+): Promise<boolean> {
   console.log("modifyRoom", room_id, body);
-  return null;
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Failed to edit room with id ${room_id}`))
+    }, 300)
+    resolve(true) // return true
+  })
 }
 
-export function deleteRoom(room_id: string) {
+export async function deleteRoom(room_id: string): Promise<boolean> {
   console.log("deleteRoom", room_id);
-  return null;
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Failed to delete room with id ${room_id}`))
+    }, 300)
+    resolve(true) // return true
+  })
 }
 
 export function addRack(body: Pick<mytype.Rack, "name" | "height" | "room_id" | "dc_id">) {
@@ -106,14 +103,24 @@ export function getRack(rack_id: string): Promise<mytype.Rack> {
 export function modifyRack(
   rack_id: string,
   body: Partial<Pick<mytype.Rack, "name" | "height" | "room_id" | "service_id">>,
-) {
+): Promise<boolean> {
   console.log("modifyRack", rack_id, body);
-  return null;
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Failed to edit room with id ${rack_id}`))
+    }, 300)
+    resolve(true) // return true
+  })
 }
 
-export function deleteRack(rack_id: string) {
+export function deleteRack(rack_id: string): Promise<boolean> {
   console.log("deleteRack", rack_id);
-  return null;
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Failed to delete room with id ${rack_id}`))
+    }, 300)
+    resolve(true) // return true
+  })
 }
 
 export function addHost(

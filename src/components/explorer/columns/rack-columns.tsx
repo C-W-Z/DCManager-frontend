@@ -1,20 +1,17 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import type { SimpleRack } from "@/lib/type";
 import { Link } from "react-router-dom";
+import { RackRowActions } from "./rack-actions";
 
-export function rackColumns(): ColumnDef<SimpleRack>[] {
+export function rackColumns(
+  onUpdateSuccess: (dc: SimpleRack) => void,
+  onDeleteSuccess: (ids: string[]) => void,
+): ColumnDef<SimpleRack>[] {
   return [
     {
       id: "select",
@@ -129,38 +126,13 @@ export function rackColumns(): ColumnDef<SimpleRack>[] {
     },
     {
       id: "actions",
-      cell: ({ row, table }) => {
-        const rack = row.original;
-
-        // Access the functions from table meta
-        const { openDeleteDialog, openEditDialog } = table.options.meta as {
-          openDeleteDialog: (row: unknown, name?: string) => void;
-          openEditDialog: (row: SimpleRack) => void;
-        };
-
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => openEditDialog(rack)}>
-                <Edit className="mr-2 h-4 w-4" /> Edit
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-red-600"
-                onClick={() => openDeleteDialog(row, rack.name)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" /> DELETE
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
+      cell: ({ row }) => (
+        <RackRowActions
+          row={row}
+          onUpdateSuccess={onUpdateSuccess}
+          onDeleteSuccess={onDeleteSuccess}
+        />
+      ),
     },
   ];
 }

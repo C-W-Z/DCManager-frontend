@@ -23,13 +23,12 @@ interface IPRange {
   end_ip: string;
 }
 
-// 修改组件接口，移除 open 和 onOpenChange 参数
 interface EditDatacenterDialogProps {
   datacenter: SimpleDatacenter | null;
-  onUpdate: (updatedDC: SimpleDatacenter | null) => void;
+  onUpdateSuccess: (updatedDC: SimpleDatacenter) => void;
 }
 
-export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDialogProps) {
+export function EditDatacenterDialog({ datacenter, onUpdateSuccess }: EditDatacenterDialogProps) {
   // 添加内部状态管理打开/关闭状态
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -132,14 +131,14 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
           name: formData.name,
           height: Number.parseInt(formData.height),
         };
-        onUpdate(updatedDC);
+        onUpdateSuccess(updatedDC);
         setOpen(false);
       } else {
-        setError("更新數據中心失敗，請稍後再試。");
+        setError("Failed to edit Datacenter.");
       }
     } catch (error) {
       console.error("Error updating datacenter:", error);
-      setError("更新數據中心時發生錯誤。");
+      setError("Failed to edit Datacenter.");
     } finally {
       setLoading(false);
     }
@@ -150,7 +149,7 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-            <Edit className="h-5 w-5" /> 編輯數據中心
+            <Edit className="h-5 w-5" /> Edit Data Center
           </DialogTitle>
         </DialogHeader>
         {loading ? (
@@ -160,7 +159,7 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6 pt-4">
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
@@ -168,7 +167,7 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">名稱</Label>
+                <Label htmlFor="name">Name</Label>
                 <Input
                   id="name"
                   name="name"
@@ -178,7 +177,7 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="height">標準高度 (U)</Label>
+                <Label htmlFor="height">Height (U)</Label>
                 <Input
                   id="height"
                   name="height"
@@ -192,7 +191,7 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label>IP 範圍</Label>
+                <Label>IP Ranges</Label>
                 <Button
                   type="button"
                   variant="outline"
@@ -200,13 +199,13 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
                   onClick={addIpRange}
                   className="h-8"
                 >
-                  <Plus className="mr-1 h-4 w-4" /> 添加範圍
+                  <Plus className="mr-1 h-4 w-4" /> Add IP Range
                 </Button>
               </div>
 
               {ipRanges.length === 0 ? (
                 <div className="rounded-md border border-dashed p-4 text-center text-sm text-gray-500">
-                  尚未設定 IP 範圍。點擊上方按鈕添加。
+                  No IP range has been set. Click the button above to add one.
                 </div>
               ) : (
                 <div className="max-h-[300px] space-y-3 overflow-y-auto pr-2">
@@ -214,7 +213,7 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
                     <div key={index} className="flex items-center gap-2">
                       <div className="flex-1">
                         <Input
-                          placeholder="起始 IP"
+                          placeholder="Starting IP"
                           value={range.start_ip}
                           onChange={(e) =>
                             handleIpRangeChange(index, "start_ip", e.target.value)
@@ -223,11 +222,11 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
                         />
                       </div>
                       <div className="flex w-8 items-center justify-center">
-                        <span className="text-gray-500">至</span>
+                        <span className="text-gray-500">to</span>
                       </div>
                       <div className="flex-1">
                         <Input
-                          placeholder="結束 IP"
+                          placeholder="Ending IP"
                           value={range.end_ip}
                           onChange={(e) =>
                             handleIpRangeChange(index, "end_ip", e.target.value)
@@ -250,16 +249,16 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
               )}
 
               {hasEmptyIpRange && (
-                <p className="text-sm text-red-500">請填寫所有IP範圍或刪除空白項</p>
+                <p className="text-sm text-red-500">Please fill in all IP ranges or delete the blanks</p>
               )}
             </div>
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                取消
+                Cancel
               </Button>
               <Button type="submit" disabled={loading || hasEmptyIpRange}>
-                {loading ? "保存中..." : "保存"}
+                {loading ? "Saving..." : "Save"}
               </Button>
             </DialogFooter>
           </form>
