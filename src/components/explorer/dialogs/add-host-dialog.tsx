@@ -31,7 +31,7 @@ import { cn } from "@/lib/utils";
 import { Rack, SimpleHost, host_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addHost } from "@/lib/api";
-import { useRackContext } from "@/components/rack/rack-context";
+import { useRackContext } from "@/components/explorer/rack/rack-context";
 import Icon from "@/components/icon";
 
 const form_schema = host_schema.pick({ name: true, height: true });

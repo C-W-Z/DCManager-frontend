@@ -2,9 +2,9 @@ import { useEffect, useState, useReducer } from "react";
 import { getRack } from "@/lib/api";
 import { Rack } from "@/lib/type";
 import { Skeleton } from "@/components/ui/skeleton";
-import RackDnD from "@/components/rack/rack-dnd";
-import { RackDnDReducer, RackDroppable } from "@/components/rack/rack-dnd-reducer";
-import { RackContext } from "@/components/rack/rack-context";
+import RackDnD from "@/components/explorer/rack/rack-dnd";
+import { RackDnDReducer, RackDroppable } from "@/components/explorer/rack/rack-dnd-reducer";
+import { RackContext } from "@/components/explorer/rack/rack-context";
 import { AddHostDialog } from "../dialogs/add-host-dialog";
 
 interface RackViewProps {

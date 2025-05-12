@@ -97,6 +97,7 @@ export const simple_datacenter_schema = datacenter_schema.pick({
   n_hosts: true,
   n_racks: true,
   n_rooms: true,
+  ip_ranges: true,
 });
 
 export type Service = z.infer<typeof service_schema>;
