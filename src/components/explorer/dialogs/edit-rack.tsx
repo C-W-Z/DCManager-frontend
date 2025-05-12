@@ -71,11 +71,11 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
         onUpdateSuccess(updatedRack);
         setOpen(false);
       } else {
-        setError("更新數據中心失敗，請稍後再試。");
+        setError("Failed to edit Rack.");
       }
     } catch (error) {
       console.error("Error updating rack:", error);
-      setError("更新數據中心時發生錯誤。");
+      setError("Failed to edit Rack.");
     }
   };
 
@@ -92,7 +92,7 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
           <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              此機架內有主機，無法修改高度。請先移除所有主機後再修改高度。
+              There are hosts in this rack, so the height cannot be changed. Please remove all hosts before changing the height.
             </AlertDescription>
           </Alert>
         )}

@@ -68,11 +68,11 @@ export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
         onUpdateSuccess(updatedRoom);
         setOpen(false);
       } else {
-        setError("更新數據中心失敗，請稍後再試。");
+        setError("Failed to edit Room.");
       }
     } catch (error) {
       console.error("Error updating room:", error);
-      setError("更新數據中心時發生錯誤。");
+      setError("Failed to edit Room.");
     }
   };
 

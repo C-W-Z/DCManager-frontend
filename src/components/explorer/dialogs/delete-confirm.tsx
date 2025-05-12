@@ -80,7 +80,8 @@ export function DeleteConfirmation({
         // 假设有一个 deleteHost 函数
         return deleteHost;
       default:
-        return (id: string) => Promise.resolve(false);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        return (_id: string) => Promise.resolve(false);
     }
   };
 
@@ -108,12 +109,13 @@ export function DeleteConfirmation({
   // 如果提供了具体的项目名称，则使用它
   const itemName = itemNames && itemNames.length > 0 ? itemNames[0] : typeName;
 
-  const title = itemCount > 1 ? `删除 ${itemCount} 个${typeName}` : `删除 ${itemName}`;
+  const title =
+    itemCount > 1 ? `Delete ${itemCount} ${typeName}s` : `Delete ${itemName || "item"}`;
 
   const description =
     itemCount > 1
-      ? `您确定要删除这 ${itemCount} 个${typeName}吗？`
-      : `您确定要删除${itemName}吗？`;
+      ? `Are you sure you want to delete these ${itemCount} items?`
+      : `Are you sure you want to delete ${itemName || "this item"}?`;
 
   return (
     <div
@@ -130,7 +132,7 @@ export function DeleteConfirmation({
             {title}
           </h2>
           <p className="text-sm text-black">{description}</p>
-          <p className="text-sm text-red-600">此操作无法撤销。所有相关内容也将被删除。</p>
+          <p className="text-sm text-red-600">This action cannot be undone. All associated content will also be deleted.</p>
         </div>
 
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
@@ -138,16 +140,15 @@ export function DeleteConfirmation({
             variant="outline"
             onClick={onClose}
             className="mt-2 sm:mt-0"
-            disabled={loading}
           >
-            取消
+            Cancel
           </Button>
           <Button
             onClick={onConfirm}
             className="bg-red-600 text-white hover:bg-red-700"
             disabled={loading}
           >
-            {loading ? "删除中..." : "删除"}
+            {loading ? "Deleting..." : "Delete"}
           </Button>
         </div>
       </div>

@@ -38,6 +38,10 @@ import { DataTablePagination } from "./data-table-pagination";
 import { Trash2 } from "lucide-react";
 import { DeleteConfirmation } from "./dialogs/delete-confirm";
 
+interface WithID {
+  id: string;
+}
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -47,7 +51,7 @@ interface DataTableProps<TData, TValue> {
   onDeleteSuccess?: (ids: string[]) => void;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends WithID, TValue>({
   columns,
   data,
   getRowId,
