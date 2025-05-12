@@ -108,6 +108,7 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
         getRowId={(row) => row.id}
         loading={loading}
         onDeleteSuccess={onDeleteSuccess}
+        type="datacenter"
       />
     </div>
   );

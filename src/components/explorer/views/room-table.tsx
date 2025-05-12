@@ -85,6 +85,7 @@ export default function RoomTable({ datacenter, onSelect }: RoomTableProps) {
         getRowId={(row) => row.id}
         loading={loading}
         onDeleteSuccess={onDeleteSuccess}
+        type="room"
       />
     </div>
   );

@@ -83,6 +83,7 @@ export default function RackTable({ datacenter, room }: RackTableProps) {
         getRowId={(row) => row.id}
         loading={loading}
         onDeleteSuccess={onDeleteSuccess}
+        type="rack"
       />
     </div>
   );

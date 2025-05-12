@@ -36,7 +36,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTablePagination } from "./data-table-pagination";
 import { Trash2 } from "lucide-react";
-import { DeleteConfirmation } from "./dialogs/delete-confirm";
+import { DeleteConfirmation, DeleteType } from "./dialogs/delete-confirm";
 
 interface WithID {
   id: string;
@@ -49,6 +49,7 @@ interface DataTableProps<TData, TValue> {
   getRowId: (row: TData) => string;
   loading?: boolean;
   onDeleteSuccess?: (ids: string[]) => void;
+  type: DeleteType,
 }
 
 export function DataTable<TData extends WithID, TValue>({
@@ -57,6 +58,7 @@ export function DataTable<TData extends WithID, TValue>({
   getRowId,
   loading = false,
   onDeleteSuccess,
+  type,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -242,7 +244,7 @@ export function DataTable<TData extends WithID, TValue>({
       {/* 多选删除确认对话框 */}
       <DeleteConfirmation
         ids={multipleIdsToDelete}
-        type="datacenter"
+        type={type}
         onSuccess={handleMultipleDeleteSuccess}
       />
     </div>

@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Trash2 } from "lucide-react";
+import { AlertCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteDC, deleteRoom, deleteRack, deleteHost } from "@/lib/api";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-type DeleteType = "datacenter" | "room" | "rack" | "host";
+export type DeleteType = "datacenter" | "room" | "rack" | "host";
 
 interface DeleteConfirmationProps {
   ids: string[];
@@ -114,12 +115,12 @@ export function DeleteConfirmation({
 
   const description =
     itemCount > 1
-      ? `Are you sure you want to delete these ${itemCount} items?`
+      ? `Are you sure you want to delete these ${itemCount} ${typeName}s?`
       : `Are you sure you want to delete ${itemName || "this item"}?`;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 text-pretty"
       onClick={onClose}
     >
       <div
@@ -132,15 +133,14 @@ export function DeleteConfirmation({
             {title}
           </h2>
           <p className="text-sm text-black">{description}</p>
-          <p className="text-sm text-red-600">This action cannot be undone. All associated content will also be deleted.</p>
+          <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>This action cannot be undone. All associated content will also be deleted.</AlertDescription>
+          </Alert>
         </div>
 
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="mt-2 sm:mt-0"
-          >
+          <Button variant="outline" onClick={onClose} className="mt-2 sm:mt-0">
             Cancel
           </Button>
           <Button
