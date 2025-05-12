@@ -4,6 +4,8 @@ import { height2Px, pos2translateY, HOST_HEIGHT, RACK_GAP } from "@/lib/constant
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRackContext } from "./rack-context";
+import { modifyHost } from "@/lib/api";
+import { Link } from "react-router-dom";
 
 interface HostDraggableProps {
   host: SimpleHost;
@@ -76,6 +78,15 @@ export default function HostDraggable({
         toast.success(
           `Host ${host.name} successfully moved to position ${state.dragging.nextPos}`,
         );
+
+        modifyHost(host.id, {
+          rack_id: state.rack.id,
+          pos: state.dragging.nextPos,
+        })
+          .then(() => {})
+          .catch((error) => {
+            toast.error(`Failed to move host ${host.name}: ${error.message}`);
+          });
       } else {
         toast.warning(`Host cannot be moved here`);
       }
@@ -113,7 +124,9 @@ export default function HostDraggable({
           zIndex: state.dragging?.id === host.id ? 99 : 1,
         }}
       >
-        <div className="text-sm font-bold">{host.name}</div>
+        <Link to={`/host/${host.id}`} className="text-sm font-bold">
+          {host.name}
+        </Link>
         <div
           className={cn(
             "h-3 w-3 rounded-full",

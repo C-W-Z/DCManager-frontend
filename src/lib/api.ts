@@ -34,8 +34,8 @@ export function getDC(dc_id: string): Promise<mytype.Datacenter> {
 
 export function modifyDC(
   dc_id: string,
-  body: Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">,
-): Promise<boolean> {
+  body: Partial<Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">>,
+) {
   console.log("modifyDC", dc_id, body);
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -77,7 +77,7 @@ export function getRoom(room_id: string): Promise<mytype.Room> {
 
 export function modifyRoom(
   room_id: string,
-  body: Pick<mytype.Room, "name" | "height" | "dc_id">,
+  body: Partial<Pick<mytype.Room, "name" | "height" | "dc_id">>,
 ) {
   console.log("modifyRoom", room_id, body);
   return null;
@@ -105,7 +105,7 @@ export function getRack(rack_id: string): Promise<mytype.Rack> {
 
 export function modifyRack(
   rack_id: string,
-  body: Pick<mytype.Rack, "name" | "height" | "room_id" | "service_id">,
+  body: Partial<Pick<mytype.Rack, "name" | "height" | "room_id" | "service_id">>,
 ) {
   console.log("modifyRack", rack_id, body);
   return null;
@@ -135,15 +135,15 @@ export function getHost(host_id: string): Promise<mytype.Host> {
 
 export function modifyHost(
   host_id: string,
-  body: Pick<mytype.Host, "name" | "height" | "rack_id" | "pos">,
+  body: Partial<Pick<mytype.Host, "name" | "height" | "ip" | "rack_id" | "pos">>,
 ) {
   console.log("modifyHost", host_id, body);
-  return Promise.resolve("success");
+  return Promise.resolve(true);
 }
 
 export function deleteHost(host_id: string) {
   console.log("deleteHost", host_id);
-  return Promise.resolve("success");
+  return Promise.resolve(true);
 }
 
 export function addService(body: Pick<mytype.Service, "name" | "n_racks" | "total_ip">) {
