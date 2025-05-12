@@ -23,7 +23,6 @@ interface IPRange {
   end_ip: string;
 }
 
-// 修改组件接口，移除 open 和 onOpenChange 参数
 interface EditDatacenterDialogProps {
   datacenter: SimpleDatacenter | null;
   onUpdateSuccess: (updatedDC: SimpleDatacenter) => void;

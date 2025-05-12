@@ -13,31 +13,32 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Edit } from "lucide-react";
+import { AlertCircle, Edit } from "lucide-react";
 import type { SimpleRoom } from "@/lib/type";
 import { modifyRoom } from "@/lib/api";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface EditRoomDialogProps {
-  room: SimpleRoom;
-  onUpdate: (updatedRoom: SimpleRoom | null) => void;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  room: SimpleRoom | null;
+  onUpdateSuccess: (updatedRoom: SimpleRoom) => void;
 }
 
-export function EditRoomDialog({ room, onUpdate, open, onOpenChange }: EditRoomDialogProps) {
+export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
+  const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     height: "",
   });
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (open && room) {
-      setFormData({
-        name: room.name,
-        height: room.height.toString(),
-      });
-    }
-  }, [open, room]);
+    if (!room) return;
+    setOpen(true);
+    setFormData({
+      name: room.name,
+      height: room.height.toString(),
+    });
+  }, [room]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,25 +46,38 @@ export function EditRoomDialog({ room, onUpdate, open, onOpenChange }: EditRoomD
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    if (!room) return;
     e.preventDefault();
+    setError(null);
 
     try {
-      const updatedRoom = await modifyRoom(room.id, {
-        // TODO
+      const success = await modifyRoom(room.id, {
         name: formData.name,
         height: Number.parseInt(formData.height),
         dc_id: room.dc_id,
       });
 
-      onUpdate(updatedRoom);
-      onOpenChange(false);
+      if (success) {
+        // 如果修改成功，更新父组件中的数据
+        // 由于modifyDC只返回布尔值，我们需要构造一个更新后的对象
+        const updatedRoom: SimpleRoom = {
+          ...room,
+          name: formData.name,
+          height: Number.parseInt(formData.height),
+        };
+        onUpdateSuccess(updatedRoom);
+        setOpen(false);
+      } else {
+        setError("更新數據中心失敗，請稍後再試。");
+      }
     } catch (error) {
       console.error("Error updating room:", error);
+      setError("更新數據中心時發生錯誤。");
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
@@ -71,6 +85,13 @@ export function EditRoomDialog({ room, onUpdate, open, onOpenChange }: EditRoomD
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -93,7 +114,7 @@ export function EditRoomDialog({ room, onUpdate, open, onOpenChange }: EditRoomD
             />
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button type="submit">Save</Button>
