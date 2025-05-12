@@ -80,7 +80,7 @@ export function DeleteConfirmation({
         // 假设有一个 deleteHost 函数
         return deleteHost;
       default:
-        return () => Promise.resolve(false);
+        return (id: string) => Promise.resolve(false);
     }
   };
 

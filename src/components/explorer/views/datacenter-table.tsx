@@ -6,12 +6,10 @@ import type { SimpleDatacenter } from "@/lib/type";
 import { getAllDC } from "@/lib/api";
 import { useEffect, useState, useCallback } from "react";
 import { AddDatacenterDialog } from "@/components/explorer/dialogs/add-datacenter-dialog";
-import type { Row } from "@tanstack/react-table";
 import {
   type Count,
   DataCenterSummary,
 } from "@/components/explorer/summary/datacenter-summary";
-import { DeleteConfirmation } from "../dialogs/delete-confirm";
 
 interface DataCenterTableProps {
   onSelect: (dc: SimpleDatacenter) => void;
@@ -21,7 +19,6 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
   const [totalCounts, setTotalCounts] = useState<Count>({ dc: 0, room: 0, rack: 0, host: 0 });
   const [loading, setLoading] = useState(false);
-  const [multipleIdsToDelete, setMultipleIdsToDelete] = useState<string[]>([]);
 
   // 使用 useCallback 包装 calculateTotalCounts 函数
   const calculateTotalCounts = useCallback((dcs: SimpleDatacenter[]) => {
@@ -71,20 +68,13 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
     }
   };
 
-  const handleDeleteMultiple = (rows: Row<SimpleDatacenter>[]) => {
-    const idsToDelete = rows.map((row) => row.original.id);
-    setMultipleIdsToDelete(idsToDelete);
-  };
-
   const handleMultipleDeleteSuccess = (idsToDelete: string[]) => {
-    setMultipleIdsToDelete([]);
-    // 重新加载数据
-    // loadDataCenters();
-
     const updatedDCs = dataCenters.filter((dc) => !idsToDelete.includes(dc.id));
     setDataCenters(updatedDCs);
     // 重新计算总计数据
     calculateTotalCounts(updatedDCs);
+    // 重新加载数据
+    // loadDataCenters();
   };
 
   // 添加手动刷新功能
@@ -115,16 +105,9 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
       <DataTable
         columns={columns}
         data={dataCenters}
-        onDeleteRows={handleDeleteMultiple}
         getRowId={(row) => row.id}
         loading={loading}
-      />
-
-      {/* 多选删除确认对话框 */}
-      <DeleteConfirmation
-        ids={multipleIdsToDelete}
-        type="datacenter"
-        onSuccess={handleMultipleDeleteSuccess}
+        onDeleteSuccess={handleMultipleDeleteSuccess}
       />
     </div>
   );

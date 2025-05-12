@@ -36,6 +36,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTablePagination } from "./data-table-pagination";
 import { Trash2 } from "lucide-react";
+import { DeleteConfirmation } from "./dialogs/delete-confirm";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -43,19 +44,21 @@ interface DataTableProps<TData, TValue> {
   onDeleteRows?: (rows: Row<TData>[]) => void;
   getRowId: (row: TData) => string;
   loading?: boolean;
+  onDeleteSuccess?: (ids: string[]) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  onDeleteRows,
   getRowId,
   loading = false,
+  onDeleteSuccess,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [isColumnMenuOpen, setIsColumnMenuOpen] = useState(false);
+  const [multipleIdsToDelete, setMultipleIdsToDelete] = useState<string[]>([]);
 
   const table = useReactTable({
     data,
@@ -82,10 +85,21 @@ export function DataTable<TData, TValue>({
 
   const handleDeleteSelected = () => {
     const selectedRows = table.getFilteredSelectedRowModel().rows;
-    if (selectedRows.length > 0 && onDeleteRows) {
+    if (selectedRows.length > 0) {
       onDeleteRows(selectedRows);
-      table.resetRowSelection();
     }
+  };
+
+  const onDeleteRows = (rows: Row<TData>[]) => {
+    const idsToDelete = rows.map((row) => row.original.id);
+    setMultipleIdsToDelete(idsToDelete);
+  };
+
+  const handleMultipleDeleteSuccess = (idsToDelete: string[]) => {
+    if (onDeleteSuccess)
+      onDeleteSuccess(idsToDelete)
+    setMultipleIdsToDelete([]);
+    table.resetRowSelection();
   };
 
   const selectedRowCount = table.getFilteredSelectedRowModel().rows.length;
@@ -220,6 +234,13 @@ export function DataTable<TData, TValue>({
       </div>
 
       <DataTablePagination table={table} />
+
+      {/* 多选删除确认对话框 */}
+      <DeleteConfirmation
+        ids={multipleIdsToDelete}
+        type="datacenter"
+        onSuccess={handleMultipleDeleteSuccess}
+      />
     </div>
   );
 }
