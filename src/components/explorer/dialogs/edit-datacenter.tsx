@@ -23,19 +23,15 @@ interface IPRange {
   end_ip: string;
 }
 
+// 修改组件接口，移除 open 和 onOpenChange 参数
 interface EditDatacenterDialogProps {
   datacenter: SimpleDatacenter;
   onUpdate: (updatedDC: SimpleDatacenter | null) => void;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
 }
 
-export function EditDatacenterDialog({
-  datacenter,
-  onUpdate,
-  open,
-  onOpenChange,
-}: EditDatacenterDialogProps) {
+export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDialogProps) {
+  // 添加内部状态管理打开/关闭状态
+  const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     height: "",
@@ -45,8 +41,10 @@ export function EditDatacenterDialog({
   const [error, setError] = useState<string | null>(null);
   const [hasEmptyIpRange, setHasEmptyIpRange] = useState(false);
 
+  // 当 datacenter 变化时，如果有值则打开对话框
   useEffect(() => {
-    if (open && datacenter) {
+    if (datacenter) {
+      setOpen(true);
       setLoading(true);
       setError(null);
       getDC(datacenter.id)
@@ -135,24 +133,24 @@ export function EditDatacenterDialog({
           height: Number.parseInt(formData.height),
         };
         onUpdate(updatedDC);
-        onOpenChange(false);
+        setOpen(false);
       } else {
-        setError("Failed to update data center, please try again later.");
+        setError("更新數據中心失敗，請稍後再試。");
       }
     } catch (error) {
       console.error("Error updating datacenter:", error);
-      setError("An error occurred while updating the data center.");
+      setError("更新數據中心時發生錯誤。");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-            <Edit className="h-5 w-5" /> Edit Data Center
+            <Edit className="h-5 w-5" /> 編輯數據中心
           </DialogTitle>
         </DialogHeader>
         {loading ? (
@@ -170,7 +168,7 @@ export function EditDatacenterDialog({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">名稱</Label>
                 <Input
                   id="name"
                   name="name"
@@ -180,7 +178,7 @@ export function EditDatacenterDialog({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="height">Height (U)</Label>
+                <Label htmlFor="height">標準高度 (U)</Label>
                 <Input
                   id="height"
                   name="height"
@@ -194,7 +192,7 @@ export function EditDatacenterDialog({
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label>IP Ranges</Label>
+                <Label>IP 範圍</Label>
                 <Button
                   type="button"
                   variant="outline"
@@ -202,13 +200,13 @@ export function EditDatacenterDialog({
                   onClick={addIpRange}
                   className="h-8"
                 >
-                  <Plus className="mr-1 h-4 w-4" /> Add IP Range
+                  <Plus className="mr-1 h-4 w-4" /> 添加範圍
                 </Button>
               </div>
 
               {ipRanges.length === 0 ? (
                 <div className="rounded-md border border-dashed p-4 text-center text-sm text-gray-500">
-                  No IP range has been set. Click the button above to add one.
+                  尚未設定 IP 範圍。點擊上方按鈕添加。
                 </div>
               ) : (
                 <div className="max-h-[300px] space-y-3 overflow-y-auto pr-2">
@@ -216,7 +214,7 @@ export function EditDatacenterDialog({
                     <div key={index} className="flex items-center gap-2">
                       <div className="flex-1">
                         <Input
-                          placeholder="Starting IP"
+                          placeholder="起始 IP"
                           value={range.start_ip}
                           onChange={(e) =>
                             handleIpRangeChange(index, "start_ip", e.target.value)
@@ -225,11 +223,11 @@ export function EditDatacenterDialog({
                         />
                       </div>
                       <div className="flex w-8 items-center justify-center">
-                        <span className="text-gray-500">to</span>
+                        <span className="text-gray-500">至</span>
                       </div>
                       <div className="flex-1">
                         <Input
-                          placeholder="Ending IP"
+                          placeholder="結束 IP"
                           value={range.end_ip}
                           onChange={(e) =>
                             handleIpRangeChange(index, "end_ip", e.target.value)
@@ -252,16 +250,13 @@ export function EditDatacenterDialog({
               )}
 
               {hasEmptyIpRange && (
-                <p className="text-sm text-red-500">Please fill in all IP ranges or delete the blanks</p>
+                <p className="text-sm text-red-500">請填寫所有IP範圍或刪除空白項</p>
               )}
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
               <Button type="submit" disabled={loading || hasEmptyIpRange}>
-                {loading ? "Saving..." : "Save"}
+                {loading ? "保存中..." : "保存"}
               </Button>
             </DialogFooter>
           </form>

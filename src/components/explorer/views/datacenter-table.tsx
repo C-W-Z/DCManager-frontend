@@ -20,7 +20,6 @@ interface DataCenterTableProps {
 export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
   const [totalCounts, setTotalCounts] = useState<Count>({ dc: 0, room: 0, rack: 0, host: 0 });
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [currentDC, setCurrentDC] = useState<SimpleDatacenter | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -122,7 +121,6 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
 
   const handleEditDataCenter = (dc: SimpleDatacenter) => {
     setCurrentDC(dc);
-    setEditDialogOpen(true);
   };
 
   const handleUpdateDataCenter = (updatedDC: SimpleDatacenter | null) => {
@@ -134,9 +132,6 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
       // 或者，如果更新不影响总计数据，可以跳过重新加载
       // loadDataCenters();
     }
-
-    // 无论更新是否成功，都关闭编辑对话框
-    setEditDialogOpen(false);
   };
 
   // 添加手动刷新功能
@@ -175,12 +170,7 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
       />
 
       {currentDC && (
-        <EditDatacenterDialog
-          datacenter={currentDC}
-          onUpdate={handleUpdateDataCenter}
-          open={editDialogOpen}
-          onOpenChange={setEditDialogOpen}
-        />
+        <EditDatacenterDialog datacenter={currentDC} onUpdate={handleUpdateDataCenter} />
       )}
     </div>
   );
