@@ -3,7 +3,7 @@
 import { DataTable } from "@/components/explorer/data-table";
 import { dataCenterColumns } from "@/components/explorer/columns/datacenter-columns";
 import type { SimpleDatacenter } from "@/lib/type";
-import { getAllDC, deleteDC } from "@/lib/api";
+import { getAllDC } from "@/lib/api";
 import { useEffect, useState, useCallback } from "react";
 import { AddDatacenterDialog } from "@/components/explorer/dialogs/add-datacenter-dialog";
 import type { Row } from "@tanstack/react-table";
@@ -11,6 +11,7 @@ import {
   type Count,
   DataCenterSummary,
 } from "@/components/explorer/summary/datacenter-summary";
+import { DeleteConfirmation } from "../dialogs/delete-confirm";
 
 interface DataCenterTableProps {
   onSelect: (dc: SimpleDatacenter) => void;
@@ -20,6 +21,7 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
   const [totalCounts, setTotalCounts] = useState<Count>({ dc: 0, room: 0, rack: 0, host: 0 });
   const [loading, setLoading] = useState(false);
+  const [multipleIdsToDelete, setMultipleIdsToDelete] = useState<string[]>([]);
 
   // 使用 useCallback 包装 calculateTotalCounts 函数
   const calculateTotalCounts = useCallback((dcs: SimpleDatacenter[]) => {
@@ -60,72 +62,29 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
     loadDataCenters();
   }, [loadDataCenters]); // 正确添加依赖项
 
-  const handleDeleteDataCenter = (id: string) => {
-    setLoading(true);
-    deleteDC(id)
-      .then((success) => {
-        if (success) {
-          // 如果删除成功，更新本地状态
-          const updatedDCs = dataCenters.filter((dc) => dc.id !== id);
-          setDataCenters(updatedDCs);
-          // 重新计算总计数据
-          calculateTotalCounts(updatedDCs);
-        } else {
-          console.error("Failed to delete datacenter");
-          // 可能需要显示错误消息给用户
-        }
-      })
-      .catch((error) => {
-        console.error("Error deleting datacenter:", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
-  const handleDeleteMultiple = (rows: Row<SimpleDatacenter>[]) => {
-    const idsToDelete = rows.map((row) => row.original.id);
-    setLoading(true);
-
-    // 创建所有删除操作的Promise数组
-    const deletePromises = idsToDelete.map((id) => deleteDC(id));
-
-    // 执行所有删除操作
-    Promise.all(deletePromises)
-      .then((results) => {
-        // 检查是否所有删除操作都成功
-        const allSuccessful = results.every((success) => success);
-
-        if (allSuccessful) {
-          // 如果所有删除都成功，更新本地状态
-          const updatedDCs = dataCenters.filter((dc) => !idsToDelete.includes(dc.id));
-          setDataCenters(updatedDCs);
-          // 重新计算总计数据
-          calculateTotalCounts(updatedDCs);
-        } else {
-          // 如果有删除失败，重新加载数据以确保一致性
-          loadDataCenters();
-        }
-      })
-      .catch((error) => {
-        console.error("Error deleting multiple datacenters:", error);
-        // 发生错误时重新加载数据
-        loadDataCenters();
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
   const handleUpdateDataCenter = (updatedDC: SimpleDatacenter | null) => {
     if (updatedDC) {
       // 如果更新成功，更新本地状态中的数据中心
       setDataCenters((prev) => prev.map((dc) => (dc.id === updatedDC.id ? updatedDC : dc)));
-
-      // 由于我们只有部分更新的数据中心信息，可能需要重新加载完整列表
-      // 或者，如果更新不影响总计数据，可以跳过重新加载
+      // 重新加载数据以确保一致性
       // loadDataCenters();
     }
+  };
+
+  const handleDeleteMultiple = (rows: Row<SimpleDatacenter>[]) => {
+    const idsToDelete = rows.map((row) => row.original.id);
+    setMultipleIdsToDelete(idsToDelete);
+  };
+
+  const handleMultipleDeleteSuccess = (idsToDelete: string[]) => {
+    setMultipleIdsToDelete([]);
+    // 重新加载数据
+    // loadDataCenters();
+
+    const updatedDCs = dataCenters.filter((dc) => !idsToDelete.includes(dc.id));
+    setDataCenters(updatedDCs);
+    // 重新计算总计数据
+    calculateTotalCounts(updatedDCs);
   };
 
   // 添加手动刷新功能
@@ -133,7 +92,7 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
     loadDataCenters();
   };
 
-  const columns = dataCenterColumns(onSelect, handleUpdateDataCenter);
+  const columns = dataCenterColumns(onSelect, handleUpdateDataCenter, handleMultipleDeleteSuccess);
 
   return (
     <div>
@@ -157,11 +116,16 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
         columns={columns}
         data={dataCenters}
         onDeleteRows={handleDeleteMultiple}
-        onDeleteRow={handleDeleteDataCenter}
         getRowId={(row) => row.id}
         loading={loading}
       />
 
+      {/* 多选删除确认对话框 */}
+      <DeleteConfirmation
+        ids={multipleIdsToDelete}
+        type="datacenter"
+        onSuccess={handleMultipleDeleteSuccess}
+      />
     </div>
   );
 }

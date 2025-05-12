@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Edit, MoreHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,14 +12,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import type { SimpleDatacenter } from "@/lib/type";
 import { EditDatacenterDialog } from "../dialogs/edit-datacenter";
-import { useState } from "react";
+import { DeleteConfirmation } from "../dialogs/delete-confirm";
 
 export function dataCenterColumns(
   onSelect: (dc: SimpleDatacenter) => void,
   onUpdate: (dc: SimpleDatacenter | null) => void,
+  onDeleteSuccess?: (ids: string[]) => void,
 ): ColumnDef<SimpleDatacenter>[] {
   return [
     {
@@ -146,11 +147,13 @@ export function dataCenterColumns(
     },
     {
       id: "actions",
-      cell: ({ row, table }) => {
+      cell: ({ row }) => {
         const dc = row.original;
 
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const [currentDC, setCurrentDC] = useState<SimpleDatacenter | null>(null);
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
         const handleEditDataCenter = (dc: SimpleDatacenter) => {
           // 先设置为 null，强制 useEffect 在下一次设置时触发
@@ -162,9 +165,18 @@ export function dataCenterColumns(
           }, 0);
         };
 
-        // Access the functions from table meta
-        const { openDeleteDialog } = table.options.meta as {
-          openDeleteDialog: (row: unknown, name?: string) => void;
+        const handleDeleteDataCenter = (dc: SimpleDatacenter) => {
+          // 设置要删除的 ID
+          setIdsToDelete([dc.id]);
+        };
+
+        const handleDeleteSuccess = (ids: string[]) => {
+          // 清除要删除的 ID
+          setIdsToDelete([]);
+          // 调用父组件的成功回调
+          if (onDeleteSuccess) {
+            onDeleteSuccess(ids);
+          }
         };
 
         return (
@@ -178,19 +190,28 @@ export function dataCenterColumns(
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => handleEditDataCenter(dc)}>
-                  <Edit className="mr-2 h-4 w-4" /> Edit
+                  <Edit className="mr-2 h-4 w-4" /> 編輯
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-red-600"
-                  onClick={() => openDeleteDialog(row, dc.name)}
+                  onClick={() => handleDeleteDataCenter(dc)}
                 >
-                  <Trash2 className="mr-2 h-4 w-4" /> DELETE
+                  <Trash2 className="mr-2 h-4 w-4" /> 刪除
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
+            {/* 编辑对话框 */}
             <EditDatacenterDialog datacenter={currentDC} onUpdate={onUpdate} />
+
+            {/* 删除确认对话框 */}
+            <DeleteConfirmation
+              ids={idsToDelete}
+              type="datacenter"
+              itemNames={idsToDelete && idsToDelete.length === 1 ? [dc.name] : undefined}
+              onSuccess={handleDeleteSuccess}
+            />
           </>
         );
       },
