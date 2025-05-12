@@ -78,7 +78,7 @@ export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] [&>button]:hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
             <Edit className="h-5 w-5" /> Edit Room

@@ -6,6 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -69,7 +70,7 @@ export function AddRoomDialog({ currentDC }: AddRoomDialogProps) {
           <p>New Room</p>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[400px]">
+      <DialogContent className="w-[400px] [&>button]:hidden">
         <DialogHeader>
           <DialogTitle>Add New Room</DialogTitle>
           <DialogDescription>
@@ -112,9 +113,12 @@ export function AddRoomDialog({ currentDC }: AddRoomDialogProps) {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
-              Add
-            </Button>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Add</Button>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

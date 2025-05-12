@@ -14,14 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Edit, Plus, Trash2, AlertCircle } from "lucide-react";
-import type { Datacenter, SimpleDatacenter } from "@/lib/type";
+import type { Datacenter, IpRange, SimpleDatacenter } from "@/lib/type";
 import { getDC, modifyDC } from "@/lib/api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-interface IPRange {
-  start_ip: string;
-  end_ip: string;
-}
 
 interface EditDatacenterDialogProps {
   datacenter: SimpleDatacenter | null;
@@ -38,7 +33,7 @@ export function EditDatacenterDialog({
     name: "",
     height: "",
   });
-  const [ipRanges, setIpRanges] = useState<IPRange[]>([]);
+  const [ipRanges, setIpRanges] = useState<IpRange[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasEmptyIpRange, setHasEmptyIpRange] = useState(false);
@@ -87,7 +82,7 @@ export function EditDatacenterDialog({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleIpRangeChange = (index: number, field: keyof IPRange, value: string) => {
+  const handleIpRangeChange = (index: number, field: keyof IpRange, value: string) => {
     setIpRanges((prev) => {
       const newRanges = [...prev];
       newRanges[index] = { ...newRanges[index], [field]: value };
@@ -149,7 +144,7 @@ export function EditDatacenterDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[600px]">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[600px] [&>button]:hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
             <Edit className="h-5 w-5" /> Edit Data Center

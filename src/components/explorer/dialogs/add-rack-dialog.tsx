@@ -6,6 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -71,7 +72,7 @@ export function AddRackDialog({ currentRoom, currentDC }: AddRackDialogProps) {
           <p>New Rack</p>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[400px]">
+      <DialogContent className="w-[400px] [&>button]:hidden">
         <DialogHeader>
           <DialogTitle>Add New Rack</DialogTitle>
           <DialogDescription>
@@ -114,9 +115,12 @@ export function AddRackDialog({ currentRoom, currentDC }: AddRackDialogProps) {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
-              Add
-            </Button>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Add</Button>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>
