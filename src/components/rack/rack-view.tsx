@@ -75,29 +75,16 @@ function Wrapper({ rack }: { rack: Rack }) {
               <Separator />
               <CardColumn label="Data Center" data={rack.dc_id} />
               <CardColumn label="Room" data={rack.room_id} />
-              <CardColumn label="Service" data={rack.service_name} />
               <Separator />
               <CardColumn label="UUID" data={rack.id} />
               <CardColumn label="Capacity" data={`${rack.capacity}/${rack.height}`} />
               <CardColumn label="Hosts" data={`${rack.n_hosts}`} />
+              <CardColumn label="Service" data={rack.service_name} />
               <div className="mt-4 flex flex-row items-center justify-center gap-8">
                 {/* This will be replace by Dialogs*/}
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    console.log("Edit rack");
-                  }}
-                >
-                  Edit Rack
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => {
-                    console.log("Delete rack");
-                  }}
-                >
-                  Delete Rack
-                </Button>
+                <Button variant="outline">Edit Rack</Button>
+                <Button variant="outline">Move Rack</Button>
+                <Button variant="destructive">Delete Rack</Button>
               </div>
             </>
           </InfoCard>

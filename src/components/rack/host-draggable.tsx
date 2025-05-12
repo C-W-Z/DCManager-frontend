@@ -124,7 +124,7 @@ export default function HostDraggable({
           zIndex: state.dragging?.id === host.id ? 99 : 1,
         }}
       >
-        <Link to={`/hosts/${host.id}`} className="text-sm font-bold">
+        <Link to={`/host/${host.id}`} className="text-sm font-bold">
           {host.name}
         </Link>
         <div
