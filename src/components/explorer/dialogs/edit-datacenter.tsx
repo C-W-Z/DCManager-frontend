@@ -14,8 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Edit } from "lucide-react";
-import type { SimpleDatacenter } from "@/lib/type";
-import { modifyDC } from "@/lib/api";
+import type { Datacenter, SimpleDatacenter } from "@/lib/type";
+import { getDC, modifyDC } from "@/lib/api";
 
 interface EditDatacenterDialogProps {
   datacenter: SimpleDatacenter;
@@ -33,13 +33,28 @@ export function EditDatacenterDialog({
   const [formData, setFormData] = useState({
     name: "",
     height: "",
+    // ip_ranges
   });
+
+//      (property) ip_ranges: {
+//          start_ip: string;
+//          end_ip: string;
+//      }[]
 
   useEffect(() => {
     if (open && datacenter) {
+      getDC(datacenter.id)
+      .then((dc: Datacenter) => {
+          // dc.ip_ranges
+      })
+      .catch((error) => {
+        console.error("Error fetching room data:", error);
+
+      });
       setFormData({
         name: datacenter.name,
         height: datacenter.height.toString(),
+        //ip_ranges
       });
     }
   }, [open, datacenter]);
