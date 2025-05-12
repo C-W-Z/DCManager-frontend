@@ -29,12 +29,12 @@ export function modifyDC(
   body: Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">,
 ) {
   console.log("modifyDC", dc_id, body);
-  return null;
+  return true;
 }
 
 export function deleteDC(dc_id: string) {
   console.log("deleteDC", dc_id);
-  return null;
+  return true;
 }
 
 export function addRoom(body: Pick<mytype.Room, "name" | "height" | "dc_id">) {
