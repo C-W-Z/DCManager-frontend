@@ -45,6 +45,7 @@ interface DataTableProps<TData, TValue> {
   onDeleteRow?: (id: string) => void;
   onEditRow?: (row: TData) => void;
   getRowId: (row: TData) => string;
+  loading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -54,6 +55,7 @@ export function DataTable<TData, TValue>({
   onDeleteRow,
   onEditRow,
   getRowId,
+  loading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -145,6 +147,7 @@ export function DataTable<TData, TValue>({
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
             className="max-w-sm"
+            disabled={loading}
           />
 
           {selectedRowCount > 0 && (
@@ -153,6 +156,7 @@ export function DataTable<TData, TValue>({
               size="sm"
               className="flex items-center gap-1"
               onClick={handleDeleteSelected}
+              disabled={loading}
             >
               <Trash2 className="h-4 w-4" />
               Delete Selected ({selectedRowCount})
@@ -162,7 +166,9 @@ export function DataTable<TData, TValue>({
 
         <DropdownMenu open={isColumnMenuOpen} onOpenChange={setIsColumnMenuOpen}>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline">Columns</Button>
+            <Button variant="outline" disabled={loading}>
+              Columns
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
@@ -197,59 +203,68 @@ export function DataTable<TData, TValue>({
       </div>
 
       <div className="modern-table">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow
-                key={headerGroup.id}
-                className="table-header-row bg-gray-200 hover:bg-gray-200"
-              >
-                {headerGroup.headers.map((header, index) => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      className={`${index === 0 ? "first-header-cell" : ""} ${
-                        index === headerGroup.headers.length - 1 ? "last-header-cell" : ""
-                      }`}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row, index) => (
+        {loading ? (
+          <div className="flex h-40 w-full items-center justify-center rounded-lg border bg-gray-50">
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
+              <p className="text-sm text-gray-500">Loading data...</p>
+            </div>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className={`table-data-row ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
+                  key={headerGroup.id}
+                  className="table-header-row bg-gray-200 hover:bg-gray-200"
                 >
-                  {row.getVisibleCells().map((cell, cellIndex) => (
-                    <TableCell
-                      key={cell.id}
-                      className={`${cellIndex === 0 ? "first-cell" : ""} ${
-                        cellIndex === row.getVisibleCells().length - 1 ? "last-cell" : ""
-                      }`}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+                  {headerGroup.headers.map((header, index) => {
+                    return (
+                      <TableHead
+                        key={header.id}
+                        className={`${index === 0 ? "first-header-cell" : ""} ${
+                          index === headerGroup.headers.length - 1 ? "last-header-cell" : ""
+                        }`}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row, index) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className={`table-data-row ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
+                  >
+                    {row.getVisibleCells().map((cell, cellIndex) => (
+                      <TableCell
+                        key={cell.id}
+                        className={`${cellIndex === 0 ? "first-cell" : ""} ${
+                          cellIndex === row.getVisibleCells().length - 1 ? "last-cell" : ""
+                        }`}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
       </div>
 
       <DataTablePagination table={table} />

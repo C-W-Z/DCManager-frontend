@@ -24,17 +24,40 @@ export function getDC(dc_id: string): Promise<mytype.Datacenter> {
   return Promise.resolve(dc);
 }
 
+// export function modifyDC(
+//   dc_id: string,
+//   body: Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">,
+// ) {
+//   console.log("modifyDC", dc_id, body);
+//   return true;
+// }
+
 export function modifyDC(
   dc_id: string,
   body: Partial<Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">>,
 ) {
   console.log("modifyDC", dc_id, body);
-  return null;
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Failed to edit datacenter with id ${dc_id}`))
+    }, 300)
+    resolve(true) // return true
+  })
 }
 
-export function deleteDC(dc_id: string) {
+// export function deleteDC(dc_id: string) {
+//   console.log("deleteDC", dc_id);
+//   return true;
+// }
+
+export async function deleteDC(dc_id: string): Promise<boolean> {
   console.log("deleteDC", dc_id);
-  return null;
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Failed to delete datacenter with id ${dc_id}`))
+    }, 300)
+    resolve(true) // return true
+  })
 }
 
 export function addRoom(body: Pick<mytype.Room, "name" | "height" | "dc_id">) {

@@ -13,9 +13,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import type { SimpleDatacenter } from "@/lib/type";
+import { EditDatacenterDialog } from "../dialogs/edit-datacenter";
+import { useState } from "react";
 
 export function dataCenterColumns(
   onSelect: (dc: SimpleDatacenter) => void,
+  onUpdate: (dc: SimpleDatacenter | null) => void,
 ): ColumnDef<SimpleDatacenter>[] {
   return [
     {
@@ -146,33 +149,49 @@ export function dataCenterColumns(
       cell: ({ row, table }) => {
         const dc = row.original;
 
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [currentDC, setCurrentDC] = useState<SimpleDatacenter | null>(null);
+
+        const handleEditDataCenter = (dc: SimpleDatacenter) => {
+          // 先设置为 null，强制 useEffect 在下一次设置时触发
+          setCurrentDC(null);
+
+          // 使用 setTimeout 确保在下一个渲染周期设置 currentDC
+          setTimeout(() => {
+            setCurrentDC(dc);
+          }, 0);
+        };
+
         // Access the functions from table meta
-        const { openDeleteDialog, openEditDialog } = table.options.meta as {
+        const { openDeleteDialog } = table.options.meta as {
           openDeleteDialog: (row: unknown, name?: string) => void;
-          openEditDialog: (row: SimpleDatacenter) => void;
         };
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => openEditDialog(dc)}>
-                <Edit className="mr-2 h-4 w-4" /> Edit
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-red-600"
-                onClick={() => openDeleteDialog(row, dc.name)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" /> DELETE
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleEditDataCenter(dc)}>
+                  <Edit className="mr-2 h-4 w-4" /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-red-600"
+                  onClick={() => openDeleteDialog(row, dc.name)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" /> DELETE
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <EditDatacenterDialog datacenter={currentDC} onUpdate={onUpdate} />
+          </>
         );
       },
     },

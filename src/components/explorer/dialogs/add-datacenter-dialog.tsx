@@ -33,6 +33,7 @@ export function AddDatacenterDialog() {
     .pick({
       name: true,
       height: true,
+      ip_ranges: true,
     })
     .extend({
       height: z.coerce.number().int().min(42).max(MAX_HEIGHT),
@@ -46,6 +47,7 @@ export function AddDatacenterDialog() {
     addDC({
       name: values.name,
       height: values.height,
+      ip_ranges: values.ip_ranges,
     })
       .then(() => {
         setOpen(false);
