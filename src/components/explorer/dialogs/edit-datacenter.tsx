@@ -9,6 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,20 +19,20 @@ import { Edit, Plus, Trash2, AlertCircle } from "lucide-react";
 import type { Datacenter, SimpleDatacenter } from "@/lib/type";
 import { getDC, modifyDC } from "@/lib/api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 interface IPRange {
   start_ip: string;
   end_ip: string;
 }
 
-// 修改组件接口，移除 open 和 onOpenChange 参数
+// 修改组件接口，接收要编辑的数据中心和更新回调
 interface EditDatacenterDialogProps {
   datacenter: SimpleDatacenter;
-  onUpdate: (updatedDC: SimpleDatacenter | null) => void;
+  onUpdate?: (updatedDC: SimpleDatacenter) => void;
 }
 
 export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDialogProps) {
-  // 添加内部状态管理打开/关闭状态
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -41,38 +43,36 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
   const [error, setError] = useState<string | null>(null);
   const [hasEmptyIpRange, setHasEmptyIpRange] = useState(false);
 
-  // 当 datacenter 变化时，如果有值则打开对话框
+  // 当对话框打开时加载数据
   useEffect(() => {
-    if (datacenter) {
-      setOpen(true);
-      setLoading(true);
-      setError(null);
-      getDC(datacenter.id)
-        .then((dc: Datacenter) => {
-          setFormData({
-            name: dc.name,
-            height: dc.height.toString(),
-          });
-          // 如果API返回的数据中有IP范围，则设置它
-          if (dc.ip_ranges && Array.isArray(dc.ip_ranges)) {
-            setIpRanges(dc.ip_ranges);
-          } else {
-            setIpRanges([]);
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching datacenter data:", error);
-          setFormData({
-            name: datacenter.name,
-            height: datacenter.height.toString(),
-          });
-          setIpRanges([]);
-          setError("Unable to retrieve data center details, please try again later.");
-        })
-        .finally(() => {
-          setLoading(false);
+    if (!open) return;
+    setLoading(true);
+    setError(null);
+    getDC(datacenter.id)
+      .then((dc: Datacenter) => {
+        setFormData({
+          name: dc.name,
+          height: dc.height.toString(),
         });
-    }
+        // 如果API返回的数据中有IP范围，则设置它
+        if (dc.ip_ranges && Array.isArray(dc.ip_ranges)) {
+          setIpRanges(dc.ip_ranges);
+        } else {
+          setIpRanges([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching datacenter data:", error);
+        setFormData({
+          name: datacenter.name,
+          height: datacenter.height.toString(),
+        });
+        setIpRanges([]);
+        setError("無法獲取數據中心詳情，請稍後再試。");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [open, datacenter]);
 
   // 检查是否有空的IP范围
@@ -107,7 +107,7 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
 
     // 检查是否有空的IP范围
     if (hasEmptyIpRange) {
-      setError("Please fill in all IP ranges or delete the blanks");
+      setError("請填寫所有IP範圍或刪除空白項");
       return;
     }
 
@@ -132,7 +132,13 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
           name: formData.name,
           height: Number.parseInt(formData.height),
         };
-        onUpdate(updatedDC);
+
+        // 如果提供了onUpdate回调，则调用它
+        if (onUpdate) {
+          onUpdate(updatedDC);
+        }
+
+        // 关闭对话框
         setOpen(false);
       } else {
         setError("更新數據中心失敗，請稍後再試。");
@@ -147,11 +153,22 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.preventDefault(); // 防止DropdownMenu关闭
+            setOpen(true);
+          }}
+        >
+          <Edit className="mr-2 h-4 w-4" /> 編輯
+        </DropdownMenuItem>
+      </DialogTrigger>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
             <Edit className="h-5 w-5" /> 編輯數據中心
           </DialogTitle>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
         {loading ? (
           <div className="flex h-40 items-center justify-center">
@@ -255,6 +272,9 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
             </div>
 
             <DialogFooter>
+              {/* <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                取消
+              </Button> */}
               <Button type="submit" disabled={loading || hasEmptyIpRange}>
                 {loading ? "保存中..." : "保存"}
               </Button>

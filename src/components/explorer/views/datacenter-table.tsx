@@ -11,7 +11,6 @@ import {
   type Count,
   DataCenterSummary,
 } from "@/components/explorer/summary/datacenter-summary";
-import { EditDatacenterDialog } from "@/components/explorer/dialogs/edit-datacenter";
 
 interface DataCenterTableProps {
   onSelect: (dc: SimpleDatacenter) => void;
@@ -20,7 +19,6 @@ interface DataCenterTableProps {
 export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
   const [totalCounts, setTotalCounts] = useState<Count>({ dc: 0, room: 0, rack: 0, host: 0 });
-  const [currentDC, setCurrentDC] = useState<SimpleDatacenter | null>(null);
   const [loading, setLoading] = useState(false);
 
   // 使用 useCallback 包装 calculateTotalCounts 函数
@@ -60,7 +58,7 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
 
   useEffect(() => {
     loadDataCenters();
-  }, [loadDataCenters]); // 正确添加依赖项
+  }, [loadDataCenters]);
 
   const handleDeleteDataCenter = (id: string) => {
     setLoading(true);
@@ -74,7 +72,6 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
           calculateTotalCounts(updatedDCs);
         } else {
           console.error("Failed to delete datacenter");
-          // 可能需要显示错误消息给用户
         }
       })
       .catch((error) => {
@@ -119,19 +116,12 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
       });
   };
 
-  const handleEditDataCenter = (dc: SimpleDatacenter) => {
-    setCurrentDC(dc);
-  };
-
-  const handleUpdateDataCenter = (updatedDC: SimpleDatacenter | null) => {
-    if (updatedDC) {
-      // 如果更新成功，更新本地状态中的数据中心
-      setDataCenters((prev) => prev.map((dc) => (dc.id === updatedDC.id ? updatedDC : dc)));
-
-      // 由于我们只有部分更新的数据中心信息，可能需要重新加载完整列表
-      // 或者，如果更新不影响总计数据，可以跳过重新加载
-      // loadDataCenters();
-    }
+  // 处理数据中心更新
+  const handleUpdateDataCenter = (updatedDC: SimpleDatacenter) => {
+    // 更新本地状态中的数据中心
+    setDataCenters((prev) => prev.map((dc) => (dc.id === updatedDC.id ? updatedDC : dc)));
+    // 重新加载数据以确保一致性
+    // loadDataCenters();
   };
 
   // 添加手动刷新功能
@@ -139,7 +129,8 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
     loadDataCenters();
   };
 
-  const columns = dataCenterColumns(onSelect);
+  // 传递 onUpdate 回调给 columns
+  const columns = dataCenterColumns(onSelect, handleUpdateDataCenter);
 
   return (
     <div>
@@ -164,14 +155,9 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
         data={dataCenters}
         onDeleteRows={handleDeleteMultiple}
         onDeleteRow={handleDeleteDataCenter}
-        onEditRow={handleEditDataCenter}
         getRowId={(row) => row.id}
         loading={loading}
       />
-
-      {currentDC && (
-        <EditDatacenterDialog datacenter={currentDC} onUpdate={handleUpdateDataCenter} />
-      )}
     </div>
   );
 }
