@@ -26,10 +26,10 @@ interface IPRange {
 // 修改组件接口，移除 open 和 onOpenChange 参数
 interface EditDatacenterDialogProps {
   datacenter: SimpleDatacenter | null;
-  onUpdate: (updatedDC: SimpleDatacenter | null) => void;
+  onUpdateSuccess: (updatedDC: SimpleDatacenter) => void;
 }
 
-export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDialogProps) {
+export function EditDatacenterDialog({ datacenter, onUpdateSuccess }: EditDatacenterDialogProps) {
   // 添加内部状态管理打开/关闭状态
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -132,7 +132,7 @@ export function EditDatacenterDialog({ datacenter, onUpdate }: EditDatacenterDia
           name: formData.name,
           height: Number.parseInt(formData.height),
         };
-        onUpdate(updatedDC);
+        onUpdateSuccess(updatedDC);
         setOpen(false);
       } else {
         setError("更新數據中心失敗，請稍後再試。");

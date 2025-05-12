@@ -59,7 +59,7 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
     loadDataCenters();
   }, [loadDataCenters]); // 正确添加依赖项
 
-  const handleUpdateDataCenter = (updatedDC: SimpleDatacenter | null) => {
+  const onUpdateSuccess = (updatedDC: SimpleDatacenter) => {
     if (updatedDC) {
       // 如果更新成功，更新本地状态中的数据中心
       setDataCenters((prev) => prev.map((dc) => (dc.id === updatedDC.id ? updatedDC : dc)));
@@ -68,7 +68,7 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
     }
   };
 
-  const handleMultipleDeleteSuccess = (idsToDelete: string[]) => {
+  const onDeleteSuccess = (idsToDelete: string[]) => {
     const updatedDCs = dataCenters.filter((dc) => !idsToDelete.includes(dc.id));
     setDataCenters(updatedDCs);
     // 重新计算总计数据
@@ -82,7 +82,7 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
     loadDataCenters();
   };
 
-  const columns = dataCenterColumns(onSelect, handleUpdateDataCenter, handleMultipleDeleteSuccess);
+  const columns = dataCenterColumns(onSelect, onUpdateSuccess, onDeleteSuccess);
 
   return (
     <div>
@@ -107,7 +107,7 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
         data={dataCenters}
         getRowId={(row) => row.id}
         loading={loading}
-        onDeleteSuccess={handleMultipleDeleteSuccess}
+        onDeleteSuccess={onDeleteSuccess}
       />
     </div>
   );

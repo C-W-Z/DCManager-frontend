@@ -9,8 +9,8 @@ import { DatacenterRowActions } from "./datacenter-actions";
 
 export function dataCenterColumns(
   onSelect: (dc: SimpleDatacenter) => void,
-  onUpdate: (dc: SimpleDatacenter | null) => void,
-  onDeleteSuccess?: (ids: string[]) => void,
+  onUpdateSuccess: (dc: SimpleDatacenter) => void,
+  onDeleteSuccess: (ids: string[]) => void,
 ): ColumnDef<SimpleDatacenter>[] {
   return [
     {
@@ -141,7 +141,7 @@ export function dataCenterColumns(
       cell: ({ row }) => (
         <DatacenterRowActions
           row={row}
-          onUpdate={onUpdate}
+          onUpdateSuccess={onUpdateSuccess}
           onDeleteSuccess={onDeleteSuccess}
         ></DatacenterRowActions>
       ),

@@ -17,11 +17,11 @@ import type { SimpleDatacenter } from "@/lib/type";
 
 interface DCRowActionsProps {
   row: Row<SimpleDatacenter>;
-  onUpdate: (dc: SimpleDatacenter | null) => void;
-  onDeleteSuccess?: (ids: string[]) => void;
+  onUpdateSuccess: (dc: SimpleDatacenter) => void;
+  onDeleteSuccess: (ids: string[]) => void;
 }
 
-export function DatacenterRowActions({ row, onUpdate, onDeleteSuccess }: DCRowActionsProps) {
+export function DatacenterRowActions({ row, onUpdateSuccess, onDeleteSuccess }: DCRowActionsProps) {
   const dc = row.original;
 
   const [currentDC, setCurrentDC] = useState<SimpleDatacenter | null>(null);
@@ -46,9 +46,7 @@ export function DatacenterRowActions({ row, onUpdate, onDeleteSuccess }: DCRowAc
     // 清除要删除的 ID
     setIdsToDelete([]);
     // 调用父组件的成功回调
-    if (onDeleteSuccess) {
-      onDeleteSuccess(ids);
-    }
+    onDeleteSuccess(ids);
   };
 
   return (
@@ -62,20 +60,20 @@ export function DatacenterRowActions({ row, onUpdate, onDeleteSuccess }: DCRowAc
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => handleEditDataCenter(dc)}>
-            <Edit className="mr-2 h-4 w-4" /> 編輯
+            <Edit className="mr-2 h-4 w-4" /> Edit
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-red-600"
             onClick={() => handleDeleteDataCenter(dc)}
           >
-            <Trash2 className="mr-2 h-4 w-4" /> 刪除
+            <Trash2 className="mr-2 h-4 w-4" /> DELETE
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
       {/* 编辑对话框 */}
-      <EditDatacenterDialog datacenter={currentDC} onUpdate={onUpdate} />
+      <EditDatacenterDialog datacenter={currentDC} onUpdateSuccess={onUpdateSuccess} />
 
       {/* 删除确认对话框 */}
       <DeleteConfirmation
