@@ -45,6 +45,7 @@ export default function RackTable({ datacenter, room }: RackTableProps) {
     }
   };
 
+  // onMoveSuccess也做一樣的事（把table中被move/delete的移除掉）
   const onDeleteSuccess = (idsToDelete: string[]) => {
     const updatedRooms = racks.filter((rack) => !idsToDelete.includes(rack.id));
     setRacks(updatedRooms);
@@ -56,7 +57,7 @@ export default function RackTable({ datacenter, room }: RackTableProps) {
     loadRacks(datacenter.id);
   };
 
-  const columns = rackColumns(onUpdateSuccess, onDeleteSuccess);
+  const columns = rackColumns(onUpdateSuccess, onDeleteSuccess, onDeleteSuccess);
 
   return (
     <div>

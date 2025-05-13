@@ -41,7 +41,7 @@ export function DeleteConfirmation({
 
     try {
       // 根据类型选择不同的删除函数
-      const deleteFunction = getDeleteFunction(type);
+      const deleteFunction = getDeleteFunction();
 
       // 创建所有删除操作的Promise数组
       const deletePromises = ids.map((id) => deleteFunction(id));
@@ -52,14 +52,9 @@ export function DeleteConfirmation({
       // 检查是否所有删除操作都成功
       const allSuccessful = results.every((result) => result === true || result === undefined);
 
-      if (allSuccessful) {
-        // 如果所有删除都成功，通知父组件
-        if (onSuccess) {
-          onSuccess(ids);
-        }
-      } else {
-        console.error("Some delete operations failed");
-      }
+      // 如果所有删除都成功，通知父组件
+      if (allSuccessful && onSuccess) onSuccess(ids);
+      else console.error("Some delete operations failed");
     } catch (error) {
       console.error(`Error deleting ${type}:`, error);
     } finally {
@@ -69,7 +64,7 @@ export function DeleteConfirmation({
   };
 
   // 根据类型获取对应的删除函数
-  const getDeleteFunction = (type: DeleteType) => {
+  const getDeleteFunction = () => {
     switch (type) {
       case "datacenter":
         return deleteDC;

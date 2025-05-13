@@ -26,11 +26,11 @@ type MoveItemType = "room" | "rack" | "host";
 
 interface MoveItemDialogProps {
   type: MoveItemType;
-  item: SimpleRoom | SimpleRack | SimpleHost | null;
-  onSuccess?: () => void;
+  items: (SimpleRoom | SimpleRack | SimpleHost)[];
+  onSuccess?: (ids: string[]) => void;
 }
 
-export function MoveItemDialog({ type, item, onSuccess }: MoveItemDialogProps) {
+export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
@@ -83,13 +83,13 @@ export function MoveItemDialog({ type, item, onSuccess }: MoveItemDialogProps) {
     loadDataCenters();
     switch (type) {
       case "room": {
-        setSelectedDC((item as SimpleRoom).dc_id);
+        setSelectedDC((items[0] as SimpleRoom).dc_id);
         break;
       }
       case "rack": {
         try {
-          const room = await getRoom((item as SimpleRack).room_id);
-          if (room.id !== (item as SimpleRack).room_id)
+          const room = await getRoom((items[0] as SimpleRack).room_id);
+          if (room.id !== (items[0] as SimpleRack).room_id)
             console.error("room.id !== item.room_id");
           loadRoomsByDCId(room.dc_id);
           setSelectedDC(room.dc_id);
@@ -101,8 +101,8 @@ export function MoveItemDialog({ type, item, onSuccess }: MoveItemDialogProps) {
       }
       case "host": {
         try {
-          const rack = await getRack((item as SimpleHost).rack_id);
-          if (rack.id !== (item as SimpleHost).rack_id)
+          const rack = await getRack((items[0] as SimpleHost).rack_id);
+          if (rack.id !== (items[0] as SimpleHost).rack_id)
             console.error("rack.id !== item.rack_id");
           loadRoomsByDCId(rack.dc_id);
           loadRacksByRoomId(rack.room_id);
@@ -117,11 +117,11 @@ export function MoveItemDialog({ type, item, onSuccess }: MoveItemDialogProps) {
       default:
         break;
     }
-  }, [loadDataCenters, type, item, loadRoomsByDCId, loadRacksByRoomId]);
+  }, [loadDataCenters, type, items, loadRoomsByDCId, loadRacksByRoomId]);
 
   // 当 item 变化时，如果有值则打开对话框
   useEffect(() => {
-    if (item) {
+    if (items.length > 0) {
       setIsOpen(true);
       loadParentLevel();
     } else {
@@ -130,7 +130,7 @@ export function MoveItemDialog({ type, item, onSuccess }: MoveItemDialogProps) {
       setSelectedRoom(null);
       setSelectedRack(null);
     }
-  }, [item, loadParentLevel]);
+  }, [items, loadParentLevel]);
 
   // 处理数据中心选择
   const handleSelectDC = (dc_id: string) => {
@@ -179,24 +179,29 @@ export function MoveItemDialog({ type, item, onSuccess }: MoveItemDialogProps) {
   const showRoomList = type !== "room" && selectedDC && (!selectedRoom || type === "rack");
   const showRackList = type === "host" && selectedDC && selectedRoom;
 
+  const getPromises = () => {
+    if (type === "room" && selectedDC)
+      return items.map((item) => modifyRoom(item.id, { dc_id: selectedDC }));
+    if (type === "rack" && selectedRoom)
+      return items.map((item) => modifyRack(item.id, { room_id: selectedRoom }));
+    if (type === "host" && selectedRack)
+      return items.map((item) => modifyHost(item.id, { rack_id: selectedRack }));
+    return items.map(() => Promise.resolve(false));
+  };
+
   // 处理移动确认
   const handleMove = async () => {
-    if (!item) return;
-
+    if (items.length === 0) return;
     setLoading(true);
     try {
-      let success = false;
-      if (type === "room" && selectedDC) {
-        success = await modifyRoom(item.id, { dc_id: selectedDC });
-      } else if (type === "rack" && selectedRoom) {
-        success = await modifyRack(item.id, { room_id: selectedRoom });
-      } else if (type === "host" && selectedRack) {
-        success = await modifyHost(item.id, { rack_id: selectedRack });
-      }
+      const movePromises = getPromises();
+      const results = await Promise.all(movePromises);
+      const allSuccessful = results.every((result) => result === true || result === undefined);
 
       // 关闭对话框并通知成功
       setIsOpen(false);
-      if (success && onSuccess) onSuccess();
+      if (allSuccessful && onSuccess) onSuccess(items.map((item) => item.id));
+      else console.error("Some move operations failed");
     } catch (error) {
       console.error(`Error moving ${type}:`, error);
     } finally {
@@ -232,11 +237,12 @@ export function MoveItemDialog({ type, item, onSuccess }: MoveItemDialogProps) {
 
   // 检查是否可以移动
   const canMove = () => {
-    if (type === "room") return !!selectedDC && selectedDC !== (item as SimpleRoom).dc_id;
+    if (items.length === 0) return false;
+    if (type === "room") return !!selectedDC && selectedDC !== (items[0] as SimpleRoom).dc_id;
     if (type === "rack")
-      return !!selectedRoom && selectedRoom !== (item as SimpleRack).room_id;
+      return !!selectedRoom && selectedRoom !== (items[0] as SimpleRack).room_id;
     if (type === "host")
-      return !!selectedRack && selectedRack !== (item as SimpleHost).rack_id;
+      return !!selectedRack && selectedRack !== (items[0] as SimpleHost).rack_id;
     return false;
   };
 
@@ -270,12 +276,14 @@ export function MoveItemDialog({ type, item, onSuccess }: MoveItemDialogProps) {
     return "";
   };
 
+  if (items.length === 0) return null;
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[500px] [&>button]:hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-            <Move className="h-5 w-5" /> Move {getTypeName()} "{item?.name}"
+            <Move className="h-5 w-5" /> Move {getTypeName()} "{items[0].name}"
           </DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
@@ -303,13 +311,13 @@ export function MoveItemDialog({ type, item, onSuccess }: MoveItemDialogProps) {
                       key={dc.id}
                       className={`flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100 ${
                         selectedDC === dc.id ? "bg-gray-100" : ""
-                      } ${(item as SimpleRoom).dc_id === dc.id ? "opacity-50" : ""}`}
+                      } ${(items[0] as SimpleRoom).dc_id === dc.id ? "opacity-50" : ""}`}
                       onClick={() => handleSelectDC(dc.id)}
                     >
                       <div className="flex items-center gap-2">
                         <Home className="h-4 w-4 text-gray-500" />
                         <span>{dc.name}</span>
-                        {(item as SimpleRoom).dc_id === dc.id && (
+                        {(items[0] as SimpleRoom).dc_id === dc.id && (
                           <span className="ml-auto text-xs text-gray-500">(Current)</span>
                         )}
                       </div>
@@ -326,13 +334,13 @@ export function MoveItemDialog({ type, item, onSuccess }: MoveItemDialogProps) {
                       key={room.id}
                       className={`flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100 ${
                         selectedRoom === room.id ? "bg-gray-100" : ""
-                      } ${(item as SimpleRack).room_id === room.id ? "opacity-50" : ""}`}
+                      } ${(items[0] as SimpleRack).room_id === room.id ? "opacity-50" : ""}`}
                       onClick={() => handleSelectRoom(room.id)}
                     >
                       <div className="flex items-center gap-2">
                         <Home className="h-4 w-4 text-gray-500" />
                         <span>{room.name}</span>
-                        {(item as SimpleRack).room_id === room.id && (
+                        {(items[0] as SimpleRack).room_id === room.id && (
                           <span className="ml-auto text-xs text-gray-500">(Current)</span>
                         )}
                       </div>
@@ -349,13 +357,13 @@ export function MoveItemDialog({ type, item, onSuccess }: MoveItemDialogProps) {
                       key={rack.id}
                       className={`flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100 ${
                         selectedRoom === rack.id ? "bg-gray-100" : ""
-                      } ${(item as SimpleHost).rack_id === rack.id ? "opacity-50" : ""}`}
+                      } ${(items[0] as SimpleHost).rack_id === rack.id ? "opacity-50" : ""}`}
                       onClick={() => handleSelectRack(rack.id)}
                     >
                       <div className="flex items-center gap-2">
                         <Home className="h-4 w-4 text-gray-500" />
                         <span>{rack.name}</span>
-                        {(item as SimpleHost).rack_id === rack.id && (
+                        {(items[0] as SimpleHost).rack_id === rack.id && (
                           <span className="ml-auto text-xs text-gray-500">(Current)</span>
                         )}
                       </div>
@@ -370,7 +378,7 @@ export function MoveItemDialog({ type, item, onSuccess }: MoveItemDialogProps) {
           {canMove() && (
             <div className="mt-4">
               <p className="text-sm font-medium">
-                Move <span className="font-bold">{item?.name}</span> to{" "}
+                Move <span className="font-bold">{items[0].name}</span> to{" "}
                 <span className="font-bold">{getSelectedDestinationName()}</span>
               </p>
             </div>

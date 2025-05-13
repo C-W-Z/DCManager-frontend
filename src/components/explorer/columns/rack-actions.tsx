@@ -20,7 +20,7 @@ interface RackRowActionsProps {
   row: Row<SimpleRack>;
   onUpdateSuccess: (rack: SimpleRack) => void;
   onDeleteSuccess: (ids: string[]) => void;
-  onMoveSuccess?: () => void;
+  onMoveSuccess?: (ids: string[]) => void;
 }
 
 export function RackRowActions({
@@ -32,7 +32,7 @@ export function RackRowActions({
   const rack = row.original;
 
   const [rackToEdit, setRackToEdit] = useState<SimpleRack | null>(null);
-  const [rackToMove, setRackToMove] = useState<SimpleRack | null>(null);
+  const [racksToMove, setRacksToMove] = useState<SimpleRack[]>([]);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
   const handleEditDataCenter = (rack: SimpleRack) => {
@@ -54,9 +54,9 @@ export function RackRowActions({
   };
 
   const handleMoveRack = (rack: SimpleRack) => {
-    setRackToMove(null);
+    setRacksToMove([]);
     setTimeout(() => {
-      setRackToMove(rack);
+      setRacksToMove([rack]);
     }, 0);
   };
 
@@ -88,7 +88,7 @@ export function RackRowActions({
 
       <EditRackDialog rack={rackToEdit} onUpdateSuccess={onUpdateSuccess} />
 
-      <MoveItemDialog type="rack" item={rackToMove} onSuccess={onMoveSuccess} />
+      <MoveItemDialog type="rack" items={racksToMove} onSuccess={onMoveSuccess} />
 
       <DeleteConfirmation
         ids={idsToDelete}
