@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Edit, MoreHorizontal, MoveRight, Trash2 } from "lucide-react";
+import { Edit, MoreHorizontal, Move, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -75,7 +75,7 @@ export function RackRowActions({
             <Edit className="mr-2 h-4 w-4" /> EDIT
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleMoveRack(rack)}>
-            <MoveRight className="mr-2 h-4 w-4" /> Move
+            <Move className="mr-2 h-4 w-4" /> Move
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
