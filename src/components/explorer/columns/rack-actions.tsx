@@ -55,17 +55,10 @@ export function RackRowActions({
   };
 
   const handleMoveRack = (rack: SimpleRack) => {
-    // 设置要移动的 ID
-    setRackToMove(rack.id);
-  };
-
-  const handleMoveSuccess = () => {
-    // 清除要移动的 ID
     setRackToMove(null);
-    // 调用父组件的成功回调
-    if (onMoveSuccess) {
-      onMoveSuccess();
-    }
+    setTimeout(() => {
+      setRackToMove(rack.id);
+    }, 0);
   };
 
   return (
@@ -108,7 +101,7 @@ export function RackRowActions({
         itemId={rackToMove}
         itemName={rack.name}
         currentParentId={rack.room_id}
-        onSuccess={handleMoveSuccess}
+        onSuccess={onMoveSuccess}
       />
     </>
   );
