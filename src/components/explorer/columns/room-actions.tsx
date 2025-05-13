@@ -31,16 +31,16 @@ export function RoomRowActions({
 }: RoomRowActionsProps) {
   const room = row.original;
 
-  const [currentRoom, setCurrentRoom] = useState<SimpleRoom | null>(null);
+  const [roomToEdit, setRoomToEdit] = useState<SimpleRoom | null>(null);
   const [roomsToMove, setRoomsToMove] = useState<SimpleRoom[]>([]);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
   const handleEditDataCenter = (room: SimpleRoom) => {
     // 先设置为 null，强制 useEffect 在下一次设置时触发
-    setCurrentRoom(null);
-    // 使用 setTimeout 确保在下一个渲染周期设置 currentRoom
+    setRoomToEdit(null);
+    // 使用 setTimeout 确保在下一个渲染周期设置 roomToEdit
     setTimeout(() => {
-      setCurrentRoom(room);
+      setRoomToEdit(room);
     }, 0);
   };
 
@@ -86,7 +86,7 @@ export function RoomRowActions({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <EditRoomDialog room={currentRoom} onUpdateSuccess={onUpdateSuccess} />
+      <EditRoomDialog room={roomToEdit} onUpdateSuccess={onUpdateSuccess} />
 
       <MoveItemDialog type="room" items={roomsToMove} onSuccess={onMoveSuccess} />
 

@@ -28,16 +28,16 @@ export function DatacenterRowActions({
 }: DCRowActionsProps) {
   const dc = row.original;
 
-  const [currentDC, setCurrentDC] = useState<SimpleDatacenter | null>(null);
+  const [dcToEdit, setDCToEdit] = useState<SimpleDatacenter | null>(null);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
   const handleEditDataCenter = (dc: SimpleDatacenter) => {
     // 先设置为 null，强制 useEffect 在下一次设置时触发
-    setCurrentDC(null);
+    setDCToEdit(null);
 
-    // 使用 setTimeout 确保在下一个渲染周期设置 currentDC
+    // 使用 setTimeout 确保在下一个渲染周期设置 dcToEdit
     setTimeout(() => {
-      setCurrentDC(dc);
+      setDCToEdit(dc);
     }, 0);
   };
 
@@ -77,7 +77,7 @@ export function DatacenterRowActions({
       </DropdownMenu>
 
       {/* 编辑对话框 */}
-      <EditDatacenterDialog datacenter={currentDC} onUpdateSuccess={onUpdateSuccess} />
+      <EditDatacenterDialog datacenter={dcToEdit} onUpdateSuccess={onUpdateSuccess} />
 
       {/* 删除确认对话框 */}
       <DeleteConfirmation
