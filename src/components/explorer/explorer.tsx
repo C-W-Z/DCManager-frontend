@@ -4,7 +4,7 @@ import { useState } from "react";
 import DataCenterTable from "@/components/explorer/tables/datacenter-table";
 import RoomTable from "@/components/explorer/tables/room-table";
 import RackTable from "@/components/explorer/tables/rack-table";
-import Breadcrumb from "../components/explorer/breadcrumb";
+import Breadcrumb from "./breadcrumb";
 import type { SimpleDatacenter, SimpleRoom } from "@/lib/type";
 
 export type ViewLevel = "datacenter-table" | "room-table" | "rack-table";

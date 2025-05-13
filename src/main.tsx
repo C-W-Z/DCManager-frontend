@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import "./global.css";
 
 import Home from "@/pages/Home";
-import Explorer from "@/pages/explorer";
+import Explorer from "@/components/explorer/explorer";
 import Layout from "./layout";
 import HostView from "./components/host/host-view";
 import HostTable from "./components/host/host-table";
