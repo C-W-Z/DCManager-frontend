@@ -90,6 +90,11 @@ export function addRack(body: Pick<mytype.Rack, "name" | "height" | "room_id" | 
   return Promise.resolve(faker.string.uuid());
 }
 
+export function getAllRack(): Promise<mytype.SimpleRack[]> {
+  console.log("getAllRack");
+  return Promise.resolve(MockData.rack as mytype.SimpleRack[]);
+}
+
 export function getRack(rack_id: string): Promise<mytype.Rack> {
   console.log("getRack", rack_id);
 
@@ -142,7 +147,7 @@ export function getHost(host_id: string): Promise<mytype.Host> {
 
 export function modifyHost(
   host_id: string,
-  body: Partial<Pick<mytype.Host, "name" | "height" | "ip" | "rack_id" | "pos">>,
+  body: Partial<Pick<mytype.Host, "name" | "height" | "ip" | "status" | "rack_id" | "pos">>,
 ) {
   console.log("modifyHost", host_id, body);
   return Promise.resolve(true);

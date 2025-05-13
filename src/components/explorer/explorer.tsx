@@ -45,7 +45,7 @@ export default function Explorer() {
         />
       </div>
 
-      <div className="flex-1 p-4">
+      <div className="flex-1 px-6">
         {currentView === "datacenter-table" && (
           <DataCenterTable onSelect={handleDataCenterSelect} />
         )}

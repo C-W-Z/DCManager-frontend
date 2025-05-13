@@ -73,7 +73,6 @@ export function DeleteConfirmation({
       case "rack":
         return deleteRack;
       case "host":
-        // 假设有一个 deleteHost 函数
         return deleteHost;
       default:
         // eslint-disable-next-line @typescript-eslint/no-unused-vars

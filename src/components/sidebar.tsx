@@ -46,7 +46,7 @@ export default function Sidebar() {
         href="/explorer"
         active={currentPath === "/explorer"}
       />
-      <SidebarItem
+      {/* <SidebarItem
         iconId="rack"
         label="Racks"
         collapsed={collapsed}
@@ -59,8 +59,14 @@ export default function Sidebar() {
         collapsed={collapsed}
         href="/host"
         active={currentPath === "/host"}
+      /> */}
+      <SidebarItem
+        iconId="service"
+        label="Services"
+        collapsed={collapsed}
+        href="/service"
+        active={currentPath === "/service"}
       />
-      <SidebarItem iconId="service" label="Services" collapsed={collapsed} />
       <div className="flex-1"></div>
       <SidebarItem iconId="settings" label="Setting" collapsed={collapsed} />
     </div>

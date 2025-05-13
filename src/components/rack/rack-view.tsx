@@ -1,14 +1,20 @@
-import { useEffect, useState, useReducer } from "react";
+import { useEffect, useState, useReducer, createContext } from "react";
 import { getRack } from "@/lib/api";
 import { Rack } from "@/lib/type";
-import RackDnD from "@/components/rack/rack-dnd";
-import { RackDnDReducer, RackDroppable } from "@/components/rack/rack-dnd-reducer";
-import { RackContext } from "@/components/rack/rack-context";
+import RackDnD from "@/components/rack-dnd/rack-dnd";
+import { RackDnDReducer, RackDroppable, Action } from "@/components/rack-dnd/rack-dnd-reducer";
 import { InfoCard, Separator, CardColumn } from "@/components/infocard";
 import { AddHostDialog } from "@/components/rack/add-host-dialog";
 import { Button } from "@/components/ui/button";
 import { useParams } from "react-router-dom";
 import Icon from "@/components/icon";
+import { DeleteConfirmation } from "../explorer/dialogs/delete-confirm";
+import { EditRackDialog } from "../explorer/dialogs/edit-rack";
+
+const RackContext = createContext<{
+  state: RackDroppable;
+  dispatch: React.ActionDispatch<[action: Action]>;
+} | null>(null);
 
 export default function RackView() {
   const rackId = useParams().rackId as string;
@@ -28,9 +34,9 @@ export default function RackView() {
   return (
     <>
       {rack ? (
-        <Wrapper rack={rack} />
+        <Wrapper rack={rack} setRack={setRack} />
       ) : (
-        <div className="flex w-full items-center justify-center">
+        <div className="flex h-screen w-full items-center justify-center">
           <div className="text-xl font-bold">Rack ID: {rackId} not found :(</div>
         </div>
       )}
@@ -59,8 +65,10 @@ function createInitialState(rack: Rack): RackDroppable {
   } as RackDroppable;
 }
 
-function Wrapper({ rack }: { rack: Rack }) {
+function Wrapper({ rack, setRack }: { rack: Rack; setRack: (_: Rack | null) => void }) {
   const [state, dispatch] = useReducer(RackDnDReducer, rack, createInitialState);
+  const [deleteIds, setDeleteIds] = useState<string[]>([]);
+  const [editRack, setEditRack] = useState<Rack | null>(null);
 
   return (
     <RackContext.Provider value={{ state, dispatch }}>
@@ -79,22 +87,55 @@ function Wrapper({ rack }: { rack: Rack }) {
               <CardColumn label="UUID" data={rack.id} />
               <CardColumn label="Capacity" data={`${rack.capacity}/${rack.height}`} />
               <CardColumn label="Hosts" data={`${rack.n_hosts}`} />
-              <CardColumn label="Service" data={rack.service_name} />
+              <CardColumn
+                label="Service"
+                data={rack.service_name}
+                link={`/service/${rack.service_id}`}
+              />
               <div className="mt-4 flex flex-row items-center justify-center gap-8">
-                {/* This will be replace by Dialogs*/}
-                <Button variant="outline">Edit Rack</Button>
+                <Button
+                  variant="outline"
+                  className="w-24"
+                  onClick={() => {
+                    setEditRack(null);
+                    setTimeout(() => {
+                      setEditRack(rack);
+                    }, 0);
+                  }}
+                >
+                  Edit
+                </Button>
+                <EditRackDialog
+                  rack={editRack}
+                  onUpdateSuccess={(updatedRack) => setRack({ ...rack, ...updatedRack })}
+                />
                 <Button variant="outline">Move Rack</Button>
-                <Button variant="destructive">Delete Rack</Button>
+                <Button
+                  variant="destructive"
+                  className="w-24"
+                  onClick={() => {
+                    setDeleteIds([]);
+                    setTimeout(() => {
+                      setDeleteIds([rack.id]);
+                    }, 0);
+                  }}
+                >
+                  DELETE
+                </Button>
+                <DeleteConfirmation
+                  ids={deleteIds}
+                  type="rack"
+                  itemNames={[rack.name]}
+                  onSuccess={() => setRack(null)}
+                />
               </div>
             </>
           </InfoCard>
         </div>
         <div className="flex flex-col items-center justify-start gap-2">
-          <AddHostDialog />
-          <RackDnD />
-          <div className="text-sm text-gray-500">
-            Drag the host to move. Click the host to see host information.
-          </div>
+          <AddHostDialog context={RackContext} />
+          <RackDnD context={RackContext} />
+          <div className="text-sm text-gray-500">Click the host to manage host.</div>
         </div>
       </div>
     </RackContext.Provider>

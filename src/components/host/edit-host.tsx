@@ -1,7 +1,4 @@
-"use client";
-
 import type React from "react";
-
 import { useState, useEffect } from "react";
 import {
   Dialog,
@@ -15,35 +12,37 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Edit, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import type { SimpleRack } from "@/lib/type";
-import { modifyRack } from "@/lib/api";
+import { simple_host_schema, SimpleHost } from "@/lib/type";
+import { modifyHost } from "@/lib/api";
 import { toast } from "sonner";
+import { z } from "zod";
 
-interface EditRackDialogProps {
-  rack: SimpleRack | null;
-  onUpdateSuccess?: (updatedRack: SimpleRack) => void;
+interface EditHostDialogProps {
+  host: SimpleHost | null;
+  onUpdateSuccess?: (updatedHost: SimpleHost) => void;
 }
 
-export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
+const form_schema = simple_host_schema.pick({
+  name: true,
+  height: true,
+});
+
+export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<z.infer<typeof form_schema>>({
     name: "",
-    service_name: "", // TODO: we need service ID
-    height: "",
+    height: 0,
   });
 
-  const hasHosts = rack ? rack.n_hosts > 0 : false;
-
   useEffect(() => {
-    if (!rack) return;
+    if (!host) return;
     setOpen(true);
     setFormData({
-      name: rack.name,
-      service_name: rack.service_name,
-      height: rack.height.toString(),
+      name: host.name,
+      height: host.height,
     });
-  }, [rack]);
+  }, [host]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -51,27 +50,25 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    if (!rack) return;
+    if (!host) return;
     e.preventDefault();
     setError(null);
 
     try {
-      const success = await modifyRack(rack.id, {
+      const success = await modifyHost(host.id, {
         name: formData.name,
-        service_id: formData.service_name, // TODO
-        height: Number.parseInt(formData.height),
-        room_id: rack.room_id,
+        height: formData.height,
       });
 
       if (success) {
-        const updatedRack: SimpleRack = {
-          ...rack,
+        const updatedHost: SimpleHost = {
+          ...host,
           name: formData.name,
-          height: Number.parseInt(formData.height),
+          height: formData.height,
         };
-        if (onUpdateSuccess) onUpdateSuccess(updatedRack);
+        if (onUpdateSuccess) onUpdateSuccess(updatedHost);
         setOpen(false);
-        toast.success("Rack updated successfully");
+        toast.success("Host updated successfully");
       } else {
         setError("Failed to edit Rack.");
       }
@@ -89,16 +86,6 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
             <Edit className="h-5 w-5" /> Edit Rack
           </DialogTitle>
         </DialogHeader>
-
-        {hasHosts && (
-          <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              There are hosts in this rack, so the height cannot be changed. Please remove all
-              hosts before changing the height.
-            </AlertDescription>
-          </Alert>
-        )}
 
         {error && (
           <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
@@ -119,15 +106,6 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="service_name">Service</Label>
-            <Input
-              id="service_name"
-              name="service_name"
-              value={formData.service_name}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="height">Height (U)</Label>
             <Input
               id="height"
@@ -136,9 +114,9 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
               value={formData.height}
               onChange={handleChange}
               required
-              disabled={hasHosts}
             />
           </div>
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel

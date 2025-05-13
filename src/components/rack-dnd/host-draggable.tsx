@@ -3,22 +3,27 @@ import { motion, PanInfo, useMotionValue, useMotionValueEvent } from "motion/rea
 import { height2Px, pos2translateY, HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useRackContext } from "./rack-context";
 import { modifyHost } from "@/lib/api";
 import { Link } from "react-router-dom";
+import { useContextSafe } from "@/lib/utils";
+import { RackContextType } from "@/components/rack-dnd/rack-dnd-reducer";
 
 interface HostDraggableProps {
   host: SimpleHost;
   constraintsRef: React.RefObject<HTMLDivElement | null>;
   scrollRef: React.RefObject<HTMLDivElement | null>;
+  context: RackContextType;
+  onUpdate?: (newPos: number) => void;
 }
 
 export default function HostDraggable({
   host,
   constraintsRef,
   scrollRef,
+  context,
+  onUpdate,
 }: HostDraggableProps) {
-  const { state, dispatch } = useRackContext();
+  const { state, dispatch } = useContextSafe(context);
 
   const dragY = useMotionValue(pos2translateY(host.pos, host.height, state.rack.height));
 
@@ -79,11 +84,16 @@ export default function HostDraggable({
           `Host ${host.name} successfully moved to position ${state.dragging.nextPos}`,
         );
 
+        const newPos = state.dragging.nextPos;
+
         modifyHost(host.id, {
           rack_id: state.rack.id,
-          pos: state.dragging.nextPos,
+          pos: newPos,
         })
-          .then(() => {})
+          .then(() => {
+            toast.success(`Host ${host.name} moved successfully!`);
+            onUpdate?.(newPos);
+          })
           .catch((error) => {
             toast.error(`Failed to move host ${host.name}: ${error.message}`);
           });
@@ -114,9 +124,7 @@ export default function HostDraggable({
         onDrag={handleOnDrag}
         onDragEnd={handleDragEnd}
         initial={false}
-        className={
-          "absolute top-0 left-0 flex w-full flex-row items-center justify-between rounded-lg border-3 border-gray-950 bg-white px-4 py-2 hover:bg-blue-100"
-        }
+        className="absolute top-0 left-0 flex w-full flex-row items-center justify-between rounded-lg border-3 border-blue-500 bg-white px-4 py-2 hover:bg-blue-100"
         style={{
           y: dragY,
           translateY: translateY,
@@ -124,7 +132,7 @@ export default function HostDraggable({
           zIndex: state.dragging?.id === host.id ? 99 : 1,
         }}
       >
-        <Link to={`/host/${host.id}`} className="text-sm font-bold">
+        <Link to={`/host/${host.id}`} className="text-sm font-bold hover:underline">
           {host.name}
         </Link>
         <div

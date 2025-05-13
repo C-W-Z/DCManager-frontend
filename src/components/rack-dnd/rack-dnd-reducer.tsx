@@ -18,6 +18,11 @@ export type Action =
   | { type: "DRAG_ENDED"; payload: { host: SimpleHost } }
   | { type: "ANIMATION_ENDED" };
 
+export type RackContextType = React.Context<{
+  state: RackDroppable;
+  dispatch: React.ActionDispatch<[action: Action]>;
+} | null>;
+
 export function RackDnDReducer(state: RackDroppable, action: Action) {
   function clearHostFromSpaces(host: SimpleHost, spaces: string[]) {
     const newSpace = [...spaces];
