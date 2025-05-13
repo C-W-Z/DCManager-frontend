@@ -11,26 +11,26 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { MoveRight, Home, Move, MoveLeft } from "lucide-react";
-import type { SimpleDatacenter, SimpleRack, SimpleRoom } from "@/lib/type";
-import { getAllDC, getDC, modifyRoom, modifyRack, getRoom, getRack } from "@/lib/api";
+import type { SimpleDatacenter, SimpleHost, SimpleRack, SimpleRoom } from "@/lib/type";
+import {
+  getAllDC,
+  getDC,
+  modifyRoom,
+  modifyRack,
+  getRoom,
+  getRack,
+  modifyHost,
+} from "@/lib/api";
 
 type MoveItemType = "room" | "rack" | "host";
 
 interface MoveItemDialogProps {
   type: MoveItemType;
-  itemId: string | null;
-  itemName?: string;
-  currentParentId?: string;
+  item: SimpleRoom | SimpleRack | SimpleHost | null;
   onSuccess?: () => void;
 }
 
-export function MoveItemDialog({
-  type,
-  itemId,
-  itemName,
-  currentParentId,
-  onSuccess,
-}: MoveItemDialogProps) {
+export function MoveItemDialog({ type, item, onSuccess }: MoveItemDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
@@ -79,18 +79,18 @@ export function MoveItemDialog({
     }
   }, []);
 
-  const loadParentLayer = useCallback(async () => {
+  const loadParentLevel = useCallback(async () => {
     loadDataCenters();
     switch (type) {
       case "room": {
-        if (currentParentId) setSelectedDC(currentParentId);
+        setSelectedDC((item as SimpleRoom).dc_id);
         break;
       }
       case "rack": {
-        if (!currentParentId) break;
         try {
-          const room = await getRoom(currentParentId);
-          if (room.id !== currentParentId) console.error("room.id !== currentParentId");
+          const room = await getRoom((item as SimpleRack).room_id);
+          if (room.id !== (item as SimpleRack).room_id)
+            console.error("room.id !== item.room_id");
           loadRoomsByDCId(room.dc_id);
           setSelectedDC(room.dc_id);
           setSelectedRoom(room.id);
@@ -100,10 +100,10 @@ export function MoveItemDialog({
         break;
       }
       case "host": {
-        if (!currentParentId) break;
         try {
-          const rack = await getRack(currentParentId);
-          if (rack.id !== currentParentId) console.error("rack.id !== currentParentId");
+          const rack = await getRack((item as SimpleHost).rack_id);
+          if (rack.id !== (item as SimpleHost).rack_id)
+            console.error("rack.id !== item.rack_id");
           loadRoomsByDCId(rack.dc_id);
           loadRacksByRoomId(rack.room_id);
           setSelectedDC(rack.dc_id);
@@ -117,20 +117,20 @@ export function MoveItemDialog({
       default:
         break;
     }
-  }, [type, loadDataCenters, currentParentId, loadRoomsByDCId, loadRacksByRoomId]);
+  }, [loadDataCenters, type, item, loadRoomsByDCId, loadRacksByRoomId]);
 
-  // 当 itemId 变化时，如果有值则打开对话框
+  // 当 item 变化时，如果有值则打开对话框
   useEffect(() => {
-    if (itemId) {
+    if (item) {
       setIsOpen(true);
-      loadParentLayer();
+      loadParentLevel();
     } else {
       // 重置选择状态
       setSelectedDC(null);
       setSelectedRoom(null);
       setSelectedRack(null);
     }
-  }, [itemId, loadParentLayer]);
+  }, [item, loadParentLevel]);
 
   // 处理数据中心选择
   const handleSelectDC = (dc_id: string) => {
@@ -181,21 +181,22 @@ export function MoveItemDialog({
 
   // 处理移动确认
   const handleMove = async () => {
-    if (!itemId) return;
+    if (!item) return;
 
     setLoading(true);
     try {
+      let success = false;
       if (type === "room" && selectedDC) {
-        // 移动房间到新的数据中心
-        await modifyRoom(itemId, { dc_id: selectedDC });
+        success = await modifyRoom(item.id, { dc_id: selectedDC });
       } else if (type === "rack" && selectedRoom) {
-        // 移动机架到新的房间
-        await modifyRack(itemId, { room_id: selectedRoom });
+        success = await modifyRack(item.id, { room_id: selectedRoom });
+      } else if (type === "host" && selectedRack) {
+        success = await modifyHost(item.id, { rack_id: selectedRack });
       }
 
       // 关闭对话框并通知成功
       setIsOpen(false);
-      if (onSuccess) onSuccess();
+      if (success && onSuccess) onSuccess();
     } catch (error) {
       console.error(`Error moving ${type}:`, error);
     } finally {
@@ -231,9 +232,11 @@ export function MoveItemDialog({
 
   // 检查是否可以移动
   const canMove = () => {
-    if (type === "room") return !!selectedDC && selectedDC !== currentParentId;
-    if (type === "rack") return !!selectedRoom && selectedRoom !== currentParentId;
-    if (type === "host") return !!selectedRack && selectedRack !== currentParentId;
+    if (type === "room") return !!selectedDC && selectedDC !== (item as SimpleRoom).dc_id;
+    if (type === "rack")
+      return !!selectedRoom && selectedRoom !== (item as SimpleRack).room_id;
+    if (type === "host")
+      return !!selectedRack && selectedRack !== (item as SimpleHost).rack_id;
     return false;
   };
 
@@ -272,7 +275,7 @@ export function MoveItemDialog({
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[500px] [&>button]:hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-            <Move className="h-5 w-5" /> Move {getTypeName()} "{itemName}"
+            <Move className="h-5 w-5" /> Move {getTypeName()} "{item?.name}"
           </DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
@@ -300,13 +303,13 @@ export function MoveItemDialog({
                       key={dc.id}
                       className={`flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100 ${
                         selectedDC === dc.id ? "bg-gray-100" : ""
-                      }`}
+                      } ${(item as SimpleRoom).dc_id === dc.id ? "opacity-50" : ""}`}
                       onClick={() => handleSelectDC(dc.id)}
                     >
                       <div className="flex items-center gap-2">
                         <Home className="h-4 w-4 text-gray-500" />
                         <span>{dc.name}</span>
-                        {currentParentId === dc.id && (
+                        {(item as SimpleRoom).dc_id === dc.id && (
                           <span className="ml-auto text-xs text-gray-500">(Current)</span>
                         )}
                       </div>
@@ -323,13 +326,13 @@ export function MoveItemDialog({
                       key={room.id}
                       className={`flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100 ${
                         selectedRoom === room.id ? "bg-gray-100" : ""
-                      } ${currentParentId === room.id ? "opacity-50" : ""}`}
+                      } ${(item as SimpleRack).room_id === room.id ? "opacity-50" : ""}`}
                       onClick={() => handleSelectRoom(room.id)}
                     >
                       <div className="flex items-center gap-2">
                         <Home className="h-4 w-4 text-gray-500" />
                         <span>{room.name}</span>
-                        {currentParentId === room.id && (
+                        {(item as SimpleRack).room_id === room.id && (
                           <span className="ml-auto text-xs text-gray-500">(Current)</span>
                         )}
                       </div>
@@ -346,13 +349,13 @@ export function MoveItemDialog({
                       key={rack.id}
                       className={`flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100 ${
                         selectedRoom === rack.id ? "bg-gray-100" : ""
-                      } ${currentParentId === rack.id ? "opacity-50" : ""}`}
+                      } ${(item as SimpleHost).rack_id === rack.id ? "opacity-50" : ""}`}
                       onClick={() => handleSelectRack(rack.id)}
                     >
                       <div className="flex items-center gap-2">
                         <Home className="h-4 w-4 text-gray-500" />
                         <span>{rack.name}</span>
-                        {currentParentId === rack.id && (
+                        {(item as SimpleHost).rack_id === rack.id && (
                           <span className="ml-auto text-xs text-gray-500">(Current)</span>
                         )}
                       </div>
@@ -367,7 +370,7 @@ export function MoveItemDialog({
           {canMove() && (
             <div className="mt-4">
               <p className="text-sm font-medium">
-                Move <span className="font-bold">{itemName}</span> to{" "}
+                Move <span className="font-bold">{item?.name}</span> to{" "}
                 <span className="font-bold">{getSelectedDestinationName()}</span>
               </p>
             </div>

@@ -31,17 +31,16 @@ export function RackRowActions({
 }: RackRowActionsProps) {
   const rack = row.original;
 
-  const [currentRack, setCurrentRack] = useState<SimpleRack | null>(null);
+  const [rackToEdit, setRackToEdit] = useState<SimpleRack | null>(null);
+  const [rackToMove, setRackToMove] = useState<SimpleRack | null>(null);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
-
-  const [rackToMove, setRackToMove] = useState<string | null>(null);
 
   const handleEditDataCenter = (rack: SimpleRack) => {
     // 先设置为 null，强制 useEffect 在下一次设置时触发
-    setCurrentRack(null);
-    // 使用 setTimeout 确保在下一个渲染周期设置 currentRack
+    setRackToEdit(null);
+    // 使用 setTimeout 确保在下一个渲染周期设置 rackToEdit
     setTimeout(() => {
-      setCurrentRack(rack);
+      setRackToEdit(rack);
     }, 0);
   };
 
@@ -57,7 +56,7 @@ export function RackRowActions({
   const handleMoveRack = (rack: SimpleRack) => {
     setRackToMove(null);
     setTimeout(() => {
-      setRackToMove(rack.id);
+      setRackToMove(rack);
     }, 0);
   };
 
@@ -87,21 +86,15 @@ export function RackRowActions({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <EditRackDialog rack={currentRack} onUpdateSuccess={onUpdateSuccess} />
+      <EditRackDialog rack={rackToEdit} onUpdateSuccess={onUpdateSuccess} />
+
+      <MoveItemDialog type="rack" item={rackToMove} onSuccess={onMoveSuccess} />
 
       <DeleteConfirmation
         ids={idsToDelete}
         type="rack"
         itemNames={idsToDelete && idsToDelete.length === 1 ? [rack.name] : undefined}
         onSuccess={handleDeleteSuccess}
-      />
-
-      <MoveItemDialog
-        type="rack"
-        itemId={rackToMove}
-        itemName={rack.name}
-        currentParentId={rack.room_id}
-        onSuccess={onMoveSuccess}
       />
     </>
   );
