@@ -11,6 +11,7 @@ import { RackRowActions } from "./rack-actions";
 export function rackColumns(
   onUpdateSuccess: (dc: SimpleRack) => void,
   onDeleteSuccess: (ids: string[]) => void,
+  onMoveSuccess?: () => void,
 ): ColumnDef<SimpleRack>[] {
   return [
     {
@@ -131,6 +132,7 @@ export function rackColumns(
           row={row}
           onUpdateSuccess={onUpdateSuccess}
           onDeleteSuccess={onDeleteSuccess}
+          onMoveSuccess={onMoveSuccess}
         />
       ),
     },

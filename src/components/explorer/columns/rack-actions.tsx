@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import { Edit, MoreHorizontal, MoveRight, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,22 +14,27 @@ import { EditRackDialog } from "../dialogs/edit-rack";
 import { DeleteConfirmation } from "../dialogs/delete-confirm";
 import { Row } from "@tanstack/react-table";
 import type { SimpleRack } from "@/lib/type";
+import { MoveItemDialog } from "../dialogs/move-item";
 
 interface RackRowActionsProps {
   row: Row<SimpleRack>;
   onUpdateSuccess: (rack: SimpleRack) => void;
   onDeleteSuccess: (ids: string[]) => void;
+  onMoveSuccess?: () => void;
 }
 
 export function RackRowActions({
   row,
   onUpdateSuccess,
   onDeleteSuccess,
+  onMoveSuccess,
 }: RackRowActionsProps) {
   const rack = row.original;
 
   const [currentRack, setCurrentRack] = useState<SimpleRack | null>(null);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
+
+  const [rackToMove, setRackToMove] = useState<string | null>(null);
 
   const handleEditDataCenter = (rack: SimpleRack) => {
     // 先设置为 null，强制 useEffect 在下一次设置时触发
@@ -49,6 +54,20 @@ export function RackRowActions({
     onDeleteSuccess(ids);
   };
 
+  const handleMoveRack = (rack: SimpleRack) => {
+    // 设置要移动的 ID
+    setRackToMove(rack.id);
+  };
+
+  const handleMoveSuccess = () => {
+    // 清除要移动的 ID
+    setRackToMove(null);
+    // 调用父组件的成功回调
+    if (onMoveSuccess) {
+      onMoveSuccess();
+    }
+  };
+
   return (
     <>
       <DropdownMenu>
@@ -61,6 +80,9 @@ export function RackRowActions({
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => handleEditDataCenter(rack)}>
             <Edit className="mr-2 h-4 w-4" /> EDIT
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleMoveRack(rack)}>
+            <MoveRight className="mr-2 h-4 w-4" /> Move
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -79,6 +101,14 @@ export function RackRowActions({
         type="rack"
         itemNames={idsToDelete && idsToDelete.length === 1 ? [rack.name] : undefined}
         onSuccess={handleDeleteSuccess}
+      />
+
+      <MoveItemDialog
+        type="rack"
+        itemId={rackToMove}
+        itemName={rack.name}
+        currentParentId={rack.room_id}
+        onSuccess={handleMoveSuccess}
       />
     </>
   );
