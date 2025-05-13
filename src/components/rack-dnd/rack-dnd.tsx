@@ -3,10 +3,20 @@ import { useRef } from "react";
 import { cn } from "@/lib/utils";
 import { HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
 import HostDraggable from "./host-draggable";
-import { useRackContext } from "./rack-context";
+import { RackContextType } from "@/components/rack-dnd/rack-dnd-reducer";
+import { useContextSafe } from "@/lib/utils";
+import { HostComponent } from "./host-component";
 
-export default function RackDnD() {
-  const { state } = useRackContext();
+export default function RackDnD({
+  context,
+  hostId,
+  onMoveUpdate,
+}: {
+  context: RackContextType;
+  hostId?: string;
+  onMoveUpdate?: (newPos: number) => void;
+}) {
+  const { state } = useContextSafe(context);
 
   const constraintsRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -35,14 +45,20 @@ export default function RackDnD() {
         </div>
 
         {state.rack.hosts.map((host, index) => {
-          return (
-            <HostDraggable
-              key={index}
-              host={host}
-              constraintsRef={constraintsRef}
-              scrollRef={scrollRef}
-            />
-          );
+          if (hostId && host.id === hostId) {
+            return (
+              <HostDraggable
+                key={index}
+                host={host}
+                constraintsRef={constraintsRef}
+                scrollRef={scrollRef}
+                context={context}
+                onUpdate={onMoveUpdate}
+              />
+            );
+          } else {
+            return <HostComponent key={index} host={host} rackHeight={state.rack.height} />;
+          }
         })}
       </motion.div>
     </div>

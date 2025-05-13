@@ -90,6 +90,11 @@ export function addRack(body: Pick<mytype.Rack, "name" | "height" | "room_id" | 
   return Promise.resolve(faker.string.uuid());
 }
 
+export function getAllRack(): Promise<mytype.SimpleRack[]> {
+  console.log("getAllRack");
+  return Promise.resolve(MockData.rack as mytype.SimpleRack[]);
+}
+
 export function getRack(rack_id: string): Promise<mytype.Rack> {
   console.log("getRack", rack_id);
 

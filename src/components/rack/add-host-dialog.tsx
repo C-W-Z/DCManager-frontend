@@ -27,17 +27,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 import { Rack, SimpleHost, host_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addHost } from "@/lib/api";
-import { useRackContext } from "@/components/rack/rack-context";
 import Icon from "@/components/icon";
+import { RackContextType } from "@/components/rack-dnd/rack-dnd-reducer";
+import { useContextSafe } from "@/lib/utils";
 
 const form_schema = host_schema.pick({ name: true, height: true });
 
-export function AddHostDialog() {
-  const { state, dispatch } = useRackContext();
+export function AddHostDialog({ context }: { context: RackContextType }) {
+  const { state, dispatch } = useContextSafe(context);
 
   const [open, setOpen] = useState(false);
 
@@ -86,11 +86,7 @@ export function AddHostDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          className={cn(
-            "flex h-fit w-full flex-row items-center justify-start gap-3 text-sm font-bold",
-          )}
-        >
+        <Button className="flex h-fit w-full flex-row items-center justify-start gap-3 text-sm font-bold">
           <Icon id="add" className="size-4 fill-white" />
           <p>New Host</p>
         </Button>

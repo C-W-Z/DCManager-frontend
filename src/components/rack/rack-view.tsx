@@ -1,9 +1,8 @@
-import { useEffect, useState, useReducer } from "react";
+import { useEffect, useState, useReducer, createContext } from "react";
 import { getRack } from "@/lib/api";
 import { Rack } from "@/lib/type";
-import RackDnD from "@/components/rack/rack-dnd";
-import { RackDnDReducer, RackDroppable } from "@/components/rack/rack-dnd-reducer";
-import { RackContext } from "@/components/rack/rack-context";
+import RackDnD from "@/components/rack-dnd/rack-dnd";
+import { RackDnDReducer, RackDroppable, Action } from "@/components/rack-dnd/rack-dnd-reducer";
 import { InfoCard, Separator, CardColumn } from "@/components/infocard";
 import { AddHostDialog } from "@/components/rack/add-host-dialog";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,11 @@ import { useParams } from "react-router-dom";
 import Icon from "@/components/icon";
 import { DeleteConfirmation } from "../explorer/dialogs/delete-confirm";
 import { EditRackDialog } from "../explorer/dialogs/edit-rack";
+
+const RackContext = createContext<{
+  state: RackDroppable;
+  dispatch: React.ActionDispatch<[action: Action]>;
+} | null>(null);
 
 export default function RackView() {
   const rackId = useParams().rackId as string;
@@ -125,11 +129,9 @@ function Wrapper({ rack, setRack }: { rack: Rack; setRack: (_: Rack | null) => v
           </InfoCard>
         </div>
         <div className="flex flex-col items-center justify-start gap-2">
-          <AddHostDialog />
-          <RackDnD />
-          <div className="text-sm text-gray-500">
-            Drag the host to move. Click the host to see host information.
-          </div>
+          <AddHostDialog context={RackContext} />
+          <RackDnD context={RackContext} />
+          <div className="text-sm text-gray-500">Click the host to manage host.</div>
         </div>
       </div>
     </RackContext.Provider>
