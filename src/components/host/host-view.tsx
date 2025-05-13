@@ -104,13 +104,17 @@ function Wrapper({
               <Separator />
               <CardColumn label="Data Center" data={host.dc_id} />
               <CardColumn label="Room" data={host.room_id} />
-              <CardColumn label="Rack" data={host.rack_id} />
+              <CardColumn label="Rack" data={host.rack_id} link={`/rack/${host.rack_id}`} />
               <CardColumn label="Position" data={`${host.pos}`} />
               <Separator />
               <CardColumn label="UUID" data={host.id} />
               <CardColumn label="Height" data={`${host.height}`} />
               <CardColumn label="IP" data={host.ip} />
-              <CardColumn label="Service" data={host.service_id} />
+              <CardColumn
+                label="Service"
+                data={host.service_id}
+                link={`/service/${host.service_id}`}
+              />
               <CardColumn label="Status" data={host.status} />
               <div className="mt-4 flex flex-row items-center justify-center gap-8">
                 <Button

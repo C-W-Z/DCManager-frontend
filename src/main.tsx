@@ -10,6 +10,7 @@ import Layout from "./layout";
 import HostView from "./components/host/host-view";
 import RackView from "./components/rack/rack-view";
 import ServiceTable from "./components/service/service-table";
+import ServiceView from "./components/service/service-view";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -51,6 +52,14 @@ createRoot(document.getElementById("root")!).render(
         element={
           <Layout>
             <ServiceTable />
+          </Layout>
+        }
+      />
+      <Route
+        path="/service/:serviceId"
+        element={
+          <Layout>
+            <ServiceView />
           </Layout>
         }
       />

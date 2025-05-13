@@ -1,9 +1,8 @@
-"use client";
-
 import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { SimpleService } from "@/lib/type";
+import { Link } from "react-router-dom";
 
 export function ServiceColumns(): ColumnDef<SimpleService>[] {
   return [
@@ -24,7 +23,12 @@ export function ServiceColumns(): ColumnDef<SimpleService>[] {
         const name: string = row.getValue("name");
         return (
           <div className="pl-4 text-left font-medium">
-            <button className="hover:underline focus:outline-none">{name}</button>
+            <Link
+              to={`/service/${row.original.id}`}
+              className="hover:underline focus:outline-none"
+            >
+              {name}
+            </Link>
           </div>
         );
       },

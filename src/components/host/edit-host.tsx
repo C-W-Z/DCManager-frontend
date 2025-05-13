@@ -25,7 +25,6 @@ interface EditHostDialogProps {
 const form_schema = simple_host_schema.pick({
   name: true,
   height: true,
-  ip: true,
 });
 
 export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
@@ -34,7 +33,6 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
   const [formData, setFormData] = useState<z.infer<typeof form_schema>>({
     name: "",
     height: 0,
-    ip: "",
   });
 
   useEffect(() => {
@@ -43,7 +41,6 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
     setFormData({
       name: host.name,
       height: host.height,
-      ip: host.ip,
     });
   }, [host]);
 
@@ -61,7 +58,6 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
       const success = await modifyHost(host.id, {
         name: formData.name,
         height: formData.height,
-        ip: formData.ip,
       });
 
       if (success) {
@@ -118,16 +114,6 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
               value={formData.height}
               onChange={handleChange}
               required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="ip">IP address</Label>
-            <Input
-              id="ip"
-              name="ip"
-              type="string"
-              value={formData.ip}
-              onChange={handleChange}
             />
           </div>
 

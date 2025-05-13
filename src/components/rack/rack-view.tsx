@@ -87,7 +87,11 @@ function Wrapper({ rack, setRack }: { rack: Rack; setRack: (_: Rack | null) => v
               <CardColumn label="UUID" data={rack.id} />
               <CardColumn label="Capacity" data={`${rack.capacity}/${rack.height}`} />
               <CardColumn label="Hosts" data={`${rack.n_hosts}`} />
-              <CardColumn label="Service" data={rack.service_name} />
+              <CardColumn
+                label="Service"
+                data={rack.service_name}
+                link={`/service/${rack.service_id}`}
+              />
               <div className="mt-4 flex flex-row items-center justify-center gap-8">
                 <Button
                   variant="outline"
