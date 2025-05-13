@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import { Edit, MoreHorizontal, Move, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,29 +14,33 @@ import { EditRackDialog } from "../dialogs/edit-rack";
 import { DeleteConfirmation } from "../dialogs/delete-confirm";
 import { Row } from "@tanstack/react-table";
 import type { SimpleRack } from "@/lib/type";
+import { MoveItemDialog } from "../dialogs/move-item";
 
 interface RackRowActionsProps {
   row: Row<SimpleRack>;
   onUpdateSuccess: (rack: SimpleRack) => void;
   onDeleteSuccess: (ids: string[]) => void;
+  onMoveSuccess: (ids: string[]) => void;
 }
 
 export function RackRowActions({
   row,
   onUpdateSuccess,
   onDeleteSuccess,
+  onMoveSuccess,
 }: RackRowActionsProps) {
   const rack = row.original;
 
-  const [currentRack, setCurrentRack] = useState<SimpleRack | null>(null);
+  const [rackToEdit, setRackToEdit] = useState<SimpleRack | null>(null);
+  const [racksToMove, setRacksToMove] = useState<SimpleRack[]>([]);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
   const handleEditDataCenter = (rack: SimpleRack) => {
     // 先设置为 null，强制 useEffect 在下一次设置时触发
-    setCurrentRack(null);
-    // 使用 setTimeout 确保在下一个渲染周期设置 currentRack
+    setRackToEdit(null);
+    // 使用 setTimeout 确保在下一个渲染周期设置 rackToEdit
     setTimeout(() => {
-      setCurrentRack(rack);
+      setRackToEdit(rack);
     }, 0);
   };
 
@@ -47,6 +51,13 @@ export function RackRowActions({
   const handleDeleteSuccess = (ids: string[]) => {
     setIdsToDelete([]);
     onDeleteSuccess(ids);
+  };
+
+  const handleMoveRack = (rack: SimpleRack) => {
+    setRacksToMove([]);
+    setTimeout(() => {
+      setRacksToMove([rack]);
+    }, 0);
   };
 
   return (
@@ -62,6 +73,9 @@ export function RackRowActions({
           <DropdownMenuItem onClick={() => handleEditDataCenter(rack)}>
             <Edit className="mr-2 h-4 w-4" /> EDIT
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleMoveRack(rack)}>
+            <Move className="mr-2 h-4 w-4" /> MOVE
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-red-600"
@@ -72,7 +86,9 @@ export function RackRowActions({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <EditRackDialog rack={currentRack} onUpdateSuccess={onUpdateSuccess} />
+      <EditRackDialog rack={rackToEdit} onUpdateSuccess={onUpdateSuccess} />
+
+      <MoveItemDialog type="rack" items={racksToMove} onSuccess={onMoveSuccess} />
 
       <DeleteConfirmation
         ids={idsToDelete}

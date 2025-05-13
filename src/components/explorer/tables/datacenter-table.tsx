@@ -82,7 +82,7 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
     loadDataCenters();
   };
 
-  const columns = dataCenterColumns(onSelect, onUpdateSuccess, onDeleteSuccess);
+  const columns = dataCenterColumns({ onSelect, onUpdateSuccess, onDeleteSuccess });
 
   return (
     <div>

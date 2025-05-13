@@ -7,11 +7,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import type { SimpleRoom } from "@/lib/type";
 import { RoomRowActions } from "./room-actions";
 
-export function roomColumns(
-  onSelect: (room: SimpleRoom) => void,
-  onUpdateSuccess: (dc: SimpleRoom) => void,
-  onDeleteSuccess: (ids: string[]) => void,
-): ColumnDef<SimpleRoom>[] {
+interface RoomColumnsProps {
+  onSelect: (room: SimpleRoom) => void;
+  onUpdateSuccess: (dc: SimpleRoom) => void;
+  onDeleteSuccess: (ids: string[]) => void;
+  onMoveSuccess: (ids: string[]) => void;
+}
+
+export function roomColumns({
+  onSelect,
+  onUpdateSuccess,
+  onDeleteSuccess,
+  onMoveSuccess,
+}: RoomColumnsProps): ColumnDef<SimpleRoom>[] {
   return [
     {
       id: "select",
@@ -125,6 +133,7 @@ export function roomColumns(
           row={row}
           onUpdateSuccess={onUpdateSuccess}
           onDeleteSuccess={onDeleteSuccess}
+          onMoveSuccess={onMoveSuccess}
         />
       ),
     },

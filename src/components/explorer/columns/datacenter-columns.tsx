@@ -7,11 +7,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import type { SimpleDatacenter } from "@/lib/type";
 import { DatacenterRowActions } from "./datacenter-actions";
 
-export function dataCenterColumns(
-  onSelect: (dc: SimpleDatacenter) => void,
-  onUpdateSuccess: (dc: SimpleDatacenter) => void,
-  onDeleteSuccess: (ids: string[]) => void,
-): ColumnDef<SimpleDatacenter>[] {
+interface DataCenterColumnsProps {
+  onSelect: (room: SimpleDatacenter) => void;
+  onUpdateSuccess: (dc: SimpleDatacenter) => void;
+  onDeleteSuccess: (ids: string[]) => void;
+}
+
+export function dataCenterColumns({
+  onSelect,
+  onUpdateSuccess,
+  onDeleteSuccess,
+}: DataCenterColumnsProps): ColumnDef<SimpleDatacenter>[] {
   return [
     {
       id: "select",

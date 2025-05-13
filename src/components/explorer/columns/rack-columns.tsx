@@ -8,10 +8,17 @@ import type { SimpleRack } from "@/lib/type";
 import { Link } from "react-router-dom";
 import { RackRowActions } from "./rack-actions";
 
-export function rackColumns(
-  onUpdateSuccess: (dc: SimpleRack) => void,
-  onDeleteSuccess: (ids: string[]) => void,
-): ColumnDef<SimpleRack>[] {
+interface RackColumnsProps {
+  onUpdateSuccess: (dc: SimpleRack) => void;
+  onDeleteSuccess: (ids: string[]) => void;
+  onMoveSuccess: (ids: string[]) => void;
+}
+
+export function rackColumns({
+  onUpdateSuccess,
+  onDeleteSuccess,
+  onMoveSuccess,
+}: RackColumnsProps): ColumnDef<SimpleRack>[] {
   return [
     {
       id: "select",
@@ -131,6 +138,7 @@ export function rackColumns(
           row={row}
           onUpdateSuccess={onUpdateSuccess}
           onDeleteSuccess={onDeleteSuccess}
+          onMoveSuccess={onMoveSuccess}
         />
       ),
     },
