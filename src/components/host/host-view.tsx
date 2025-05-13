@@ -7,11 +7,14 @@ import Icon from "@/components/icon";
 import { cn } from "@/lib/utils";
 import { useParams } from "react-router-dom";
 import { height2Px } from "@/lib/constant";
+import { DeleteConfirmation } from "../explorer/dialogs/delete-confirm";
+import { EditHostDialog } from "./edit-host";
 
 export default function HostView() {
   const hostId = useParams().hostId as string;
-
   const [host, setHost] = useState<Host | null>(null);
+  const [deleteIds, setDeleteIds] = useState<string[]>([]);
+  const [editHost, setEditHost] = useState<Host | null>(null);
 
   useEffect(() => {
     getHost(hostId)
@@ -39,6 +42,7 @@ export default function HostView() {
                 <CardColumn label="Data Center" data={host.dc_id} />
                 <CardColumn label="Room" data={host.room_id} />
                 <CardColumn label="Rack" data={host.rack_id} />
+                <CardColumn label="Position" data={`${host.pos}`} />
                 <Separator />
                 <CardColumn label="UUID" data={host.id} />
                 <CardColumn label="Height" data={`${host.height}`} />
@@ -47,19 +51,48 @@ export default function HostView() {
                 <CardColumn label="Status" data={host.status} />
                 <div className="mt-4 flex flex-row items-center justify-center gap-8">
                   {/* This will be replace by Dialogs*/}
-                  <Button variant="outline">Edit Host</Button>
+                  <Button
+                    variant="outline"
+                    className="w-24"
+                    onClick={() => {
+                      setEditHost(null);
+                      setTimeout(() => {
+                        setEditHost(host);
+                      }, 0);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <EditHostDialog
+                    host={editHost}
+                    onUpdateSuccess={(updatedHost) => setHost({ ...host, ...updatedHost })}
+                  />
                   <Button variant="outline">Move Host</Button>
-                  <Button variant="destructive">Delete Host</Button>
+                  <Button
+                    variant="destructive"
+                    className="w-24"
+                    onClick={() => {
+                      setDeleteIds([]);
+                      setTimeout(() => {
+                        setDeleteIds([host.id]);
+                      }, 0);
+                    }}
+                  >
+                    DELETE
+                  </Button>
+                  <DeleteConfirmation
+                    ids={deleteIds}
+                    type="host"
+                    itemNames={[host.name]}
+                    onSuccess={() => setHost(null)}
+                  />
                 </div>
               </>
             </InfoCard>
           </div>
-          <div className="flex h-full flex-col items-center justify-center gap-2 pb-20">
-            <HostComponent host={host} />
-          </div>
         </div>
       ) : (
-        <div className="flex w-full items-center justify-center">
+        <div className="flex h-screen w-full items-center justify-center">
           <div className="text-xl font-bold">Host ID: {hostId} not found :(</div>
         </div>
       )}

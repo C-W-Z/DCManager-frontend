@@ -142,7 +142,7 @@ export function getHost(host_id: string): Promise<mytype.Host> {
 
 export function modifyHost(
   host_id: string,
-  body: Partial<Pick<mytype.Host, "name" | "height" | "ip" | "rack_id" | "pos">>,
+  body: Partial<Pick<mytype.Host, "name" | "height" | "ip" | "status" | "rack_id" | "pos">>,
 ) {
   console.log("modifyHost", host_id, body);
   return Promise.resolve(true);

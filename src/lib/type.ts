@@ -26,6 +26,7 @@ export const simple_host_schema = host_schema.pick({
   name: true,
   height: true,
   status: true,
+  ip: true,
   rack_id: true,
   pos: true,
 });

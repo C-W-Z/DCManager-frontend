@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import DataCenterTable from "@/components/explorer/views/datacenter-table";
-import RoomTable from "@/components/explorer/views/room-table";
-import RackTable from "@/components/explorer/views/rack-table";
+import DataCenterTable from "@/components/explorer/tables/datacenter-table";
+import RoomTable from "@/components/explorer/tables/room-table";
+import RackTable from "@/components/explorer/tables/rack-table";
 import Breadcrumb from "../components/explorer/breadcrumb";
 import type { SimpleDatacenter, SimpleRoom } from "@/lib/type";
 

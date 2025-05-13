@@ -68,6 +68,7 @@ export function AddHostDialog() {
           name: values.name,
           height: values.height,
           status: "idle",
+          ip: "",
           rack_id: state.rack.id,
           pos: newPos,
         };
