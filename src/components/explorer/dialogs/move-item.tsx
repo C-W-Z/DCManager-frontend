@@ -390,7 +390,7 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
             type="button"
             variant="outline"
             onClick={handleSelectParentLevel}
-            disabled={loading || loadingDestinations || selectedDC === null}
+            disabled={loading || loadingDestinations || selectedDC === null || type === "room"}
           >
             <MoveLeft></MoveLeft>Parent
           </Button>

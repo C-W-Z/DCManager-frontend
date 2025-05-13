@@ -59,7 +59,12 @@ export default function RoomTable({ datacenter, onSelect }: RoomTableProps) {
     loadRooms(datacenter.id);
   };
 
-  const columns = roomColumns(onSelect, onUpdateSuccess, onDeleteSuccess);
+  const columns = roomColumns({
+    onSelect,
+    onUpdateSuccess,
+    onDeleteSuccess,
+    onMoveSuccess: onDeleteSuccess,
+  });
 
   return (
     <div>

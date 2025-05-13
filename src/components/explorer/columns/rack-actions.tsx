@@ -20,7 +20,7 @@ interface RackRowActionsProps {
   row: Row<SimpleRack>;
   onUpdateSuccess: (rack: SimpleRack) => void;
   onDeleteSuccess: (ids: string[]) => void;
-  onMoveSuccess?: (ids: string[]) => void;
+  onMoveSuccess: (ids: string[]) => void;
 }
 
 export function RackRowActions({
@@ -74,7 +74,7 @@ export function RackRowActions({
             <Edit className="mr-2 h-4 w-4" /> EDIT
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleMoveRack(rack)}>
-            <Move className="mr-2 h-4 w-4" /> Move
+            <Move className="mr-2 h-4 w-4" /> MOVE
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

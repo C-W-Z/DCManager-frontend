@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import { Edit, MoreHorizontal, Move, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,21 +14,25 @@ import { EditRoomDialog } from "../dialogs/edit-room";
 import { DeleteConfirmation } from "../dialogs/delete-confirm";
 import { Row } from "@tanstack/react-table";
 import type { SimpleRoom } from "@/lib/type";
+import { MoveItemDialog } from "../dialogs/move-item";
 
 interface RoomRowActionsProps {
   row: Row<SimpleRoom>;
   onUpdateSuccess: (room: SimpleRoom) => void;
   onDeleteSuccess: (ids: string[]) => void;
+  onMoveSuccess: (ids: string[]) => void;
 }
 
 export function RoomRowActions({
   row,
   onUpdateSuccess,
   onDeleteSuccess,
+  onMoveSuccess,
 }: RoomRowActionsProps) {
   const room = row.original;
 
   const [currentRoom, setCurrentRoom] = useState<SimpleRoom | null>(null);
+  const [roomsToMove, setRoomsToMove] = useState<SimpleRoom[]>([]);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
   const handleEditDataCenter = (room: SimpleRoom) => {
@@ -49,6 +53,13 @@ export function RoomRowActions({
     onDeleteSuccess(ids);
   };
 
+  const handleMoveRoom = (room: SimpleRoom) => {
+      setRoomsToMove([]);
+      setTimeout(() => {
+        setRoomsToMove([room]);
+      }, 0);
+    };
+
   return (
     <>
       <DropdownMenu>
@@ -62,6 +73,9 @@ export function RoomRowActions({
           <DropdownMenuItem onClick={() => handleEditDataCenter(room)}>
             <Edit className="mr-2 h-4 w-4" /> EDIT
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleMoveRoom(room)}>
+            <Move className="mr-2 h-4 w-4" /> MOVE
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-red-600"
@@ -73,6 +87,8 @@ export function RoomRowActions({
       </DropdownMenu>
 
       <EditRoomDialog room={currentRoom} onUpdateSuccess={onUpdateSuccess} />
+
+      <MoveItemDialog type="room" items={roomsToMove} onSuccess={onMoveSuccess} />
 
       <DeleteConfirmation
         ids={idsToDelete}

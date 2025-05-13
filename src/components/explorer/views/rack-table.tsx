@@ -57,7 +57,11 @@ export default function RackTable({ datacenter, room }: RackTableProps) {
     loadRacks(datacenter.id);
   };
 
-  const columns = rackColumns(onUpdateSuccess, onDeleteSuccess, onDeleteSuccess);
+  const columns = rackColumns({
+    onUpdateSuccess,
+    onDeleteSuccess,
+    onMoveSuccess: onDeleteSuccess,
+  });
 
   return (
     <div>
