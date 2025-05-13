@@ -5,11 +5,11 @@ import { Toaster } from "@/components/ui/sonner";
 import "./global.css";
 
 import Home from "@/pages/Home";
-import Explorer from "@/pages/explorer";
+import Explorer from "@/components/explorer/explorer";
 import Layout from "./layout";
 import HostView from "./components/host/host-view";
-import HostTable from "./components/host/host-table";
 import RackView from "./components/rack/rack-view";
+import ServiceTable from "./components/service/service-table";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -31,14 +31,6 @@ createRoot(document.getElementById("root")!).render(
         }
       />
       <Route
-        path="/rack"
-        element={
-          <Layout>
-            <HostTable />
-          </Layout>
-        }
-      />
-      <Route
         path="/rack/:rackId"
         element={
           <Layout>
@@ -47,18 +39,18 @@ createRoot(document.getElementById("root")!).render(
         }
       />
       <Route
-        path="/host"
-        element={
-          <Layout>
-            <HostTable />
-          </Layout>
-        }
-      />
-      <Route
         path="/host/:hostId"
         element={
           <Layout>
             <HostView />
+          </Layout>
+        }
+      />
+      <Route
+        path="/service"
+        element={
+          <Layout>
+            <ServiceTable />
           </Layout>
         }
       />

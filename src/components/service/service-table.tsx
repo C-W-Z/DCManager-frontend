@@ -1,5 +1,3 @@
-"use client";
-import { useState } from "react";
 import {
   type ColumnDef,
   flexRender,
@@ -26,17 +24,73 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ServiceColumns } from "./service-column";
+import { SimpleService } from "@/lib/type";
+import { getAllService } from "@/lib/api";
+import { useEffect, useState, useCallback } from "react";
+import { DataTablePagination } from "../explorer/data-table-pagination";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { DataTablePagination } from "./data-table-pagination";
-import { Trash2 } from "lucide-react";
-import { DeleteConfirmation, DeleteType } from "./dialogs/delete-confirm";
+
+export default function ServiceTable() {
+  const [services, setServices] = useState<SimpleService[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // 使用 useCallback 包装 loadDataCenters 函数
+  const loadDataCenters = useCallback(() => {
+    setLoading(true);
+    getAllService()
+      .then((serviceList) => {
+        setServices(serviceList);
+      })
+      .catch((error) => {
+        console.error("Error fetching all dc data:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    loadDataCenters();
+  }, [loadDataCenters]);
+
+  const handleRefresh = () => {
+    loadDataCenters();
+  };
+
+  const columns = ServiceColumns();
+
+  return (
+    <div className="flex h-full w-full flex-col gap-4 overflow-hidden px-12 pt-12">
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Services</h1>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleRefresh}
+            className="rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Refresh"}
+          </button>
+        </div>
+      </div>
+
+      <DataTable
+        columns={columns}
+        data={services}
+        getRowId={(row) => row.id}
+        loading={loading}
+      />
+    </div>
+  );
+}
 
 interface WithID {
   id: string;
@@ -48,8 +102,6 @@ interface DataTableProps<TData, TValue> {
   onDeleteRows?: (rows: Row<TData>[]) => void;
   getRowId: (row: TData) => string;
   loading?: boolean;
-  onDeleteSuccess?: (ids: string[]) => void;
-  type: DeleteType;
 }
 
 export function DataTable<TData extends WithID, TValue>({
@@ -57,14 +109,11 @@ export function DataTable<TData extends WithID, TValue>({
   data,
   getRowId,
   loading = false,
-  onDeleteSuccess,
-  type,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [isColumnMenuOpen, setIsColumnMenuOpen] = useState(false);
-  const [multipleIdsToDelete, setMultipleIdsToDelete] = useState<string[]>([]);
 
   const table = useReactTable({
     data,
@@ -89,51 +138,16 @@ export function DataTable<TData extends WithID, TValue>({
     getRowId: (row) => getRowId(row),
   });
 
-  const handleDeleteSelected = () => {
-    const selectedRows = table.getFilteredSelectedRowModel().rows;
-    if (selectedRows.length > 0) {
-      onDeleteRows(selectedRows);
-    }
-  };
-
-  const onDeleteRows = (rows: Row<TData>[]) => {
-    const idsToDelete = rows.map((row) => row.original.id);
-    setMultipleIdsToDelete(idsToDelete);
-  };
-
-  const handleMultipleDeleteSuccess = (idsToDelete: string[]) => {
-    if (onDeleteSuccess) onDeleteSuccess(idsToDelete);
-    setMultipleIdsToDelete([]);
-    table.resetRowSelection();
-  };
-
-  const selectedRowCount = table.getFilteredSelectedRowModel().rows.length;
-
   return (
-    <div className="px-6">
+    <div>
       <div className="flex items-center justify-between py-4">
-        <div className="flex items-center gap-2">
-          <Input
-            placeholder="Filter by name..."
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
-            className="max-w-sm"
-            disabled={loading}
-          />
-
-          {selectedRowCount > 0 && (
-            <Button
-              variant="destructive"
-              size="sm"
-              className="flex items-center gap-1"
-              onClick={handleDeleteSelected}
-              disabled={loading}
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete Selected ({selectedRowCount})
-            </Button>
-          )}
-        </div>
+        <Input
+          placeholder="Filter by name..."
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
+          className="max-w-sm"
+          disabled={loading}
+        />
 
         <DropdownMenu open={isColumnMenuOpen} onOpenChange={setIsColumnMenuOpen}>
           <DropdownMenuTrigger asChild>
@@ -187,7 +201,7 @@ export function DataTable<TData extends WithID, TValue>({
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow
                   key={headerGroup.id}
-                  className="table-header-row bg-gray-200 hover:bg-gray-200"
+                  className="table-header-row h-12 bg-gray-200 hover:bg-gray-200"
                 >
                   {headerGroup.headers.map((header, index) => {
                     return (
@@ -239,13 +253,6 @@ export function DataTable<TData extends WithID, TValue>({
       </div>
 
       <DataTablePagination table={table} />
-
-      {/* 多选删除确认对话框 */}
-      <DeleteConfirmation
-        ids={multipleIdsToDelete}
-        type={type}
-        onSuccess={handleMultipleDeleteSuccess}
-      />
     </div>
   );
 }

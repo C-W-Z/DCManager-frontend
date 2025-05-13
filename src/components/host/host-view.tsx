@@ -9,8 +9,6 @@ import { DeleteConfirmation } from "../explorer/dialogs/delete-confirm";
 import { EditHostDialog } from "./edit-host";
 import { RackDroppable, RackDnDReducer, Action } from "@/components/rack-dnd/rack-dnd-reducer";
 import RackDnD from "@/components/rack-dnd/rack-dnd";
-import { Move } from "lucide-react";
-import { MoveHostDialog } from "./move-host-dialog";
 
 export default function HostView() {
   const hostId = useParams().hostId as string;
@@ -115,7 +113,6 @@ function Wrapper({
               <CardColumn label="Service" data={host.service_id} />
               <CardColumn label="Status" data={host.status} />
               <div className="mt-4 flex flex-row items-center justify-center gap-8">
-                {/* This will be replace by Dialogs*/}
                 <Button
                   variant="outline"
                   className="w-24"
@@ -132,7 +129,6 @@ function Wrapper({
                   host={editHost}
                   onUpdateSuccess={(updatedHost) => setHost({ ...host, ...updatedHost })}
                 />
-                <Button variant="outline">Move Host</Button>
                 <Button
                   variant="destructive"
                   className="w-24"

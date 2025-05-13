@@ -7,13 +7,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -33,7 +26,6 @@ const form_schema = simple_host_schema.pick({
   name: true,
   height: true,
   ip: true,
-  status: true,
 });
 
 export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
@@ -43,7 +35,6 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
     name: "",
     height: 0,
     ip: "",
-    status: "idle",
   });
 
   useEffect(() => {
@@ -53,7 +44,6 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
       name: host.name,
       height: host.height,
       ip: host.ip,
-      status: host.status,
     });
   }, [host]);
 
@@ -72,7 +62,6 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
         name: formData.name,
         height: formData.height,
         ip: formData.ip,
-        status: formData.status,
       });
 
       if (success) {
@@ -141,19 +130,7 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
               onChange={handleChange}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select>
-              <SelectTrigger className="w-full">
-                <SelectValue defaultValue={formData.status} onChange={handleChange} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="idle">Idle</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="stopped">Stopped</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
