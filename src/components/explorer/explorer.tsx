@@ -61,7 +61,7 @@ export default function Explorer() {
 
   return (
     <div className="flex h-full flex-col overflow-auto">
-      <div className="mt-4 ml-4 flex items-center justify-between p-4">
+      <div className="mt-4 ml-8 flex items-center justify-between p-4">
         <Breadcrumb
           currentView={currentView}
           dcName={selectedDataCenter ? selectedDataCenter.name : null}
@@ -70,7 +70,7 @@ export default function Explorer() {
         />
       </div>
 
-      <div className="flex-1 px-6">
+      <div className="flex-1 px-12">
         <Outlet
           context={{ datacenter: selectedDataCenter, room: selectedRoom, onSelect: navigate }}
         />

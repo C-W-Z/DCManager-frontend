@@ -68,7 +68,7 @@ export default function ServiceTable() {
   const columns = ServiceColumns();
 
   return (
-    <div className="flex h-full w-full flex-col gap-4 px-12 pt-12">
+    <div className="flex h-full w-full flex-col px-12 pt-12">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Services</h1>
         <div className="flex items-center gap-2">
@@ -140,7 +140,7 @@ export function DataTable<TData extends WithID, TValue>({
 
   return (
     <div>
-      <div className="flex items-center justify-between py-4">
+      <div className="flex items-center justify-between pt-2">
         <Input
           placeholder="Filter by name..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}

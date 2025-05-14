@@ -110,8 +110,8 @@ export function DataTable<TData extends WithID, TValue>({
   const selectedRowCount = table.getFilteredSelectedRowModel().rows.length;
 
   return (
-    <div className="px-6">
-      <div className="flex items-center justify-between py-4">
+    <div className="px-0">
+      <div className="flex items-center justify-between pt-2">
         <div className="flex items-center gap-2">
           <Input
             placeholder="Filter by name..."
