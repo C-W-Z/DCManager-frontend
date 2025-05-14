@@ -71,10 +71,10 @@ export function RackRowActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => handleEditDataCenter(rack)}>
-            <Edit className="mr-2 h-4 w-4" /> EDIT
+            <Edit className="mr-2 h-4 w-4" /> Edit
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleMoveRack(rack)}>
-            <Move className="mr-2 h-4 w-4" /> MOVE
+            <Move className="mr-2 h-4 w-4" /> Move
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

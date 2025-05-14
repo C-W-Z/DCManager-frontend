@@ -61,7 +61,7 @@ export default function Explorer() {
 
   return (
     <div className="flex h-full flex-col overflow-auto">
-      <div className="mt-4 ml-8 flex items-center justify-between p-4">
+      <div className="mt-5 ml-8 flex items-center justify-between p-4">
         <Breadcrumb
           currentView={currentView}
           dcName={selectedDataCenter ? selectedDataCenter.name : null}
