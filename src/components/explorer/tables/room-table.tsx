@@ -90,6 +90,7 @@ export default function RoomTable() {
         data={rooms}
         getRowId={(row) => row.id}
         loading={loading}
+        onMoveSuccess={onDeleteSuccess}
         onDeleteSuccess={onDeleteSuccess}
         type="room"
       />

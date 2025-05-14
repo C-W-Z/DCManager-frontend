@@ -54,11 +54,11 @@ export function RoomRowActions({
   };
 
   const handleMoveRoom = (room: SimpleRoom) => {
-      setRoomsToMove([]);
-      setTimeout(() => {
-        setRoomsToMove([room]);
-      }, 0);
-    };
+    setRoomsToMove([]);
+    setTimeout(() => {
+      setRoomsToMove([room]);
+    }, 0);
+  };
 
   return (
     <>

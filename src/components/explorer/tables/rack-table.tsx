@@ -88,6 +88,7 @@ export default function RackTable() {
         data={racks}
         getRowId={(row) => row.id}
         loading={loading}
+        onMoveSuccess={onDeleteSuccess}
         onDeleteSuccess={onDeleteSuccess}
         type="rack"
       />

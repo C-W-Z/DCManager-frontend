@@ -16,7 +16,6 @@ import {
   type ColumnFiltersState,
   type SortingState,
   type VisibilityState,
-  type Row,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -35,8 +34,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTablePagination } from "./data-table-pagination";
-import { Trash2 } from "lucide-react";
+import { Move, Trash2 } from "lucide-react";
 import { DeleteConfirmation, DeleteType } from "./dialogs/delete-confirm";
+import { MoveItemDialog } from "./dialogs/move-item";
 
 interface WithID {
   id: string;
@@ -45,9 +45,9 @@ interface WithID {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  onDeleteRows?: (rows: Row<TData>[]) => void;
   getRowId: (row: TData) => string;
   loading?: boolean;
+  onMoveSuccess?: (ids: string[]) => void;
   onDeleteSuccess?: (ids: string[]) => void;
   type: DeleteType;
 }
@@ -57,6 +57,7 @@ export function DataTable<TData extends WithID, TValue>({
   data,
   getRowId,
   loading = false,
+  onMoveSuccess,
   onDeleteSuccess,
   type,
 }: DataTableProps<TData, TValue>) {
@@ -65,6 +66,7 @@ export function DataTable<TData extends WithID, TValue>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [isColumnMenuOpen, setIsColumnMenuOpen] = useState(false);
   const [multipleIdsToDelete, setMultipleIdsToDelete] = useState<string[]>([]);
+  const [itemsToMove, setItemsToMove] = useState<TData[]>([]);
 
   const table = useReactTable({
     data,
@@ -89,19 +91,31 @@ export function DataTable<TData extends WithID, TValue>({
     getRowId: (row) => getRowId(row),
   });
 
-  const handleDeleteSelected = () => {
+  const onMoveSelected = () => {
+    setItemsToMove([]);
+    setTimeout(() => {
+      const selectedRows = table.getFilteredSelectedRowModel().rows;
+      if (selectedRows.length > 0) {
+        const items = selectedRows.map((row) => row.original);
+        setItemsToMove(items);
+      }
+    }, 0);
+  };
+
+  const handleMoveSuccess = (idsToMove: string[]) => {
+    if (onMoveSuccess) onMoveSuccess(idsToMove);
+    table.resetRowSelection();
+  };
+
+  const onDeleteSelected = () => {
     const selectedRows = table.getFilteredSelectedRowModel().rows;
     if (selectedRows.length > 0) {
-      onDeleteRows(selectedRows);
+      const idsToDelete = selectedRows.map((row) => row.original.id);
+      setMultipleIdsToDelete(idsToDelete);
     }
   };
 
-  const onDeleteRows = (rows: Row<TData>[]) => {
-    const idsToDelete = rows.map((row) => row.original.id);
-    setMultipleIdsToDelete(idsToDelete);
-  };
-
-  const handleMultipleDeleteSuccess = (idsToDelete: string[]) => {
+  const handleDeleteSuccess = (idsToDelete: string[]) => {
     if (onDeleteSuccess) onDeleteSuccess(idsToDelete);
     setMultipleIdsToDelete([]);
     table.resetRowSelection();
@@ -121,12 +135,25 @@ export function DataTable<TData extends WithID, TValue>({
             disabled={loading}
           />
 
+          {type !== "datacenter" && selectedRowCount > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1"
+              onClick={onMoveSelected}
+              disabled={loading}
+            >
+              <Move className="h-4 w-4" />
+              Move Selected ({selectedRowCount})
+            </Button>
+          )}
+
           {selectedRowCount > 0 && (
             <Button
               variant="destructive"
               size="sm"
               className="flex items-center gap-1"
-              onClick={handleDeleteSelected}
+              onClick={onDeleteSelected}
               disabled={loading}
             >
               <Trash2 className="h-4 w-4" />
@@ -240,11 +267,14 @@ export function DataTable<TData extends WithID, TValue>({
 
       <DataTablePagination table={table} />
 
-      {/* 多选删除确认对话框 */}
+      {type !== "datacenter" && (
+        <MoveItemDialog type={type} items={itemsToMove} onSuccess={handleMoveSuccess} />
+      )}
+
       <DeleteConfirmation
         ids={multipleIdsToDelete}
         type={type}
-        onSuccess={handleMultipleDeleteSuccess}
+        onSuccess={handleDeleteSuccess}
       />
     </div>
   );
