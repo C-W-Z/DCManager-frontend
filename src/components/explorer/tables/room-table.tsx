@@ -7,13 +7,16 @@ import type { SimpleDatacenter, SimpleRoom } from "@/lib/type";
 import { getDC } from "@/lib/api";
 import { AddRoomDialog } from "../dialogs/add-room-dialog";
 import { RoomSummary } from "../summary/room-summary";
+import { useParams, useOutletContext } from "react-router-dom";
 
-interface RoomTableProps {
-  datacenter: SimpleDatacenter;
-  onSelect: (room: SimpleRoom) => void;
+interface OutletContext {
+  datacenter: SimpleDatacenter | null;
+  onSelect: (path: string) => void;
 }
 
-export default function RoomTable({ datacenter, onSelect }: RoomTableProps) {
+export default function RoomTable() {
+  const { datacenter, onSelect } = useOutletContext<OutletContext>();
+  const { dcId } = useParams<{ dcId: string }>();
   const [rooms, setRooms] = useState<SimpleRoom[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -33,34 +36,32 @@ export default function RoomTable({ datacenter, onSelect }: RoomTableProps) {
   }, []);
 
   useEffect(() => {
-    loadRooms(datacenter.id);
-  }, [loadRooms, datacenter.id]);
+    if (dcId) {
+      loadRooms(dcId);
+    }
+  }, [dcId, loadRooms]);
 
   const onUpdateSuccess = (updatedRoom: SimpleRoom) => {
     if (updatedRoom) {
-      // 如果更新成功，更新本地状态中的数据中心
       setRooms((prev) =>
         prev.map((room) => (room.id === updatedRoom.id ? updatedRoom : room)),
       );
-      // 重新加载数据以确保一致性
-      // loadRooms();
     }
   };
 
   const onDeleteSuccess = (idsToDelete: string[]) => {
     const updatedRooms = rooms.filter((room) => !idsToDelete.includes(room.id));
     setRooms(updatedRooms);
-    // 重新加载数据
-    // loadRooms();
   };
 
-  // 添加手动刷新功能
   const handleRefresh = () => {
-    loadRooms(datacenter.id);
+    if (dcId) {
+      loadRooms(dcId);
+    }
   };
 
   const columns = roomColumns({
-    onSelect,
+    onSelect: (room) => onSelect(`/explorer/dc/${dcId}/room/${room.id}`),
     onUpdateSuccess,
     onDeleteSuccess,
     onMoveSuccess: onDeleteSuccess,
@@ -68,7 +69,7 @@ export default function RoomTable({ datacenter, onSelect }: RoomTableProps) {
 
   return (
     <div>
-      <RoomSummary datacenter={datacenter} />
+      {datacenter && <RoomSummary datacenter={datacenter} />}
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Rooms</h1>
@@ -80,7 +81,7 @@ export default function RoomTable({ datacenter, onSelect }: RoomTableProps) {
           >
             {loading ? "Loading..." : "Refresh"}
           </button>
-          <AddRoomDialog currentDC={datacenter} />
+          {datacenter && <AddRoomDialog currentDC={datacenter} />}
         </div>
       </div>
 

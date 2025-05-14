@@ -5,13 +5,16 @@ import type { SimpleRoom, SimpleRack, SimpleDatacenter } from "@/lib/type";
 import { getRoom } from "@/lib/api";
 import { AddRackDialog } from "@/components/explorer/dialogs/add-rack-dialog";
 import { RackSummary } from "../summary/rack-summary";
+import { useParams, useOutletContext } from "react-router-dom";
 
-interface RackTableProps {
-  datacenter: SimpleDatacenter;
-  room: SimpleRoom;
+interface OutletContext {
+  datacenter: SimpleDatacenter | null;
+  room: SimpleRoom | null;
 }
 
-export default function RackTable({ datacenter, room }: RackTableProps) {
+export default function RackTable() {
+  const { datacenter, room } = useOutletContext<OutletContext>();
+  const { roomId } = useParams<{ roomId: string }>();
   const [racks, setRacks] = useState<SimpleRack[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -31,30 +34,28 @@ export default function RackTable({ datacenter, room }: RackTableProps) {
   }, []);
 
   useEffect(() => {
-    loadRacks(room.id);
-  }, [loadRacks, room.id]);
+    if (roomId) {
+      loadRacks(roomId);
+    }
+  }, [roomId, loadRacks]);
 
   const onUpdateSuccess = (updatedRack: SimpleRack) => {
     if (updatedRack) {
-      // 如果更新成功，更新本地状态中的数据中心
       setRacks((prev) =>
         prev.map((rack) => (rack.id === updatedRack.id ? updatedRack : rack)),
       );
-      // 重新加载数据以确保一致性
-      // loadRacks();
     }
   };
 
-  // onMoveSuccess也做一樣的事（把table中被move/delete的移除掉）
   const onDeleteSuccess = (idsToDelete: string[]) => {
-    const updatedRooms = racks.filter((rack) => !idsToDelete.includes(rack.id));
-    setRacks(updatedRooms);
-    // 重新加载数据
-    // loadRacks();
+    const updatedRacks = racks.filter((rack) => !idsToDelete.includes(rack.id));
+    setRacks(updatedRacks);
   };
 
   const handleRefresh = () => {
-    loadRacks(datacenter.id);
+    if (roomId) {
+      loadRacks(roomId);
+    }
   };
 
   const columns = rackColumns({
@@ -65,7 +66,7 @@ export default function RackTable({ datacenter, room }: RackTableProps) {
 
   return (
     <div>
-      <RackSummary room={room} />
+      {room && <RackSummary room={room} />}
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Racks</h1>
@@ -78,7 +79,7 @@ export default function RackTable({ datacenter, room }: RackTableProps) {
           >
             {loading ? "Loading..." : "Refresh"}
           </button>
-          <AddRackDialog currentDC={datacenter} currentRoom={room} />
+          {datacenter && room && <AddRackDialog currentDC={datacenter} currentRoom={room} />}
         </div>
       </div>
 

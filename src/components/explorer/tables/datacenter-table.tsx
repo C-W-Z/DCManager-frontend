@@ -10,17 +10,18 @@ import {
   type Count,
   DataCenterSummary,
 } from "@/components/explorer/summary/datacenter-summary";
+import { useOutletContext } from "react-router-dom";
 
-interface DataCenterTableProps {
-  onSelect: (dc: SimpleDatacenter) => void;
+interface OutletContext {
+  onSelect: (path: string) => void;
 }
 
-export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
+export default function DataCenterTable() {
+  const { onSelect } = useOutletContext<OutletContext>();
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
   const [totalCounts, setTotalCounts] = useState<Count>({ dc: 0, room: 0, rack: 0, host: 0 });
   const [loading, setLoading] = useState(false);
 
-  // 使用 useCallback 包装 calculateTotalCounts 函数
   const calculateTotalCounts = useCallback((dcs: SimpleDatacenter[]) => {
     let n_rooms = 0;
     let n_racks = 0;
@@ -38,7 +39,6 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
     });
   }, []);
 
-  // 使用 useCallback 包装 loadDataCenters 函数
   const loadDataCenters = useCallback(() => {
     setLoading(true);
     getAllDC()
@@ -57,32 +57,29 @@ export default function DataCenterTable({ onSelect }: DataCenterTableProps) {
 
   useEffect(() => {
     loadDataCenters();
-  }, [loadDataCenters]); // 正确添加依赖项
+  }, [loadDataCenters]);
 
   const onUpdateSuccess = (updatedDC: SimpleDatacenter) => {
     if (updatedDC) {
-      // 如果更新成功，更新本地状态中的数据中心
       setDataCenters((prev) => prev.map((dc) => (dc.id === updatedDC.id ? updatedDC : dc)));
-      // 重新加载数据以确保一致性
-      // loadDataCenters();
     }
   };
 
   const onDeleteSuccess = (idsToDelete: string[]) => {
     const updatedDCs = dataCenters.filter((dc) => !idsToDelete.includes(dc.id));
     setDataCenters(updatedDCs);
-    // 重新计算总计数据
     calculateTotalCounts(updatedDCs);
-    // 重新加载数据
-    // loadDataCenters();
   };
 
-  // 添加手动刷新功能
   const handleRefresh = () => {
     loadDataCenters();
   };
 
-  const columns = dataCenterColumns({ onSelect, onUpdateSuccess, onDeleteSuccess });
+  const columns = dataCenterColumns({
+    onSelect: (dc) => onSelect(`/explorer/dc/${dc.id}`),
+    onUpdateSuccess,
+    onDeleteSuccess,
+  });
 
   return (
     <div>

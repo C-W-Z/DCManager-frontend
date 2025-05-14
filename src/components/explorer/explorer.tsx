@@ -1,36 +1,61 @@
 "use client";
 
-import { useState } from "react";
-import DataCenterTable from "@/components/explorer/tables/datacenter-table";
-import RoomTable from "@/components/explorer/tables/room-table";
-import RackTable from "@/components/explorer/tables/rack-table";
+import { useState, useEffect } from "react";
+import { Outlet, useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "./breadcrumb";
 import type { SimpleDatacenter, SimpleRoom } from "@/lib/type";
+import { getDC, getRoom } from "@/lib/api";
 
 export type ViewLevel = "datacenter-table" | "room-table" | "rack-table";
 
 export default function Explorer() {
+  const navigate = useNavigate();
+  const { dcId, roomId } = useParams<{ dcId?: string; roomId?: string }>();
   const [currentView, setCurrentView] = useState<ViewLevel>("datacenter-table");
   const [selectedDataCenter, setSelectedDataCenter] = useState<SimpleDatacenter | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<SimpleRoom | null>(null);
 
-  const handleDataCenterSelect = (dc: SimpleDatacenter) => {
-    setSelectedDataCenter(dc);
-    setCurrentView("room-table");
-  };
-
-  const handleRoomSelect = (room: SimpleRoom) => {
-    setSelectedRoom(room);
-    setCurrentView("rack-table");
-  };
-
-  const handleBreadcrumbClick = (level: ViewLevel) => {
-    setCurrentView(level);
-    if (level === "datacenter-table") {
+  // 根據 URL 參數加載數據
+  useEffect(() => {
+    if (roomId && dcId) {
+      // 加載 RackTable 所需的數據
+      setCurrentView("rack-table");
+      getRoom(roomId)
+        .then((room) => {
+          setSelectedRoom(room);
+          getDC(dcId).then((dc) => setSelectedDataCenter(dc));
+        })
+        .catch((error) => {
+          console.error("Error loading room:", error);
+          navigate("/explorer"); // 錯誤時導航回 All
+        });
+    } else if (dcId) {
+      // 加載 RoomTable 所需的數據
+      setCurrentView("room-table");
+      getDC(dcId)
+        .then((dc) => {
+          setSelectedDataCenter(dc);
+          setSelectedRoom(null);
+        })
+        .catch((error) => {
+          console.error("Error loading datacenter:", error);
+          navigate("/explorer");
+        });
+    } else {
+      // 加載 DataCenterTable
+      setCurrentView("datacenter-table");
       setSelectedDataCenter(null);
       setSelectedRoom(null);
-    } else if (level === "room-table") {
-      setSelectedRoom(null);
+    }
+  }, [dcId, roomId, navigate]);
+
+  const handleBreadcrumbClick = (level: ViewLevel) => {
+    if (level === "datacenter-table") {
+      navigate("/explorer");
+    } else if (level === "room-table" && selectedDataCenter) {
+      navigate(`/explorer/dc/${selectedDataCenter.id}`);
+    } else if (level === "rack-table" && selectedDataCenter && selectedRoom) {
+      navigate(`/explorer/dc/${selectedDataCenter.id}/room/${selectedRoom.id}`);
     }
   };
 
@@ -46,15 +71,9 @@ export default function Explorer() {
       </div>
 
       <div className="flex-1 px-6">
-        {currentView === "datacenter-table" && (
-          <DataCenterTable onSelect={handleDataCenterSelect} />
-        )}
-        {currentView === "room-table" && selectedDataCenter && (
-          <RoomTable datacenter={selectedDataCenter} onSelect={handleRoomSelect} />
-        )}
-        {currentView === "rack-table" && selectedDataCenter && selectedRoom && (
-          <RackTable datacenter={selectedDataCenter} room={selectedRoom} />
-        )}
+        <Outlet
+          context={{ datacenter: selectedDataCenter, room: selectedRoom, onSelect: navigate }}
+        />
       </div>
     </div>
   );
