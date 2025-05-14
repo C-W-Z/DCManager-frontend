@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { MoveRight, Home, Move, MoveLeft } from "lucide-react";
-import type { SimpleDatacenter, SimpleHost, SimpleRack, SimpleRoom } from "@/lib/type";
+import type { SimpleDatacenter, SimpleHost, SimpleRack, SimpleRoom, Rack } from "@/lib/type";
 import {
   getAllDC,
   getDC,
@@ -21,6 +21,8 @@ import {
   getRack,
   modifyHost,
 } from "@/lib/api";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 type MoveItemType = "room" | "rack" | "host";
 
@@ -39,6 +41,8 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
   const [selectedDC, setSelectedDC] = useState<string | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
   const [selectedRack, setSelectedRack] = useState<string | null>(null);
+  const [selectedRackPos, setSelectedRackPos] = useState<number | null>(null);
+  const [checkingRackPos, setCheckingRackPos] = useState(false);
   const [loadingDestinations, setLoadingDestinations] = useState(false);
 
   const [parentDCId, setParentDCId] = useState<string | null>(null);
@@ -115,9 +119,9 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
           setParentDCId(rack.dc_id);
           setSelectedDC(rack.dc_id);
           loadRacksByRoomId(rack.room_id);
-          setParentRoomId(rack.room_id)
+          setParentRoomId(rack.room_id);
           setSelectedRoom(rack.room_id);
-          setParentRackId(rack.id)
+          setParentRackId(rack.id);
           setSelectedRack(rack.id);
         } catch (error) {
           console.error("Error loading racks:", error);
@@ -157,6 +161,7 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
 
   const handleSelectRack = (rack_id: string) => {
     setSelectedRack(rack_id);
+    setCheckingRackPos(true);
   };
 
   const handleSelectParentLevel = () => {
@@ -195,7 +200,10 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
     if (type === "rack" && selectedRoom)
       return items.map((item) => modifyRack(item.id, { room_id: selectedRoom }));
     if (type === "host" && selectedRack)
-      return items.map((item) => modifyHost(item.id, { rack_id: selectedRack }));
+      return items.map((item) => {
+        if (selectedRackPos !== null)
+          modifyHost(item.id, { rack_id: selectedRack, pos: selectedRackPos });
+      });
     return items.map(() => Promise.resolve(false));
   };
 
@@ -210,6 +218,7 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
 
       // 关闭对话框并通知成功
       setIsOpen(false);
+      toast.success(type + " has successfully move to " + getSelectedDestinationName());
       if (allSuccessful && onSuccess) onSuccess(items.map((item) => item.id));
       else console.error("Some move operations failed");
     } catch (error) {
@@ -252,9 +261,43 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
     if (type === "rack")
       return !!selectedRoom && selectedRoom !== (items[0] as SimpleRack).room_id;
     if (type === "host")
-      return !!selectedRack && selectedRack !== (items[0] as SimpleHost).rack_id;
+      return (
+        selectedRackPos &&
+        selectedRackPos !== -1 &&
+        !!selectedRack &&
+        selectedRack !== (items[0] as SimpleHost).rack_id
+      );
     return false;
   };
+
+  const isHostFit = (hostHeight: number, rack: Rack) => {
+    const sortedHosts = [...rack.hosts].sort((a, b) => a.pos - b.pos);
+    let currentTop = rack.height;
+
+    for (let i = sortedHosts.length - 1; i >= 0; i--) {
+      const host = sortedHosts[i];
+      const host_top = host.pos + host.height - 1;
+      const space = currentTop - host_top;
+
+      if (space >= hostHeight) {
+        return currentTop - hostHeight + 1;
+      }
+
+      currentTop = host.pos - 1;
+    }
+    return -1;
+  };
+
+  useEffect(() => {
+    if (selectedRack && checkingRackPos) {
+      getRack(selectedRack).then((rack) => {
+        const hostHeight = (items[0] as SimpleHost).height;
+        const newPos = isHostFit(hostHeight, rack);
+        setSelectedRackPos(newPos);
+        setCheckingRackPos(false);
+      });
+    }
+  }, [checkingRackPos]);
 
   const getSelectedParentName = () => {
     let name = "";
@@ -365,13 +408,19 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
                   {racks.map((rack) => (
                     <li
                       key={rack.id}
-                      className={`flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100 ${
-                        selectedRoom === rack.id ? "bg-gray-100" : ""
-                      } ${parentRackId === rack.id ? "opacity-50" : ""}`}
+                      className={cn(
+                        "flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100",
+                        selectedRack === rack.id ? "bg-gray-100" : "",
+                        parentRackId === rack.id ? "opacity-50" : "",
+                      )}
                       onClick={() => handleSelectRack(rack.id)}
                     >
                       <div className="flex items-center gap-2">
-                        <Home className="h-4 w-4 text-gray-500" />
+                        {checkingRackPos ? (
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
+                        ) : (
+                          <Home className="h-4 w-4 text-gray-500" />
+                        )}
                         <span>{rack.name}</span>
                         {parentRackId === rack.id && (
                           <span className="ml-auto text-xs text-gray-500">(Current)</span>
@@ -385,11 +434,22 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
             </div>
           )}
 
-          {canMove() && (
+          {canMove() ? (
             <div className="mt-4">
               <p className="text-sm font-medium">
                 Move <span className="font-bold">{items[0].name}</span> to{" "}
                 <span className="font-bold">{getSelectedDestinationName()}</span>
+                {type === "host" && selectedRackPos !== null
+                  ? ` at position ${selectedRackPos + 1}`
+                  : ""}
+              </p>
+            </div>
+          ) : (
+            <div className="mt-4">
+              <p className="text-sm text-red-500">
+                {type === "host" && selectedRackPos === -1
+                  ? "Host does not fit in the selected rack."
+                  : "Please select a destination."}
               </p>
             </div>
           )}

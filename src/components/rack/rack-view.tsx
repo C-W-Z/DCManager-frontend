@@ -135,9 +135,7 @@ function Wrapper({ rack, setRack }: { rack: Rack; setRack: (_: Rack | null) => v
           </InfoCard>
         </div>
         <div className="flex flex-col items-center justify-start gap-2">
-          <div className="self-start">
-            <AddHostDialog context={RackContext} />
-          </div>
+          <AddHostDialog context={RackContext} />
           <RackDnD context={RackContext} />
           <div className="text-sm text-gray-500">Click the host to manage host.</div>
         </div>
@@ -147,7 +145,7 @@ function Wrapper({ rack, setRack }: { rack: Rack; setRack: (_: Rack | null) => v
         rack={editRack}
         onUpdateSuccess={(updatedRack) => setRack({ ...rack, ...updatedRack })}
       />
-      <MoveItemDialog type="rack" items={racksToMove}/>
+      <MoveItemDialog type="rack" items={racksToMove} />
       <DeleteConfirmation
         ids={deleteIds}
         type="rack"

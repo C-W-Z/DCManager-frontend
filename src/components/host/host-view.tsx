@@ -9,6 +9,7 @@ import { DeleteConfirmation } from "../explorer/dialogs/delete-confirm";
 import { EditHostDialog } from "./edit-host";
 import { RackDroppable, RackDnDReducer, Action } from "@/components/rack-dnd/rack-dnd-reducer";
 import RackDnD from "@/components/rack-dnd/rack-dnd";
+import { MoveItemDialog } from "../explorer/dialogs/move-item";
 
 export default function HostView() {
   const hostId = useParams().hostId as string;
@@ -86,6 +87,7 @@ function Wrapper({
   const [state, dispatch] = useReducer(RackDnDReducer, rack, createInitialState);
   const [deleteIds, setDeleteIds] = useState<string[]>([]);
   const [editHost, setEditHost] = useState<Host | null>(null);
+  const [moveHost, setMoveHost] = useState<Host[]>([]);
 
   function onMoveUpdate(newPos: number) {
     setHost({ ...host, pos: newPos });
@@ -129,10 +131,6 @@ function Wrapper({
                 >
                   Edit
                 </Button>
-                <EditHostDialog
-                  host={editHost}
-                  onUpdateSuccess={(updatedHost) => setHost({ ...host, ...updatedHost })}
-                />
                 <Button
                   variant="destructive"
                   className="w-24"
@@ -145,18 +143,20 @@ function Wrapper({
                 >
                   DELETE
                 </Button>
-                <DeleteConfirmation
-                  ids={deleteIds}
-                  type="host"
-                  itemNames={[host.name]}
-                  onSuccess={() => setHost(null)}
-                />
               </div>
             </>
           </InfoCard>
         </div>
         <div className="flex flex-col items-center justify-start gap-2">
-          <Button className="flex h-fit w-fit flex-row items-center justify-start gap-3 text-sm font-bold self-start">
+          <Button
+            onClick={() => {
+              setMoveHost([]);
+              setTimeout(() => {
+                setMoveHost([host]);
+              }, 0);
+            }}
+            className="flex h-fit w-full flex-row items-center justify-start gap-3 self-start text-sm font-bold"
+          >
             <Icon id="move" className="size-4 fill-white" />
             <p className="pr-2">Move Host To Other Rack</p>
           </Button>
@@ -164,6 +164,18 @@ function Wrapper({
           <div className="text-sm text-gray-500">Drag the host to move in rack.</div>
         </div>
       </div>
+
+      <EditHostDialog
+        host={editHost}
+        onUpdateSuccess={(updatedHost) => setHost({ ...host, ...updatedHost })}
+      />
+      <MoveItemDialog type="host" items={moveHost} />
+      <DeleteConfirmation
+        ids={deleteIds}
+        type="host"
+        itemNames={[host.name]}
+        onSuccess={() => setHost(null)}
+      />
     </HostContext.Provider>
   );
 }
