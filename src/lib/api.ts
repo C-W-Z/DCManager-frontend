@@ -85,7 +85,7 @@ export async function deleteRoom(room_id: string): Promise<boolean> {
   });
 }
 
-export function addRack(body: Pick<mytype.Rack, "name" | "height" | "room_id" | "dc_id">) {
+export function addRack(body: Pick<mytype.Rack, "name" | "height" | "room_id" | "dc_id"  | "service_id">) {
   console.log("addRack", body);
   return Promise.resolve(faker.string.uuid());
 }

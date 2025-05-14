@@ -53,6 +53,7 @@ export function AddRackDialog({ currentRoom, currentDC }: AddRackDialogProps) {
       height: values.height,
       room_id: currentRoom.id,
       dc_id: currentDC.id,
+      service_id: "", // TODO: service or none
     })
       .then(() => {
         setOpen(false);
