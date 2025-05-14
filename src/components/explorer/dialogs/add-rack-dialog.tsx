@@ -67,9 +67,9 @@ export function AddRackDialog({ currentRoom, currentDC }: AddRackDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="flex h-fit min-w-[130px] flex-row items-center justify-start gap-3 py-3 text-sm font-bold">
+        <Button className="flex h-fit w-fit flex-row items-center justify-start gap-3 text-sm font-bold">
           <Icon id="add" className="size-4 fill-white" />
-          <p>New Rack</p>
+          <p className="pr-2">New Rack</p>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[400px] [&>button]:hidden">

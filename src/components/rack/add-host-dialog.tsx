@@ -6,6 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -86,12 +87,12 @@ export function AddHostDialog({ context }: { context: RackContextType }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="flex h-fit w-full flex-row items-center justify-start gap-3 text-sm font-bold">
+        <Button className="flex h-fit w-fit flex-row items-center justify-start gap-3 text-sm font-bold">
           <Icon id="add" className="size-4 fill-white" />
-          <p>New Host</p>
+          <p className="pr-2">New Host</p>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[400px]">
+      <DialogContent className="w-[400px] [&>button]:hidden">
         <DialogHeader>
           <DialogTitle>Add New Host</DialogTitle>
           <DialogDescription>add a new host to current rack</DialogDescription>
@@ -135,9 +136,12 @@ export function AddHostDialog({ context }: { context: RackContextType }) {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
-              Add
-            </Button>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Add</Button>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

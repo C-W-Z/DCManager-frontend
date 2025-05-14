@@ -22,6 +22,7 @@ interface EditHostDialogProps {
   onUpdateSuccess?: (updatedHost: SimpleHost) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const form_schema = simple_host_schema.pick({
   name: true,
   height: true,

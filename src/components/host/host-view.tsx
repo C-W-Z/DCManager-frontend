@@ -156,9 +156,9 @@ function Wrapper({
           </InfoCard>
         </div>
         <div className="flex flex-col items-center justify-start gap-2">
-          <Button className="flex h-fit w-full flex-row items-center justify-start gap-3 text-sm font-bold">
+          <Button className="flex h-fit w-fit flex-row items-center justify-start gap-3 text-sm font-bold self-start">
             <Icon id="move" className="size-4 fill-white" />
-            <p>Move Host To Other Rack</p>
+            <p className="pr-2">Move Host To Other Rack</p>
           </Button>
           <RackDnD context={HostContext} hostId={host.id} onMoveUpdate={onMoveUpdate} />
           <div className="text-sm text-gray-500">Drag the host to move in rack.</div>
