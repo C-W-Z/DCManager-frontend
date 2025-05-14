@@ -87,7 +87,10 @@ function Wrapper({ rack, setRack }: { rack: Rack; setRack: (_: Rack | null) => v
               <CardColumn label="Room" data={rack.room_id} />
               <Separator />
               <CardColumn label="UUID" data={rack.id} />
-              <CardColumn label="Capacity" data={`${rack.capacity}/${rack.height}`} />
+              <CardColumn
+                label="Capacity"
+                data={`${rack.height - rack.capacity}/${rack.height}`}
+              />
               <CardColumn label="Hosts" data={`${rack.n_hosts}`} />
               <CardColumn
                 label="Service"

@@ -7,6 +7,7 @@ import { modifyHost } from "@/lib/api";
 import { Link } from "react-router-dom";
 import { useContextSafe } from "@/lib/utils";
 import { RackContextType } from "@/components/rack-dnd/rack-dnd-reducer";
+import { useEffect } from "react";
 
 interface HostDraggableProps {
   host: SimpleHost;
@@ -28,6 +29,17 @@ export default function HostDraggable({
   const dragY = useMotionValue(pos2translateY(host.pos, host.height, state.rack.height));
 
   const translateY = useMotionValue(0);
+
+  useEffect(() => {
+    const scrollBox = scrollRef.current;
+    if (scrollBox) {
+      const hostPosition = dragY.get();
+      scrollBox.scrollTo({
+        top: hostPosition,
+        behavior: "smooth",
+      });
+    }
+  }, [dragY, host.height, scrollRef]);
 
   function handleOnDrag(_: MouseEvent, info: PanInfo) {
     if (state.dragging?.id === host.id) {
