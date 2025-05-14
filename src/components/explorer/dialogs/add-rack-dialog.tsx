@@ -223,7 +223,7 @@ export function AddRackDialog({ currentRoom, currentDC, onSuccess }: AddRackDial
                 </CommandList>
               </Command>
             </PopoverContent>,
-            document.body,
+            document.body,  // Render PopoverContent at the root
           )}
         </Popover>
       );

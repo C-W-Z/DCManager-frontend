@@ -17,13 +17,13 @@ export default function Explorer() {
 
   // 根據 URL 參數加載數據
   useEffect(() => {
-    if (roomId && dcId) {
+    if (roomId) {
       // 加載 RackTable 所需的數據
       setCurrentView("rack-table");
       getRoom(roomId)
         .then((room) => {
           setSelectedRoom(room);
-          getDC(dcId).then((dc) => setSelectedDataCenter(dc));
+          getDC(room.dc_id).then((dc) => setSelectedDataCenter(dc));
         })
         .catch((error) => {
           console.error("Error loading room:", error);
@@ -55,7 +55,7 @@ export default function Explorer() {
     } else if (level === "room-table" && selectedDataCenter) {
       navigate(`/explorer/dc/${selectedDataCenter.id}`);
     } else if (level === "rack-table" && selectedDataCenter && selectedRoom) {
-      navigate(`/explorer/dc/${selectedDataCenter.id}/room/${selectedRoom.id}`);
+      navigate(`/explorer/room/${selectedRoom.id}`);
     }
   };
 

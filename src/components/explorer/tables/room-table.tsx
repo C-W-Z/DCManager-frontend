@@ -61,7 +61,7 @@ export default function RoomTable() {
   };
 
   const columns = roomColumns({
-    onSelect: (room) => onSelect(`/explorer/dc/${dcId}/room/${room.id}`),
+    onSelect: (room) => onSelect(`/explorer/room/${room.id}`),
     onUpdateSuccess,
     onDeleteSuccess,
     onMoveSuccess: onDeleteSuccess,
