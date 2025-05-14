@@ -151,10 +151,7 @@ export function AddRackDialog({ currentRoom, currentDC, onSuccess }: AddRackDial
                 ref={popoverTriggerRef}
                 variant="outline"
                 role="combobox"
-                className={cn(
-                  "justify-between",
-                  !form.getValues("service_id") && "text-muted-foreground",
-                )}
+                className="justify-between border-black"
                 disabled={loading}
               >
                 {loading
@@ -163,13 +160,13 @@ export function AddRackDialog({ currentRoom, currentDC, onSuccess }: AddRackDial
                     ? services.find((service) => service.id === form.getValues("service_id"))
                         ?.name || "None"
                     : "None"}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0" />
               </Button>
             </FormControl>
           </PopoverTrigger>
           {createPortal(
             <PopoverContent
-              className="z-[200] w-[300px] p-0"
+              className="z-[200] p-0"
               align="start"
               side="bottom"
               onClick={(e) => e.stopPropagation()}
