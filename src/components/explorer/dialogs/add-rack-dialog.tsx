@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   rack_schema,
   type SimpleDatacenter,
@@ -56,8 +56,8 @@ export function AddRackDialog({ currentRoom, currentDC, onSuccess }: AddRackDial
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [services, setServices] = useState<SimpleService[]>([]);
   const [loading, setLoading] = useState(false);
-  const popoverTriggerRef = useRef<HTMLButtonElement>(null); // Ref for PopoverTrigger
-  const commandInputRef = useRef<HTMLInputElement>(null); // Ref for CommandInput
+  const popoverTriggerRef = useRef<HTMLButtonElement>(null);
+  const commandInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch services when dialog opens
   useEffect(() => {
@@ -109,7 +109,7 @@ export function AddRackDialog({ currentRoom, currentDC, onSuccess }: AddRackDial
       height: values.height,
       room_id: currentRoom.id,
       dc_id: currentDC.id,
-      service_id: values.service_id || "", // Use empty string if no service selected
+      service_id: values.service_id || "",
     })
       .then(() => {
         setOpen(false);
@@ -122,92 +122,116 @@ export function AddRackDialog({ currentRoom, currentDC, onSuccess }: AddRackDial
       });
   }
 
-  const ServicePopover = () => (
-    <Popover open={popoverOpen} onOpenChange={setPopoverOpen} modal={true}>
-      <PopoverTrigger asChild>
-        <FormControl>
-          <Button
-            ref={popoverTriggerRef}
-            variant="outline"
-            role="combobox"
-            className={cn(
-              "justify-between",
-              !form.getValues("service_id") && "text-muted-foreground",
-            )}
-            disabled={loading}
-          >
-            {loading
-              ? "Loading services..."
-              : form.getValues("service_id")
-                ? services.find((service) => service.id === form.getValues("service_id"))
-                    ?.name || "None"
-                : "None"}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </FormControl>
-      </PopoverTrigger>
-      {createPortal(
-        <PopoverContent
-          className="z-[200] w-[300px] p-0"
-          align="start"
-          side="bottom"
-          onClick={(e) => e.stopPropagation()}
-          onWheel={(e) => e.stopPropagation()}
+  const ServicePopover = useMemo(() => {
+    return function ServicePopoverComponent() {
+      const [searchQuery, setSearchQuery] = useState("");
+
+      // Filter services based on search query
+      const filteredServices = searchQuery
+        ? services.filter((service) =>
+            service.name.toLowerCase().includes(searchQuery.toLowerCase()),
+          )
+        : services;
+
+      return (
+        <Popover
+          open={popoverOpen}
+          onOpenChange={(open) => {
+            setPopoverOpen(open);
+            if (!open) {
+              setSearchQuery(""); // Clear search when closing
+              popoverTriggerRef.current?.focus();
+            }
+          }}
+          modal={true}
         >
-          <Command shouldFilter={false}>
-            <CommandInput
-              ref={commandInputRef}
-              placeholder="Search service..."
+          <PopoverTrigger asChild>
+            <FormControl>
+              <Button
+                ref={popoverTriggerRef}
+                variant="outline"
+                role="combobox"
+                className={cn(
+                  "justify-between",
+                  !form.getValues("service_id") && "text-muted-foreground",
+                )}
+                disabled={loading}
+              >
+                {loading
+                  ? "Loading services..."
+                  : form.getValues("service_id")
+                    ? services.find((service) => service.id === form.getValues("service_id"))
+                        ?.name || "None"
+                    : "None"}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </FormControl>
+          </PopoverTrigger>
+          {createPortal(
+            <PopoverContent
+              className="z-[200] w-[300px] p-0"
+              align="start"
+              side="bottom"
               onClick={(e) => e.stopPropagation()}
-            />
-            <CommandList>
-              <CommandEmpty>No service found.</CommandEmpty>
-              <CommandGroup>
-                <CommandItem
-                  value="none"
-                  onSelect={() => {
-                    form.setValue("service_id", "");
-                    setPopoverOpen(false);
-                    popoverTriggerRef.current?.focus(); // Return focus to trigger
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      form.getValues("service_id") === "" ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                  None
-                </CommandItem>
-                {services.map((service) => (
-                  <CommandItem
-                    key={service.id}
-                    value={service.name}
-                    onSelect={() => {
-                      form.setValue("service_id", service.id);
-                      setPopoverOpen(false);
-                      popoverTriggerRef.current?.focus();
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        form.getValues("service_id") === service.id
-                          ? "opacity-100"
-                          : "opacity-0",
-                      )}
-                    />
-                    {service.name}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>,
-        document.body, // Render PopoverContent at the root
-      )}
-    </Popover>
-  );
+              onWheel={(e) => e.stopPropagation()}
+            >
+              <Command>
+                <CommandInput
+                  ref={commandInputRef}
+                  placeholder="Search service..."
+                  value={searchQuery}
+                  onValueChange={setSearchQuery}
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label="Search services"
+                />
+                <CommandList>
+                  <CommandEmpty>No service found.</CommandEmpty>
+                  <CommandGroup>
+                    <CommandItem
+                      value="none"
+                      onSelect={() => {
+                        form.setValue("service_id", "");
+                        setPopoverOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          form.getValues("service_id") === "" ? "opacity-100" : "opacity-0",
+                        )}
+                      />
+                      None
+                    </CommandItem>
+                    {filteredServices.map((service) => (
+                      <CommandItem
+                        key={service.id}
+                        value={service.name}
+                        onSelect={() => {
+                          form.setValue("service_id", service.id);
+                          setPopoverOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            form.getValues("service_id") === service.id
+                              ? "opacity-100"
+                              : "opacity-0",
+                          )}
+                        />
+                        {service.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>,
+            document.body,
+          )}
+        </Popover>
+      );
+    };
+  }, [services, form, popoverOpen, loading]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
