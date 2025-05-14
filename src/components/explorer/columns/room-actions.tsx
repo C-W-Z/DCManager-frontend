@@ -54,11 +54,11 @@ export function RoomRowActions({
   };
 
   const handleMoveRoom = (room: SimpleRoom) => {
-      setRoomsToMove([]);
-      setTimeout(() => {
-        setRoomsToMove([room]);
-      }, 0);
-    };
+    setRoomsToMove([]);
+    setTimeout(() => {
+      setRoomsToMove([room]);
+    }, 0);
+  };
 
   return (
     <>
@@ -71,10 +71,10 @@ export function RoomRowActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => handleEditDataCenter(room)}>
-            <Edit className="mr-2 h-4 w-4" /> EDIT
+            <Edit className="mr-2 h-4 w-4" /> Edit
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleMoveRoom(room)}>
-            <Move className="mr-2 h-4 w-4" /> MOVE
+            <Move className="mr-2 h-4 w-4" /> Move
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

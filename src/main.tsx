@@ -36,7 +36,7 @@ createRoot(document.getElementById("root")!).render(
       >
         <Route index element={<DataCenterTable />} />
         <Route path="dc/:dcId" element={<RoomTable />} />
-        <Route path="dc/:dcId/room/:roomId" element={<RackTable />} />
+        <Route path="room/:roomId" element={<RackTable />} />
       </Route>
       <Route
         path="/rack/:rackId"

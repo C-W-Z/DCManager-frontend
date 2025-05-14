@@ -17,13 +17,13 @@ export default function Explorer() {
 
   // 根據 URL 參數加載數據
   useEffect(() => {
-    if (roomId && dcId) {
+    if (roomId) {
       // 加載 RackTable 所需的數據
       setCurrentView("rack-table");
       getRoom(roomId)
         .then((room) => {
           setSelectedRoom(room);
-          getDC(dcId).then((dc) => setSelectedDataCenter(dc));
+          getDC(room.dc_id).then((dc) => setSelectedDataCenter(dc));
         })
         .catch((error) => {
           console.error("Error loading room:", error);
@@ -55,13 +55,13 @@ export default function Explorer() {
     } else if (level === "room-table" && selectedDataCenter) {
       navigate(`/explorer/dc/${selectedDataCenter.id}`);
     } else if (level === "rack-table" && selectedDataCenter && selectedRoom) {
-      navigate(`/explorer/dc/${selectedDataCenter.id}/room/${selectedRoom.id}`);
+      navigate(`/explorer/room/${selectedRoom.id}`);
     }
   };
 
   return (
     <div className="flex h-full flex-col overflow-auto">
-      <div className="mt-4 ml-4 flex items-center justify-between p-4">
+      <div className="mt-5 ml-8 flex items-center justify-between p-4">
         <Breadcrumb
           currentView={currentView}
           dcName={selectedDataCenter ? selectedDataCenter.name : null}
@@ -70,7 +70,7 @@ export default function Explorer() {
         />
       </div>
 
-      <div className="flex-1 px-6">
+      <div className="flex-1 px-12">
         <Outlet
           context={{ datacenter: selectedDataCenter, room: selectedRoom, onSelect: navigate }}
         />
