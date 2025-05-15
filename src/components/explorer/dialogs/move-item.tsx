@@ -218,7 +218,8 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
 
       // 关闭对话框并通知成功
       setIsOpen(false);
-      toast.success(type + " has successfully move to " + getSelectedDestinationName());
+      const names = items.length > 1 ? `${items.length} ${getTypeName()}s` : `${getTypeName()} ${items[0].name}`;
+      toast.success(names + " has successfully move to " + getSelectedDestinationName());
       if (allSuccessful && onSuccess) onSuccess(items.map((item) => item.id));
       else console.error("Some move operations failed");
     } catch (error) {

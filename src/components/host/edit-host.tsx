@@ -69,7 +69,7 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
         };
         if (onUpdateSuccess) onUpdateSuccess(updatedHost);
         setOpen(false);
-        toast.success("Host updated successfully");
+        toast.success(`Host ${formData.name} edited successfully`);
       } else {
         setError("Failed to edit Rack.");
       }
