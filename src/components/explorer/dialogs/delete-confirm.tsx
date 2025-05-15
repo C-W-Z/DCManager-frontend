@@ -4,6 +4,7 @@ import { AlertCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteDC, deleteRoom, deleteRack, deleteHost } from "@/lib/api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 export type DeleteType = "datacenter" | "room" | "rack" | "host";
 
@@ -53,8 +54,11 @@ export function DeleteConfirmation({
       const allSuccessful = results.every((result) => result === true || result === undefined);
 
       // 如果所有删除都成功，通知父组件
-      if (allSuccessful && onSuccess) onSuccess(ids);
-      else console.error("Some delete operations failed");
+      if (allSuccessful) {
+        const names = itemCount > 1 ? `${itemCount} ${typeName}s` : `${itemName || ""}`
+        toast.success(`Delete ${names} successfully`);
+        if (onSuccess) onSuccess(ids);
+      } else console.error("Some delete operations failed");
     } catch (error) {
       console.error(`Error deleting ${type}:`, error);
     } finally {
@@ -81,7 +85,7 @@ export function DeleteConfirmation({
   };
 
   // 获取类型的显示名称
-  const getTypeName = (type: DeleteType): string => {
+  const getTypeName = (): string => {
     switch (type) {
       case "datacenter":
         return "Data Center";
@@ -99,7 +103,7 @@ export function DeleteConfirmation({
   if (!isOpen) return null;
 
   const itemCount = ids?.length || 0;
-  const typeName = getTypeName(type);
+  const typeName = getTypeName();
 
   // 如果提供了具体的项目名称，则使用它
   const itemName = itemNames && itemNames.length > 0 ? itemNames[0] : typeName;

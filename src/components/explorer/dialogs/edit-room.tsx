@@ -17,6 +17,7 @@ import { AlertCircle, Edit } from "lucide-react";
 import type { SimpleRoom } from "@/lib/type";
 import { modifyRoom } from "@/lib/api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 interface EditRoomDialogProps {
   room: SimpleRoom | null;
@@ -65,6 +66,7 @@ export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
           name: formData.name,
           height: Number.parseInt(formData.height),
         };
+        toast.success(`Room ${formData.name} edited successfully`)
         if (onUpdateSuccess) onUpdateSuccess(updatedRoom);
         setOpen(false);
       } else {

@@ -289,15 +289,14 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
   };
 
   useEffect(() => {
-    if (selectedRack && checkingRackPos) {
-      getRack(selectedRack).then((rack) => {
-        const hostHeight = (items[0] as SimpleHost).height;
-        const newPos = isHostFit(hostHeight, rack);
-        setSelectedRackPos(newPos);
-        setCheckingRackPos(false);
-      });
-    }
-  }, [checkingRackPos]);
+    if (!selectedRack || !checkingRackPos || items.length == 0) return;
+    getRack(selectedRack).then((rack) => {
+      const hostHeight = (items[0] as SimpleHost).height;
+      const newPos = isHostFit(hostHeight, rack);
+      setSelectedRackPos(newPos);
+      setCheckingRackPos(false);
+    });
+  }, [checkingRackPos, items, selectedRack]);
 
   const getSelectedParentName = () => {
     let name = "";

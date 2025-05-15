@@ -17,6 +17,7 @@ import { Edit, Plus, Trash2, AlertCircle } from "lucide-react";
 import type { Datacenter, IpRange, SimpleDatacenter } from "@/lib/type";
 import { getDC, modifyDC } from "@/lib/api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 interface EditDatacenterDialogProps {
   datacenter: SimpleDatacenter | null;
@@ -129,6 +130,7 @@ export function EditDatacenterDialog({
           name: formData.name,
           height: Number.parseInt(formData.height),
         };
+        toast.success(`Data Center ${formData.name} edited successfully`)
         if (onUpdateSuccess) onUpdateSuccess(updatedDC);
         setOpen(false);
       } else {
