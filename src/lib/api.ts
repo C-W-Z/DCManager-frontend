@@ -1,14 +1,21 @@
 import * as mytype from "./type";
-import { faker } from "@faker-js/faker";
-import d from "./mock_data.json";
-
-const MockData = d as mytype.MockDataJson;
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
-export function addDC(body: Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">) {
+export async function addDC(body: Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">) {
   console.log("addDC", body);
-  return Promise.resolve(faker.string.uuid());
+
+  const response = await fetch(`${baseUrl}/dc/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to add datacenter"));
+  }
+  return response.json();
 }
 
 export async function getAllDC(): Promise<mytype.SimpleDatacenter[]> {
@@ -16,193 +23,334 @@ export async function getAllDC(): Promise<mytype.SimpleDatacenter[]> {
 
   const response = await fetch(`${baseUrl}/dc/all`);
   if (!response.ok) {
-    throw new Error("Failed to fetch datacenters");
+    return Promise.reject(new Error("Failed to fetch datacenters"));
   }
   return response.json();
 }
 
-export function getDC(dc_id: string): Promise<mytype.Datacenter> {
+export async function getDC(dc_id: string): Promise<mytype.Datacenter> {
   console.log("getDC", dc_id);
 
-  const dc = MockData.dc.find((dc) => dc.id === dc_id);
-  if (!dc) {
+  const response = await fetch(`${baseUrl}/dc/${dc_id}`);
+  if (!response.ok) {
     return Promise.reject(new Error("Datacenter not found"));
   }
-  return Promise.resolve(dc);
+  return response.json();
 }
 
 export async function modifyDC(
   dc_id: string,
   body: Partial<Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">>,
-): Promise<boolean> {
+): Promise<void> {
   console.log("modifyDC", dc_id, body);
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new Error(`Failed to edit datacenter with id ${dc_id}`));
-    }, 300);
-    resolve(true); // return true
+
+  const response = await fetch(`${baseUrl}/dc/${dc_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
   });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to edit datacenter"));
+  }
+  return;
 }
 
-export async function deleteDC(dc_id: string): Promise<boolean> {
+export async function deleteDC(dc_id: string): Promise<void> {
   console.log("deleteDC", dc_id);
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new Error(`Failed to delete datacenter with id ${dc_id}`));
-    }, 300);
-    resolve(true); // return true
+
+  const response = await fetch(`${baseUrl}/dc/${dc_id}`, {
+    method: "DELETE",
   });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to delete datacenter"));
+  }
+  return;
 }
 
-export function addRoom(body: Pick<mytype.Room, "name" | "height" | "dc_id">) {
+export async function addRoom(body: Pick<mytype.Room, "name" | "height" | "dc_id">) {
   console.log("addRoom", body);
-  return Promise.resolve(faker.string.uuid());
+
+  const response = await fetch(`${baseUrl}/room`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to add room"));
+  }
+  return response.json();
 }
 
-export function getRoom(room_id: string): Promise<mytype.Room> {
+export async function getRoom(room_id: string): Promise<mytype.Room> {
   console.log("getRoom", room_id);
 
-  const room = MockData.room.find((room) => room.id === room_id);
-  if (!room) {
+  const response = await fetch(`${baseUrl}/room/${room_id}`);
+  if (!response.ok) {
     return Promise.reject(new Error("Room not found"));
   }
-  return Promise.resolve(room);
+  return response.json();
 }
 
 export async function modifyRoom(
   room_id: string,
   body: Partial<Pick<mytype.Room, "name" | "height" | "dc_id">>,
-): Promise<boolean> {
+): Promise<void> {
   console.log("modifyRoom", room_id, body);
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new Error(`Failed to edit room with id ${room_id}`));
-    }, 300);
-    resolve(true); // return true
+
+  const response = await fetch(`${baseUrl}/room/${room_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
   });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to edit room"));
+  }
+  return;
 }
 
-export async function deleteRoom(room_id: string): Promise<boolean> {
+export async function deleteRoom(room_id: string): Promise<void> {
   console.log("deleteRoom", room_id);
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new Error(`Failed to delete room with id ${room_id}`));
-    }, 300);
-    resolve(true); // return true
+
+  const response = await fetch(`${baseUrl}/room/${room_id}`, {
+    method: "DELETE",
   });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to delete room"));
+  }
+  return;
 }
 
-export function addRack(
+export async function addRack(
   body: Pick<mytype.Rack, "name" | "height" | "room_id" | "dc_id" | "service_id">,
 ) {
   console.log("addRack", body);
-  return Promise.resolve(faker.string.uuid());
+
+  const response = await fetch(`${baseUrl}/rack`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to add rack"));
+  }
+  return response.json();
 }
 
-export function getAllRack(): Promise<mytype.SimpleRack[]> {
+export async function getAllRack(): Promise<mytype.SimpleRack[]> {
   console.log("getAllRack");
-  return Promise.resolve(MockData.rack as mytype.SimpleRack[]);
+
+  const response = await fetch(`${baseUrl}/rack/all`);
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to fetch racks"));
+  }
+  return response.json();
 }
 
-export function getRack(rack_id: string): Promise<mytype.Rack> {
+export async function getRack(rack_id: string): Promise<mytype.Rack> {
   console.log("getRack", rack_id);
 
-  const rack = MockData.rack.find((rack) => rack.id === rack_id);
-  if (!rack) {
+  const response = await fetch(`${baseUrl}/rack/${rack_id}`);
+  if (!response.ok) {
     return Promise.reject(new Error("Rack not found"));
   }
-  return Promise.resolve(rack);
+  return response.json();
 }
 
-export function modifyRack(
+export async function modifyRack(
   rack_id: string,
   body: Partial<Pick<mytype.Rack, "name" | "height" | "room_id" | "service_id">>,
-): Promise<boolean> {
+): Promise<void> {
   console.log("modifyRack", rack_id, body);
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new Error(`Failed to edit room with id ${rack_id}`));
-    }, 300);
-    resolve(true); // return true
+
+  const response = await fetch(`${baseUrl}/rack/${rack_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
   });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to edit rack"));
+  }
+  return;
 }
 
-export function deleteRack(rack_id: string): Promise<boolean> {
+export async function deleteRack(rack_id: string): Promise<void> {
   console.log("deleteRack", rack_id);
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new Error(`Failed to delete room with id ${rack_id}`));
-    }, 300);
-    resolve(true); // return true
+
+  const response = await fetch(`${baseUrl}/rack/${rack_id}`, {
+    method: "DELETE",
   });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to delete rack"));
+  }
+  return;
 }
 
-export function addHost(
+export async function addHost(
   body: Pick<mytype.Host, "name" | "height" | "rack_id" | "room_id" | "dc_id" | "pos">,
-) {
+): Promise<mytype.Host> {
   console.log("addHost", body);
-  return Promise.resolve(faker.string.uuid());
+
+  const response = await fetch(`${baseUrl}/host`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to add host"));
+  }
+  return response.json();
 }
 
-export function getHost(host_id: string): Promise<mytype.Host> {
+export async function getHost(host_id: string): Promise<mytype.Host> {
   console.log("getHost", host_id);
 
-  const host = MockData.host.find((host) => host.id === host_id);
-  if (!host) {
+  const response = await fetch(`${baseUrl}/host/${host_id}`);
+  if (!response.ok) {
     return Promise.reject(new Error("Host not found"));
   }
-  return Promise.resolve(host);
+  return response.json();
 }
 
-export function modifyHost(
+export async function modifyHost(
   host_id: string,
   body: Partial<Pick<mytype.Host, "name" | "height" | "ip" | "status" | "rack_id" | "pos">>,
-) {
+): Promise<void> {
   console.log("modifyHost", host_id, body);
-  return Promise.resolve(true);
+
+  const response = await fetch(`${baseUrl}/host/${host_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to edit host"));
+  }
+  return;
 }
 
-export function deleteHost(host_id: string) {
+export async function deleteHost(host_id: string): Promise<void> {
   console.log("deleteHost", host_id);
-  return Promise.resolve(true);
+
+  const response = await fetch(`${baseUrl}/host/${host_id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to delete host"));
+  }
+  return;
 }
 
-export function addService(body: Pick<mytype.Service, "name" | "n_racks" | "total_ip">) {
+export async function addService(
+  body: Pick<mytype.Service, "name" | "n_racks" | "total_ip">,
+): Promise<mytype.Service> {
   console.log("addService", body);
-  return Promise.resolve(faker.string.uuid());
+
+  const response = await fetch(`${baseUrl}/service`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to add service"));
+  }
+  return response.json();
 }
 
-export function getAllService(): Promise<mytype.SimpleService[]> {
+export async function getAllService(): Promise<mytype.SimpleService[]> {
   console.log("getAllService");
-  return Promise.resolve(MockData.service as mytype.SimpleService[]);
+
+  const response = await fetch(`${baseUrl}/service/all`);
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to fetch services"));
+  }
+  return response.json();
 }
 
-export function getService(service_id: string): Promise<mytype.Service> {
+export async function getService(service_id: string): Promise<mytype.Service> {
   console.log("getService", service_id);
 
-  const service = MockData.service.find((service) => service.id === service_id);
-  if (!service) {
+  const response = await fetch(`${baseUrl}/service/${service_id}`);
+  if (!response.ok) {
     return Promise.reject(new Error("Service not found"));
   }
-  return Promise.resolve(service);
+  return response.json();
 }
 
-export function modifyService(service_id: string, body: Pick<mytype.Service, "name">) {
+export async function modifyService(
+  service_id: string,
+  body: Pick<mytype.Service, "name">,
+): Promise<void> {
   console.log("modifyService", service_id, body);
-  return null;
+
+  const response = await fetch(`${baseUrl}/service/${service_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to modify service"));
+  }
+  return;
 }
 
-export function extendServiceRack(service_id: string, num: number) {
+export async function extendServiceRack(service_id: string, num: number): Promise<void> {
   console.log("extendServiceRack", service_id, num);
-  return null;
+
+  const response = await fetch(`${baseUrl}/service/${service_id}/rack/extend`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ num }),
+  });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to extend service rack"));
+  }
+  return;
 }
 
-export function extendServiceIP(service_id: string, num: number) {
+export async function extendServiceIP(service_id: string, num: number): Promise<void> {
   console.log("extendServiceIP", service_id, num);
-  return null;
+
+  const response = await fetch(`${baseUrl}/service/${service_id}/ip/extend`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ num }),
+  });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to extend service IP"));
+  }
+  return;
 }
 
-export function deleteService(service_id: string) {
+export async function deleteService(service_id: string): Promise<void> {
   console.log("deleteService", service_id);
-  return null;
+
+  const response = await fetch(`${baseUrl}/service/${service_id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to delete service"));
+  }
+  return;
 }
