@@ -222,7 +222,11 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
 
       // 关闭对话框并通知成功
       setIsOpen(false);
-      toast.success(type + " has successfully move to " + getSelectedDestinationName());
+      const names =
+        items.length > 1
+          ? `${items.length} ${getTypeName()}s`
+          : `${getTypeName()} ${items[0].name}`;
+      toast.success(names + " has successfully move to " + getSelectedDestinationName());
       if (allSuccessful && onSuccess)
         onSuccess({
           dc_id: selectedDC,
@@ -298,15 +302,14 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
   };
 
   useEffect(() => {
-    if (selectedRack && checkingRackPos) {
-      getRack(selectedRack).then((rack) => {
-        const hostHeight = (items[0] as SimpleHost).height;
-        const newPos = isHostFit(hostHeight, rack);
-        setSelectedRackPos(newPos);
-        setCheckingRackPos(false);
-      });
-    }
-  }, [checkingRackPos]);
+    if (!selectedRack || !checkingRackPos || items.length == 0) return;
+    getRack(selectedRack).then((rack) => {
+      const hostHeight = (items[0] as SimpleHost).height;
+      const newPos = isHostFit(hostHeight, rack);
+      setSelectedRackPos(newPos);
+      setCheckingRackPos(false);
+    });
+  }, [checkingRackPos, items, selectedRack]);
 
   const getSelectedParentName = () => {
     let name = "";

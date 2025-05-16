@@ -113,9 +113,9 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
             services.find((service) => service.id === formData.service_id)?.name || "",
           height: Number.parseInt(formData.height),
         };
+        toast.success(`Rack ${formData.name} edited successfully`)
         if (onUpdateSuccess) onUpdateSuccess(updatedRack);
         setOpen(false);
-        toast.success("Rack updated successfully");
       } else {
         setError("Failed to edit Rack.");
       }
