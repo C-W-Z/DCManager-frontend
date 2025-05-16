@@ -99,7 +99,7 @@ export function EditDatacenterDialog({
     setIpRanges((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     if (!datacenter) return;
     e.preventDefault();
 
@@ -112,17 +112,15 @@ export function EditDatacenterDialog({
     setError(null);
     setLoading(true);
 
-    try {
-      // 过滤掉空的IP范围
-      const validIpRanges = ipRanges.filter((range) => range.start_ip && range.end_ip);
+    // 过滤掉空的IP范围
+    const validIpRanges = ipRanges.filter((range) => range.start_ip && range.end_ip);
 
-      const success = await modifyDC(datacenter.id, {
-        name: formData.name,
-        height: Number.parseInt(formData.height),
-        ip_ranges: validIpRanges,
-      });
-
-      if (success) {
+    modifyDC(datacenter.id, {
+      name: formData.name,
+      height: Number.parseInt(formData.height),
+      ip_ranges: validIpRanges,
+    })
+      .then(() => {
         // 如果修改成功，更新父组件中的数据
         // 由于modifyDC只返回布尔值，我们需要构造一个更新后的对象
         const updatedDC: SimpleDatacenter = {
@@ -130,18 +128,17 @@ export function EditDatacenterDialog({
           name: formData.name,
           height: Number.parseInt(formData.height),
         };
-        toast.success(`Data Center ${formData.name} edited successfully`)
+        toast.success(`Data Center ${formData.name} edited successfully`);
         if (onUpdateSuccess) onUpdateSuccess(updatedDC);
         setOpen(false);
-      } else {
+      })
+      .catch((error) => {
+        console.error("Error updating datacenter:", error);
         setError("Failed to edit Datacenter.");
-      }
-    } catch (error) {
-      console.error("Error updating datacenter:", error);
-      setError("Failed to edit Datacenter.");
-    } finally {
-      setLoading(false);
-    }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (

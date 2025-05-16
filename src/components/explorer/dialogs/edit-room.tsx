@@ -46,19 +46,17 @@ export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     if (!room) return;
     e.preventDefault();
     setError(null);
 
-    try {
-      const success = await modifyRoom(room.id, {
-        name: formData.name,
-        height: Number.parseInt(formData.height),
-        dc_id: room.dc_id,
-      });
-
-      if (success) {
+    modifyRoom(room.id, {
+      name: formData.name,
+      height: Number.parseInt(formData.height),
+      dc_id: room.dc_id,
+    })
+      .then(() => {
         // 如果修改成功，更新父组件中的数据
         // 由于modifyDC只返回布尔值，我们需要构造一个更新后的对象
         const updatedRoom: SimpleRoom = {
@@ -66,16 +64,14 @@ export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
           name: formData.name,
           height: Number.parseInt(formData.height),
         };
-        toast.success(`Room ${formData.name} edited successfully`)
+        toast.success(`Room ${formData.name} edited successfully`);
         if (onUpdateSuccess) onUpdateSuccess(updatedRoom);
         setOpen(false);
-      } else {
+      })
+      .catch((error) => {
+        console.error("Error updating room:", error);
         setError("Failed to edit Room.");
-      }
-    } catch (error) {
-      console.error("Error updating room:", error);
-      setError("Failed to edit Room.");
-    }
+      });
   };
 
   return (
