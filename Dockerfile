@@ -1,25 +1,25 @@
 # Development
-# FROM node:22-slim
-# WORKDIR /app
-# COPY package*.json ./
-# RUN npm install
-# COPY . .
-# EXPOSE 5173
-# CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
-
-# Production
-FROM node:22-slim AS builder
+FROM node:22-slim
 WORKDIR /app
-
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run build
+EXPOSE 5173
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 
-FROM nginx:stable-alpine AS production
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Production
+# FROM node:22-slim AS builder
+# WORKDIR /app
 
-# COPY nginx.conf /etc/nginx/nginx.conf
+# COPY package*.json ./
+# RUN npm install
+# COPY . .
+# RUN npm run build
 
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# FROM nginx:stable-alpine AS production
+# COPY --from=builder /app/dist /usr/share/nginx/html
+
+# # COPY nginx.conf /etc/nginx/nginx.conf
+
+# EXPOSE 80
+# CMD ["nginx", "-g", "daemon off;"]

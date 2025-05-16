@@ -2,16 +2,16 @@ import * as mytype from "./type";
 import { faker } from "@faker-js/faker";
 import d from "./mock_data.json";
 
-const mode = import.meta.env.MODE;
-console.log("mode", mode);
+const mode = import.meta.env.API_MODE;
+console.log("api mode", mode);
 
-const baseUrl = mode === "production" ? import.meta.env.VITE_API_URL : "";
+const baseUrl = import.meta.env.VITE_API_URL;
 console.log("baseUrl", baseUrl);
 
 const MockData = d as unknown as mytype.MockDataJson;
 
 export async function addDC(body: Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">) {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("addDC", body);
     return Promise.resolve(faker.string.uuid());
   }
@@ -30,7 +30,7 @@ export async function addDC(body: Pick<mytype.Datacenter, "name" | "height" | "i
 }
 
 export async function getAllDC(): Promise<mytype.SimpleDatacenter[]> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("getAllDC");
     return Promise.resolve(MockData.dc as mytype.SimpleDatacenter[]);
   }
@@ -43,7 +43,7 @@ export async function getAllDC(): Promise<mytype.SimpleDatacenter[]> {
 }
 
 export async function getDC(dc_id: string): Promise<mytype.Datacenter> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("getDC", dc_id);
     const dc = MockData.dc.find((dc) => dc.id === dc_id);
     if (!dc) {
@@ -63,7 +63,7 @@ export async function modifyDC(
   dc_id: string,
   body: Partial<Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">>,
 ): Promise<void> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("modifyDC", dc_id, body);
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -87,7 +87,7 @@ export async function modifyDC(
 }
 
 export async function deleteDC(dc_id: string): Promise<void> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("deleteDC", dc_id);
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -107,7 +107,7 @@ export async function deleteDC(dc_id: string): Promise<void> {
 }
 
 export async function addRoom(body: Pick<mytype.Room, "name" | "height" | "dc_id">) {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("addRoom", body);
     return Promise.resolve(faker.string.uuid());
   }
@@ -126,7 +126,7 @@ export async function addRoom(body: Pick<mytype.Room, "name" | "height" | "dc_id
 }
 
 export async function getRoom(room_id: string): Promise<mytype.Room> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("getRoom", room_id);
     const room = MockData.room.find((room) => room.id === room_id);
     if (!room) {
@@ -146,7 +146,7 @@ export async function modifyRoom(
   room_id: string,
   body: Partial<Pick<mytype.Room, "name" | "height" | "dc_id">>,
 ): Promise<void> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("modifyRoom", room_id, body);
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -170,7 +170,7 @@ export async function modifyRoom(
 }
 
 export async function deleteRoom(room_id: string): Promise<void> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("deleteRoom", room_id);
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -192,7 +192,7 @@ export async function deleteRoom(room_id: string): Promise<void> {
 export async function addRack(
   body: Pick<mytype.Rack, "name" | "height" | "room_id" | "dc_id" | "service_id">,
 ) {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("addRack", body);
     return Promise.resolve(faker.string.uuid());
   }
@@ -211,7 +211,7 @@ export async function addRack(
 }
 
 export async function getRack(rack_id: string): Promise<mytype.Rack> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("getRack", rack_id);
     const rack = MockData.rack.find((rack) => rack.id === rack_id);
     if (!rack) {
@@ -231,7 +231,7 @@ export async function modifyRack(
   rack_id: string,
   body: Partial<Pick<mytype.Rack, "name" | "height" | "room_id" | "service_id">>,
 ): Promise<void> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("modifyRack", rack_id, body);
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -255,7 +255,7 @@ export async function modifyRack(
 }
 
 export async function deleteRack(rack_id: string): Promise<void> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("deleteRack", rack_id);
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -280,7 +280,7 @@ export async function addHost(
     "name" | "height" | "rack_id" | "room_id" | "dc_id" | "service_id" | "pos"
   >,
 ): Promise<string> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("addHost", body);
     return Promise.resolve(faker.string.uuid());
   }
@@ -300,7 +300,7 @@ export async function addHost(
 }
 
 export async function getHost(host_id: string): Promise<mytype.Host> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("getHost", host_id);
     const host = MockData.host.find((host) => host.id === host_id);
     if (!host) {
@@ -320,7 +320,7 @@ export async function modifyHost(
   host_id: string,
   body: Partial<Pick<mytype.Host, "name" | "height" | "ip" | "status" | "rack_id" | "pos">>,
 ): Promise<void> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("modifyHost", host_id, body);
     return Promise.resolve();
   }
@@ -339,7 +339,7 @@ export async function modifyHost(
 }
 
 export async function deleteHost(host_id: string): Promise<void> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("deleteHost", host_id);
     return Promise.resolve();
   }
@@ -356,7 +356,7 @@ export async function deleteHost(host_id: string): Promise<void> {
 export async function addService(
   body: Pick<mytype.Service, "name" | "n_racks" | "total_ip">,
 ): Promise<string> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("addService", body);
     return Promise.resolve(faker.string.uuid());
   }
@@ -376,7 +376,7 @@ export async function addService(
 }
 
 export async function getAllService(): Promise<mytype.SimpleService[]> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("getAllService");
     return Promise.resolve(MockData.service as mytype.SimpleService[]);
   }
@@ -389,7 +389,7 @@ export async function getAllService(): Promise<mytype.SimpleService[]> {
 }
 
 export async function getService(service_id: string): Promise<mytype.Service> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("getService", service_id);
 
     const service = MockData.service.find((service) => service.id === service_id);
@@ -410,7 +410,7 @@ export async function modifyService(
   service_id: string,
   body: Pick<mytype.Service, "name">,
 ): Promise<void> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("modifyService", service_id, body);
     return Promise.resolve();
   }
@@ -429,7 +429,7 @@ export async function modifyService(
 }
 
 export async function extendServiceRack(service_id: string, num: number): Promise<void> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("extendServiceRack", service_id, num);
     return Promise.resolve();
   }
@@ -448,7 +448,7 @@ export async function extendServiceRack(service_id: string, num: number): Promis
 }
 
 export async function extendServiceIP(service_id: string, num: number): Promise<void> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("extendServiceIP", service_id, num);
     return Promise.resolve();
   }
@@ -467,7 +467,7 @@ export async function extendServiceIP(service_id: string, num: number): Promise<
 }
 
 export async function deleteService(service_id: string): Promise<void> {
-  if (mode === "development") {
+  if (mode === "mock") {
     console.log("deleteService", service_id);
     return Promise.resolve();
   }
