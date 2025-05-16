@@ -17,11 +17,8 @@ export async function getAllDC({ signal }: { signal?: AbortSignal } = {}): Promi
 
   try {
     const response = await fetch(BACKEND + "/dc/all", {
-      mode: 'no-cors',
+      // mode: 'no-cors',
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
       signal,
     });
 
