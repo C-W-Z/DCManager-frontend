@@ -4,14 +4,38 @@ import d from "./mock_data.json";
 
 const MockData = d as mytype.MockDataJson;
 
+const BACKEND = "http://127.0.0.1:5000";
+
 export function addDC(body: Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">) {
   console.log("addDC", body);
   return Promise.resolve(faker.string.uuid());
 }
 
-export function getAllDC(): Promise<mytype.SimpleDatacenter[]> {
-  console.log("getAllDC");
-  return Promise.resolve(MockData.dc as mytype.SimpleDatacenter[]);
+export async function getAllDC({ signal }: { signal?: AbortSignal } = {}): Promise<mytype.SimpleDatacenter[]> {
+  console.log("getAllDC")
+  // return Promise.resolve(MockData.dc as mytype.SimpleDatacenter[]);
+
+  try {
+    const response = await fetch(BACKEND + "/dc/all", {
+      mode: 'no-cors',
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      signal,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to fetch datacenters: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data as mytype.SimpleDatacenter[];
+  } catch (error) {
+    console.error("Error fetching datacenters:", error);
+    throw error instanceof Error ? error : new Error("Failed to fetch datacenters");
+  }
 }
 
 export function getDC(dc_id: string): Promise<mytype.Datacenter> {
