@@ -54,6 +54,15 @@ export default function RoomTable() {
     setRooms(updatedRooms);
   };
 
+  const onMoveSuccess = (data: {
+    dc_id: string | null;
+    room_id: string | null;
+    rack_id: string | null;
+  }) => {
+    // Handle the move success logic here
+    console.log("Move success:", data);
+  };
+
   const handleRefresh = () => {
     if (dcId) {
       loadRooms(dcId);
@@ -64,7 +73,7 @@ export default function RoomTable() {
     onSelect: (room) => onSelect(`/explorer/room/${room.id}`),
     onUpdateSuccess,
     onDeleteSuccess,
-    onMoveSuccess: onDeleteSuccess,
+    onMoveSuccess,
   });
 
   return (
@@ -90,7 +99,7 @@ export default function RoomTable() {
         data={rooms}
         getRowId={(row) => row.id}
         loading={loading}
-        onMoveSuccess={onDeleteSuccess}
+        onMoveSuccess={onMoveSuccess}
         onDeleteSuccess={onDeleteSuccess}
         type="room"
       />

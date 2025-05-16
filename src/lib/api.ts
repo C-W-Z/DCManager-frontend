@@ -3,8 +3,12 @@ import { faker } from "@faker-js/faker";
 import d from "./mock_data.json";
 
 const mode = import.meta.env.MODE;
-const baseUrl = mode === "production" ? "" : import.meta.env.VITE_API_URL;
-const MockData = d as mytype.MockDataJson;
+console.log("mode", mode);
+
+const baseUrl = mode === "production" ? import.meta.env.VITE_API_URL : "";
+console.log("baseUrl", baseUrl);
+
+const MockData = d as unknown as mytype.MockDataJson;
 
 export async function addDC(body: Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">) {
   if (mode === "development") {

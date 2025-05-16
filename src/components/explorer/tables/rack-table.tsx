@@ -52,6 +52,15 @@ export default function RackTable() {
     setRacks(updatedRacks);
   };
 
+  const onMoveSuccess = (data: {
+    dc_id: string | null;
+    room_id: string | null;
+    rack_id: string | null;
+  }) => {
+    // Handle the move success logic here
+    console.log("Move success:", data);
+  };
+
   const handleRefresh = () => {
     if (roomId) {
       loadRacks(roomId);
@@ -61,7 +70,7 @@ export default function RackTable() {
   const columns = rackColumns({
     onUpdateSuccess,
     onDeleteSuccess,
-    onMoveSuccess: onDeleteSuccess,
+    onMoveSuccess,
   });
 
   return (
@@ -88,7 +97,7 @@ export default function RackTable() {
         data={racks}
         getRowId={(row) => row.id}
         loading={loading}
-        onMoveSuccess={onDeleteSuccess}
+        onMoveSuccess={onMoveSuccess}
         onDeleteSuccess={onDeleteSuccess}
         type="rack"
       />

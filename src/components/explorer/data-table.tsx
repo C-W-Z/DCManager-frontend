@@ -1,4 +1,3 @@
-"use client";
 import { useState } from "react";
 import {
   type ColumnDef,
@@ -31,6 +30,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SimpleHost, SimpleRack, SimpleRoom } from "@/lib/type";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTablePagination } from "./data-table-pagination";
@@ -47,7 +47,11 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   getRowId: (row: TData) => string;
   loading?: boolean;
-  onMoveSuccess?: (ids: string[]) => void;
+  onMoveSuccess?: (data: {
+    dc_id: string | null;
+    room_id: string | null;
+    rack_id: string | null;
+  }) => void;
   onDeleteSuccess?: (ids: string[]) => void;
   type: DeleteType;
 }
@@ -102,8 +106,12 @@ export function DataTable<TData extends WithID, TValue>({
     }, 0);
   };
 
-  const handleMoveSuccess = (idsToMove: string[]) => {
-    if (onMoveSuccess) onMoveSuccess(idsToMove);
+  const handleMoveSuccess = (data: {
+    dc_id: string | null;
+    room_id: string | null;
+    rack_id: string | null;
+  }) => {
+    if (onMoveSuccess) onMoveSuccess(data);
     table.resetRowSelection();
   };
 
@@ -268,7 +276,11 @@ export function DataTable<TData extends WithID, TValue>({
       <DataTablePagination table={table} />
 
       {type !== "datacenter" && (
-        <MoveItemDialog type={type} items={itemsToMove} onSuccess={handleMoveSuccess} />
+        <MoveItemDialog
+          type={type}
+          items={itemsToMove as unknown as (SimpleRoom | SimpleRack | SimpleHost)[]}
+          onSuccess={handleMoveSuccess}
+        />
       )}
 
       <DeleteConfirmation

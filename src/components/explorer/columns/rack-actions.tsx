@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Edit, MoreHorizontal, Move, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,7 +18,11 @@ interface RackRowActionsProps {
   row: Row<SimpleRack>;
   onUpdateSuccess: (rack: SimpleRack) => void;
   onDeleteSuccess: (ids: string[]) => void;
-  onMoveSuccess: (ids: string[]) => void;
+  onMoveSuccess: (data: {
+    dc_id: string | null;
+    room_id: string | null;
+    rack_id: string | null;
+  }) => void;
 }
 
 export function RackRowActions({

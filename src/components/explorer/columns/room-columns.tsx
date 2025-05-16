@@ -11,7 +11,11 @@ interface RoomColumnsProps {
   onSelect: (room: SimpleRoom) => void;
   onUpdateSuccess: (dc: SimpleRoom) => void;
   onDeleteSuccess: (ids: string[]) => void;
-  onMoveSuccess: (ids: string[]) => void;
+  onMoveSuccess: (data: {
+    dc_id: string | null;
+    room_id: string | null;
+    rack_id: string | null;
+  }) => void;
 }
 
 export function roomColumns({
