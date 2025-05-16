@@ -197,7 +197,7 @@ export async function deleteRack(rack_id: string): Promise<void> {
 
 export async function addHost(
   body: Pick<mytype.Host, "name" | "height" | "rack_id" | "room_id" | "dc_id" | "pos">,
-): Promise<mytype.Host> {
+): Promise<string> {
   console.log("addHost", body);
 
   const response = await fetch(`${baseUrl}/host/`, {
@@ -210,7 +210,8 @@ export async function addHost(
   if (!response.ok) {
     return Promise.reject(new Error("Failed to add host"));
   }
-  return response.json();
+  const data = await response.json();
+  return data.id as string;
 }
 
 export async function getHost(host_id: string): Promise<mytype.Host> {
