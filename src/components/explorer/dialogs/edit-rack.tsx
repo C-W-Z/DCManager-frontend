@@ -91,7 +91,7 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     if (!rack) return;
     e.preventDefault();
     setError(null);

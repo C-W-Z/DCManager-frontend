@@ -50,18 +50,15 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     if (!host) return;
     e.preventDefault();
     setError(null);
 
-    try {
-      const success = await modifyHost(host.id, {
+     modifyHost(host.id, {
         name: formData.name,
         height: formData.height,
-      });
-
-      if (success) {
+      }).then(() => {
         const updatedHost: SimpleHost = {
           ...host,
           name: formData.name,
@@ -70,13 +67,10 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
         if (onUpdateSuccess) onUpdateSuccess(updatedHost);
         setOpen(false);
         toast.success(`Host ${formData.name} edited successfully`);
-      } else {
-        setError("Failed to edit Rack.");
-      }
-    } catch (error) {
-      console.error("Error updating rack:", error);
+      }).catch((error) => {
+        console.error("Error updating rack:", error);
       setError("Failed to edit Rack.");
-    }
+      })
   };
 
   return (
