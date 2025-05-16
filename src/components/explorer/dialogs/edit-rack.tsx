@@ -91,20 +91,18 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     if (!rack) return;
     e.preventDefault();
     setError(null);
 
-    try {
-      const success = await modifyRack(rack.id, {
-        name: formData.name,
-        service_id: formData.service_id || "", // Use service_id
-        height: Number.parseInt(formData.height),
-        room_id: rack.room_id,
-      });
-
-      if (success) {
+    modifyRack(rack.id, {
+      name: formData.name,
+      service_id: formData.service_id || "", // Use service_id
+      height: Number.parseInt(formData.height),
+      room_id: rack.room_id,
+    })
+      .then(() => {
         const updatedRack: SimpleRack = {
           ...rack,
           name: formData.name,
@@ -113,16 +111,14 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
             services.find((service) => service.id === formData.service_id)?.name || "",
           height: Number.parseInt(formData.height),
         };
-        toast.success(`Rack ${formData.name} edited successfully`)
+        toast.success(`Rack ${formData.name} edited successfully`);
         if (onUpdateSuccess) onUpdateSuccess(updatedRack);
         setOpen(false);
-      } else {
+      })
+      .catch((error) => {
+        console.error("Error updating rack:", error);
         setError("Failed to edit Rack.");
-      }
-    } catch (error) {
-      console.error("Error updating rack:", error);
-      setError("Failed to edit Rack.");
-    }
+      });
   };
 
   const ServicePopover = useMemo(() => {
@@ -153,7 +149,7 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
               ref={popoverTriggerRef}
               variant="outline"
               role="combobox"
-              className="justify-between border-black w-full"
+              className="w-full justify-between border-black"
               disabled={loading}
             >
               {loading
@@ -222,7 +218,7 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
                 </CommandList>
               </Command>
             </PopoverContent>,
-            document.body,  // Render PopoverContent at the root
+            document.body, // Render PopoverContent at the root
           )}
         </Popover>
       );
