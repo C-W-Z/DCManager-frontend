@@ -271,7 +271,10 @@ export async function deleteRack(rack_id: string): Promise<void> {
 }
 
 export async function addHost(
-  body: Pick<mytype.Host, "name" | "height" | "rack_id" | "room_id" | "dc_id" | "pos">,
+  body: Pick<
+    mytype.Host,
+    "name" | "height" | "rack_id" | "room_id" | "dc_id" | "service_id" | "pos"
+  >,
 ): Promise<string> {
   if (mode === "development") {
     console.log("addHost", body);

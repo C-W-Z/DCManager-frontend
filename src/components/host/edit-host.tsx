@@ -16,6 +16,7 @@ import { simple_host_schema, SimpleHost } from "@/lib/type";
 import { modifyHost } from "@/lib/api";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 interface EditHostDialogProps {
   host: SimpleHost | null;
@@ -26,6 +27,7 @@ interface EditHostDialogProps {
 const form_schema = simple_host_schema.pick({
   name: true,
   height: true,
+  status: true,
 });
 
 export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
@@ -34,6 +36,7 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
   const [formData, setFormData] = useState<z.infer<typeof form_schema>>({
     name: "",
     height: 0,
+    status: "idle",
   });
 
   useEffect(() => {
@@ -42,6 +45,7 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
     setFormData({
       name: host.name,
       height: host.height,
+      status: host.status,
     });
   }, [host]);
 
@@ -55,22 +59,26 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
     e.preventDefault();
     setError(null);
 
-     modifyHost(host.id, {
-        name: formData.name,
-        height: formData.height,
-      }).then(() => {
+    modifyHost(host.id, {
+      name: formData.name,
+      height: formData.height,
+      status: formData.status,
+    })
+      .then(() => {
         const updatedHost: SimpleHost = {
           ...host,
           name: formData.name,
           height: formData.height,
+          status: formData.status,
         };
         if (onUpdateSuccess) onUpdateSuccess(updatedHost);
         setOpen(false);
         toast.success(`Host ${formData.name} edited successfully`);
-      }).catch((error) => {
-        console.error("Error updating rack:", error);
-      setError("Failed to edit Rack.");
       })
+      .catch((error) => {
+        console.error("Error updating rack:", error);
+        setError("Failed to edit Rack.");
+      });
   };
 
   return (
@@ -78,7 +86,7 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
       <DialogContent className="sm:max-w-[425px] [&>button]:hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-            <Edit className="h-5 w-5" /> Edit Rack
+            <Edit className="h-5 w-5" /> Edit Host
           </DialogTitle>
         </DialogHeader>
 
@@ -110,6 +118,23 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
               onChange={handleChange}
               required
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="status">Status</Label>
+            <Select
+              onValueChange={(value) => {
+                setFormData((prev) => ({ ...prev, status: value as SimpleHost["status"] }));
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="running">Running</SelectItem>
+                <SelectItem value="idle">Idle</SelectItem>
+                <SelectItem value="stopped">Stopped</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <DialogFooter>

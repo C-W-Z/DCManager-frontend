@@ -62,6 +62,7 @@ export function AddHostDialog({ context }: { context: RackContextType }) {
       rack_id: state.rack.id,
       room_id: state.rack.room_id,
       dc_id: state.rack.dc_id,
+      service_id: state.rack.service_id,
     })
       .then((hostId) => {
         const newHost: SimpleHost = {
