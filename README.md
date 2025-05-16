@@ -1,7 +1,6 @@
 # DCManager-frontend
 
-build image
+to test
 ```
-docker build -t dcm-frontend .
+npm run dev
 ```
-

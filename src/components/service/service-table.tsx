@@ -42,15 +42,14 @@ export default function ServiceTable() {
   const [services, setServices] = useState<SimpleService[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // 使用 useCallback 包装 loadDataCenters 函数
-  const loadDataCenters = useCallback(() => {
+  const LoadService = useCallback(() => {
     setLoading(true);
     getAllService()
       .then((serviceList) => {
         setServices(serviceList);
       })
       .catch((error) => {
-        console.error("Error fetching all dc data:", error);
+        console.error("Error fetching all service data:", error);
       })
       .finally(() => {
         setLoading(false);
@@ -58,11 +57,11 @@ export default function ServiceTable() {
   }, []);
 
   useEffect(() => {
-    loadDataCenters();
-  }, [loadDataCenters]);
+    LoadService();
+  }, [LoadService]);
 
   const handleRefresh = () => {
-    loadDataCenters();
+    LoadService();
   };
 
   const columns = ServiceColumns();
