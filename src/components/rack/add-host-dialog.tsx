@@ -76,12 +76,12 @@ export function AddHostDialog({ context }: { context: RackContextType }) {
 
         dispatch({ type: "ADD_HOST", payload: { host: newHost } });
         toast.success(`Host  ${values.name} added successfully!`);
-        setOpen(false);
       })
       .catch((error) => {
         console.error("Error adding host:", error);
         toast.error("Failed to add host");
       });
+    setOpen(false);
   }
 
   return (

@@ -37,6 +37,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AddServiceDialog } from "./add-service-dialog";
 
 export default function ServiceTable() {
   const [services, setServices] = useState<SimpleService[]>([]);
@@ -78,6 +79,7 @@ export default function ServiceTable() {
           >
             {loading ? "Loading..." : "Refresh"}
           </button>
+          <AddServiceDialog />
         </div>
       </div>
 
