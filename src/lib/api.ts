@@ -72,7 +72,7 @@ export async function deleteDC(dc_id: string): Promise<void> {
 export async function addRoom(body: Pick<mytype.Room, "name" | "height" | "dc_id">) {
   console.log("addRoom", body);
 
-  const response = await fetch(`${baseUrl}/room`, {
+  const response = await fetch(`${baseUrl}/room/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -131,7 +131,7 @@ export async function addRack(
 ) {
   console.log("addRack", body);
 
-  const response = await fetch(`${baseUrl}/rack`, {
+  const response = await fetch(`${baseUrl}/rack/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -200,7 +200,7 @@ export async function addHost(
 ): Promise<mytype.Host> {
   console.log("addHost", body);
 
-  const response = await fetch(`${baseUrl}/host`, {
+  const response = await fetch(`${baseUrl}/host/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -259,7 +259,7 @@ export async function addService(
 ): Promise<mytype.Service> {
   console.log("addService", body);
 
-  const response = await fetch(`${baseUrl}/service`, {
+  const response = await fetch(`${baseUrl}/service/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
