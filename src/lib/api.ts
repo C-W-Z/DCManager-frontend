@@ -4,14 +4,21 @@ import d from "./mock_data.json";
 
 const MockData = d as mytype.MockDataJson;
 
+const baseUrl = import.meta.env.VITE_API_URL;
+
 export function addDC(body: Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">) {
   console.log("addDC", body);
   return Promise.resolve(faker.string.uuid());
 }
 
-export function getAllDC(): Promise<mytype.SimpleDatacenter[]> {
+export async function getAllDC(): Promise<mytype.SimpleDatacenter[]> {
   console.log("getAllDC");
-  return Promise.resolve(MockData.dc as mytype.SimpleDatacenter[]);
+
+  const response = await fetch(`${baseUrl}/dc/all`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch datacenters");
+  }
+  return response.json();
 }
 
 export function getDC(dc_id: string): Promise<mytype.Datacenter> {
@@ -85,7 +92,9 @@ export async function deleteRoom(room_id: string): Promise<boolean> {
   });
 }
 
-export function addRack(body: Pick<mytype.Rack, "name" | "height" | "room_id" | "dc_id"  | "service_id">) {
+export function addRack(
+  body: Pick<mytype.Rack, "name" | "height" | "room_id" | "dc_id" | "service_id">,
+) {
   console.log("addRack", body);
   return Promise.resolve(faker.string.uuid());
 }
