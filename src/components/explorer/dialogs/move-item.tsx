@@ -29,7 +29,11 @@ type MoveItemType = "room" | "rack" | "host";
 interface MoveItemDialogProps {
   type: MoveItemType;
   items: (SimpleRoom | SimpleRack | SimpleHost)[];
-  onSuccess?: (ids: string[]) => void;
+  onSuccess?: (data: {
+    dc_id: string | null;
+    room_id: string | null;
+    rack_id: string | null;
+  }) => void;
 }
 
 export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) {
@@ -219,7 +223,12 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
       // 关闭对话框并通知成功
       setIsOpen(false);
       toast.success(type + " has successfully move to " + getSelectedDestinationName());
-      if (allSuccessful && onSuccess) onSuccess(items.map((item) => item.id));
+      if (allSuccessful && onSuccess)
+        onSuccess({
+          dc_id: selectedDC,
+          room_id: selectedRoom,
+          rack_id: selectedRack,
+        });
       else console.error("Some move operations failed");
     } catch (error) {
       console.error(`Error moving ${type}:`, error);
@@ -440,7 +449,7 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
                 Move <span className="font-bold">{items[0].name}</span> to{" "}
                 <span className="font-bold">{getSelectedDestinationName()}</span>
                 {type === "host" && selectedRackPos !== null
-                  ? ` at position ${selectedRackPos + 1}`
+                  ? ` at position ${selectedRackPos}`
                   : ""}
               </p>
             </div>

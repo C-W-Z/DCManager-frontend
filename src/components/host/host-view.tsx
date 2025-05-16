@@ -4,7 +4,7 @@ import { Host, Rack } from "@/lib/type";
 import { InfoCard, Separator, CardColumn } from "@/components/infocard";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/icon";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { DeleteConfirmation } from "../explorer/dialogs/delete-confirm";
 import { EditHostDialog } from "./edit-host";
 import { RackDroppable, RackDnDReducer, Action } from "@/components/rack-dnd/rack-dnd-reducer";
@@ -88,9 +88,17 @@ function Wrapper({
   const [deleteIds, setDeleteIds] = useState<string[]>([]);
   const [editHost, setEditHost] = useState<Host | null>(null);
   const [moveHost, setMoveHost] = useState<Host[]>([]);
+  const navigate = useNavigate();
 
   function onMoveUpdate(newPos: number) {
     setHost({ ...host, pos: newPos });
+  }
+
+  function onMoveSuccess(data: { rack_id: string | null }) {
+    if (data.rack_id) {
+      setHost({ ...host, rack_id: data.rack_id });
+      navigate(`/rack/${data.rack_id}`);
+    }
   }
 
   return (
@@ -169,7 +177,7 @@ function Wrapper({
         host={editHost}
         onUpdateSuccess={(updatedHost) => setHost({ ...host, ...updatedHost })}
       />
-      <MoveItemDialog type="host" items={moveHost} />
+      <MoveItemDialog type="host" items={moveHost} onSuccess={onMoveSuccess} />
       <DeleteConfirmation
         ids={deleteIds}
         type="host"
