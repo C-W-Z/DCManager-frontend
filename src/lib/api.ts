@@ -1,6 +1,4 @@
 import * as mytype from "./type";
-import { faker } from "@faker-js/faker";
-import d from "./mock_data.json";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 console.log("baseUrl", baseUrl);
@@ -8,14 +6,8 @@ console.log("baseUrl", baseUrl);
 const mode = import.meta.env.VITE_API_MODE;
 console.log("api mode", mode);
 
-const MockData = d as unknown as mytype.MockDataJson;
-
 /* Datacenter */
-export async function addDC(body: Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">) {
-  if (mode === "mock") {
-    return Promise.resolve(faker.string.uuid());
-  }
-
+export async function addDC(body: Pick<mytype.Datacenter, "name" | "height">) {
   const response = await fetch(`${baseUrl}/dc/`, {
     method: "POST",
     headers: {
@@ -234,7 +226,7 @@ export async function deleteRack(rack_id: string): Promise<void> {
 
 /* Host */
 export async function addHost(
-  body: Pick<mytype.Host, "name" | "height" | "rack_id" | "service_id" | "pos">,
+  body: Pick<mytype.Host, "name" | "height" | "rack_name" | "pos">,
 ): Promise<string> {
   if (mode === "mock") {
     return Promise.resolve(faker.string.uuid());
@@ -254,11 +246,7 @@ export async function addHost(
   return data.id as string;
 }
 
-export async function getAllHost(): Promise<mytype.SimpleHost[]> {
-  if (mode === "mock") {
-    return Promise.resolve(MockData.host as mytype.SimpleHost[]);
-  }
-
+export async function getAllHost(): Promise<mytype.Host[]> {
   const response = await fetch(`${baseUrl}/host/all`);
   if (!response.ok) {
     return Promise.reject(new Error("Failed to fetch hosts"));
@@ -267,14 +255,6 @@ export async function getAllHost(): Promise<mytype.SimpleHost[]> {
 }
 
 export async function getHost(host_id: string): Promise<mytype.Host> {
-  if (mode === "mock") {
-    const host = MockData.host.find((host) => host.id === host_id);
-    if (!host) {
-      return Promise.reject(new Error("Host not found"));
-    }
-    return Promise.resolve(host);
-  }
-
   const response = await fetch(`${baseUrl}/host/${host_id}`);
   if (!response.ok) {
     return Promise.reject(new Error("Host not found"));
@@ -286,10 +266,6 @@ export async function modifyHost(
   host_id: string,
   body: Partial<Pick<mytype.Host, "name" | "height" | "running" | "rack_id" | "pos">>,
 ): Promise<void> {
-  if (mode === "mock") {
-    return Promise.resolve();
-  }
-
   const response = await fetch(`${baseUrl}/host/${host_id}`, {
     method: "PUT",
     headers: {
