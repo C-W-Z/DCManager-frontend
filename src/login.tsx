@@ -95,6 +95,7 @@ export default function LoginPage() {
                           // autoComplete="name"
                           disabled={isLoading}
                           {...field}
+                          required
                         />
                       </FormControl>
                       <FormMessage />
