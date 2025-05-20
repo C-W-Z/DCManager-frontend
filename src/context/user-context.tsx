@@ -1,29 +1,35 @@
-"use client"
+"use client";
 
-import { useState, type ReactNode } from "react"
+import { useState, type ReactNode } from "react";
 import { type User, UserContext } from "./use-user";
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
     return {
-      user_role: "admin"
-    }
-  })
+      username: "admin",
+      user_role: "admin",
+    };
+  });
 
   // useEffect(() => {
-    // fetch user
-    // login() if fetch success
+  // fetch user
+  // login() if fetch success
   // }, []);
 
-  const login = (user_role: string) => {
+  const login = (username: string, user_role: "admin" | "normal") => {
     setUser({
-      user_role
-    })
-  }
+      username,
+      user_role,
+    });
+    console.log(`login as ${username} (${user_role})`);
+  };
 
   const logout = () => {
-    setUser(null)
-  }
+    if (user) console.log(`logout as ${user.username} (${user.user_role})`);
+    setUser(null);
+  };
 
-  return <UserContext.Provider value={{ user, login, logout }}>{children}</UserContext.Provider>
+  return (
+    <UserContext.Provider value={{ user, login, logout }}>{children}</UserContext.Provider>
+  );
 }

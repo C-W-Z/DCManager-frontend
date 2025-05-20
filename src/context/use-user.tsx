@@ -1,18 +1,17 @@
 import { createContext, useContext } from "react";
 
 export interface User {
-  user_role: string;
+  username: string;
+  user_role: "admin" | "normal";
 }
 
 interface UserContextType {
   user: User | null;
-  login: (user_role: string) => void;
+  login: (username: string, user_role: "admin" | "normal") => void;
   logout: () => void;
 }
 
-export const UserContext = createContext<UserContextType | undefined>(
-  undefined
-);
+export const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function useUser() {
   const context = useContext(UserContext);

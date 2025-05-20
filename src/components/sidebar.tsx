@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Link, useResolvedPath } from "react-router-dom";
 import Icon from "@/components/icon";
+import { LogOut } from "lucide-react";
+import { useUser } from "@/context/use-user";
 
 export default function Sidebar() {
+  const { logout } = useUser();
+
   const [collapsed, setCollapsed] = useState(false);
   const currentPath = useResolvedPath("").pathname;
 
@@ -32,13 +36,13 @@ export default function Sidebar() {
           {collapsed ? <Icon id="sidebar-close" /> : <Icon id="sidebar-open" />}
         </button>
       </div>
-      <SidebarItem
+      {/* <SidebarItem
         iconId="home"
         label="Home"
         collapsed={collapsed}
         href="/"
         active={currentPath === "/"}
-      />
+      /> */}
       <SidebarItem
         iconId="explorer"
         label="Explorer"
@@ -60,28 +64,41 @@ export default function Sidebar() {
         href="/host"
         active={currentPath === "/host"}
       />
-      <SidebarItem
-        iconId="service"
-        label="Services"
-        collapsed={collapsed}
-        href="/service"
-        active={currentPath === "/service"}
-      />
+      <SidebarItem iconId="service" label="Services" collapsed={collapsed} href="/service" />
       <div className="flex-1"></div>
+      <SidebarItem
+        label="Logout"
+        collapsed={collapsed}
+        href="/"
+        active={currentPath === "/"}
+        onClick={logout}
+      >
+        <LogOut />
+      </SidebarItem>
       <SidebarItem iconId="settings" label="Setting" collapsed={collapsed} />
     </div>
   );
 }
 
 interface SidebarItemProps {
-  iconId: string;
+  iconId?: string;
   label: string;
   active?: boolean;
   collapsed?: boolean;
   href?: string;
+  children?: ReactNode;
+  onClick?: React.MouseEventHandler;
 }
 
-function SidebarItem({ iconId, label, active, collapsed, href }: SidebarItemProps) {
+function SidebarItem({
+  iconId,
+  label,
+  active,
+  collapsed,
+  href,
+  children,
+  onClick,
+}: SidebarItemProps) {
   return (
     <Link
       to={href || "#"}
@@ -90,8 +107,10 @@ function SidebarItem({ iconId, label, active, collapsed, href }: SidebarItemProp
         collapsed ? "justify-center" : "justify-start gap-4",
         active ? "bg-gray-200" : "hover:bg-gray-100",
       )}
+      onClick={onClick}
     >
-      <Icon id={iconId} />
+      {iconId && <Icon id={iconId} />}
+      {children}
       {!collapsed && <span>{label}</span>}
     </Link>
   );

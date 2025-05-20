@@ -23,12 +23,15 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useUser } from "./context/use-user";
 
 const formSchema = z.object({
   username: z.string(),
 });
 
 export default function LoginPage() {
+  const { login } = useUser();
+
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -54,6 +57,8 @@ export default function LoginPage() {
       //   }),
       // })
 
+      login(values.username, values.username === "admin" ? "admin" : "normal");
+
       toast.success("Logged in successfully!");
       navigate("/explorer");
     } catch (error) {
@@ -70,7 +75,9 @@ export default function LoginPage() {
         <Card className="w-[350px]">
           <CardHeader className="mb-2">
             <CardTitle className="flex justify-center text-xl">Login</CardTitle>
-            <CardDescription className="flex justify-center">Login to Data Center Manager</CardDescription>
+            <CardDescription className="flex justify-center">
+              Login to Data Center Manager
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>

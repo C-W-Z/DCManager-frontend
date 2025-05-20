@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import "./global.css";
 
-import Home from "./home";
+// import Home from "./home";
 import Explorer from "@/components/explorer/explorer";
 import Layout from "./layout";
 import HostView from "./components/host/host-view";
