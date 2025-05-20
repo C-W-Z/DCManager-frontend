@@ -15,71 +15,76 @@ import DataCenterTable from "@/components/explorer/tables/datacenter-table";
 import RoomTable from "@/components/explorer/tables/room-table";
 import RackTable from "@/components/explorer/tables/rack-table";
 import HostTable from "./components/explorer/tables/host-table";
+import { UserProvider } from "./context/user-context";
 
 createRoot(document.getElementById("root")!).render(
-  <BrowserRouter>
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <Layout>
-            <Home />
-          </Layout>
-        }
-      />
-      <Route
-        path="/explorer"
-        element={
-          <Layout>
-            <Explorer />
-          </Layout>
-        }
-      >
-        <Route index element={<DataCenterTable />} />
-        <Route path="dc/:dcId" element={<RoomTable />} />
-        <Route path="room/:roomId" element={<RackTable />} />
-      </Route>
-      <Route
-        path="/host"
-        element={
-          <Layout>
-            <HostTable />
-          </Layout>
-        }
-      />
-      <Route
-        path="/rack/:rackId"
-        element={
-          <Layout>
-            <RackView />
-          </Layout>
-        }
-      />
-      <Route
-        path="/host/:hostId"
-        element={
-          <Layout>
-            <HostView />
-          </Layout>
-        }
-      />
-      <Route
-        path="/service"
-        element={
-          <Layout>
-            <ServiceTable />
-          </Layout>
-        }
-      />
-      <Route
-        path="/service/:serviceId"
-        element={
-          <Layout>
-            <ServiceView />
-          </Layout>
-        }
-      />
-    </Routes>
-    <Toaster />
-  </BrowserRouter>,
+  <UserProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Layout>
+              <Home />
+            </Layout>
+          }
+        />
+        <Route
+          path="/explorer"
+          element={
+            <Layout>
+              <Explorer />
+            </Layout>
+          }
+        >
+          <Route index element={<DataCenterTable />} />
+          <Route path="dc/:dcId" element={<RoomTable />} />
+          <Route path="room/:roomId" element={<RackTable />} />
+        </Route>
+        <Route
+          path="/host"
+          element={
+            <Layout>
+              <div className="flex h-full flex-1 flex-col overflow-auto px-12 pt-12">
+                <HostTable />
+              </div>
+            </Layout>
+          }
+        />
+        <Route
+          path="/rack/:rackId"
+          element={
+            <Layout>
+              <RackView />
+            </Layout>
+          }
+        />
+        <Route
+          path="/host/:hostId"
+          element={
+            <Layout>
+              <HostView />
+            </Layout>
+          }
+        />
+        <Route
+          path="/service"
+          element={
+            <Layout>
+              <ServiceTable />
+            </Layout>
+          }
+        />
+        <Route
+          path="/service/:serviceId"
+          element={
+            <Layout>
+              <ServiceView />
+            </Layout>
+          }
+        />
+      </Routes>
+      <Toaster />
+    </BrowserRouter>
+  </UserProvider>,
 );

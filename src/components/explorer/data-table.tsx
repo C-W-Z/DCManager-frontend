@@ -143,7 +143,7 @@ export function DataTable<TData extends WithID, TValue>({
             disabled={loading}
           />
 
-          {type !== "datacenter" && selectedRowCount > 0 && (
+          {type !== "datacenter" && type !== "host" && selectedRowCount > 0 && (
             <Button
               variant="outline"
               size="sm"
