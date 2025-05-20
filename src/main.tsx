@@ -43,7 +43,10 @@ createRoot(document.getElementById("root")!).render(
         path="/host"
         element={
           <Layout>
-            <HostTable />
+            <div className="flex h-full flex-col overflow-auto flex-1 px-12 pt-12">
+              <HostTable />
+            </div>
+
           </Layout>
         }
       />
