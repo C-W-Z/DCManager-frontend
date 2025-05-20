@@ -61,6 +61,7 @@ export default function RoomTable() {
   }) => {
     // Handle the move success logic here
     console.log("Move success:", data);
+    handleRefresh();
   };
 
   const handleRefresh = () => {

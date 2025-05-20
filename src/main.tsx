@@ -14,6 +14,7 @@ import ServiceView from "./components/service/service-view";
 import DataCenterTable from "@/components/explorer/tables/datacenter-table";
 import RoomTable from "@/components/explorer/tables/room-table";
 import RackTable from "@/components/explorer/tables/rack-table";
+import HostTable from "./components/explorer/tables/host-table";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -38,6 +39,17 @@ createRoot(document.getElementById("root")!).render(
         <Route path="dc/:dcId" element={<RoomTable />} />
         <Route path="room/:roomId" element={<RackTable />} />
       </Route>
+      <Route
+        path="/host"
+        element={
+          <Layout>
+            <div className="flex h-full flex-col overflow-auto flex-1 px-12 pt-12">
+              <HostTable />
+            </div>
+
+          </Layout>
+        }
+      />
       <Route
         path="/rack/:rackId"
         element={
