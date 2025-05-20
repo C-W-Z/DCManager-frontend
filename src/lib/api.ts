@@ -307,7 +307,7 @@ export async function deleteHost(host_id: string): Promise<void> {
 
 /* Service */
 export async function addService(
-  body: Pick<mytype.Service, "name" | "n_racks" | "total_ip">,
+  body: Pick<mytype.Service, "name" | "dc_id" | "n_racks" | "total_ip">,
 ): Promise<string> {
   if (mode === "mock") {
     console.log("addService", body);
