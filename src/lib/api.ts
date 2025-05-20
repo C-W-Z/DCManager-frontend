@@ -3,9 +3,6 @@ import * as mytype from "./type";
 const baseUrl = import.meta.env.VITE_API_URL;
 console.log("baseUrl", baseUrl);
 
-const mode = import.meta.env.VITE_API_MODE;
-console.log("api mode", mode);
-
 /* Datacenter */
 export async function addDC(body: Pick<mytype.Datacenter, "name" | "height">) {
   const response = await fetch(`${baseUrl}/dc/`, {
@@ -22,10 +19,6 @@ export async function addDC(body: Pick<mytype.Datacenter, "name" | "height">) {
 }
 
 export async function getAllDC(): Promise<mytype.SimpleDatacenter[]> {
-  if (mode === "mock") {
-    return Promise.resolve(MockData.dc as mytype.SimpleDatacenter[]);
-  }
-
   const response = await fetch(`${baseUrl}/dc/all`);
   if (!response.ok) {
     return Promise.reject(new Error("Failed to fetch datacenters"));
@@ -33,16 +26,8 @@ export async function getAllDC(): Promise<mytype.SimpleDatacenter[]> {
   return response.json();
 }
 
-export async function getDC(dc_id: string): Promise<mytype.Datacenter> {
-  if (mode === "mock") {
-    const dc = MockData.dc.find((dc) => dc.id === dc_id);
-    if (!dc) {
-      return Promise.reject(new Error("Datacenter not found"));
-    }
-    return Promise.resolve(dc);
-  }
-
-  const response = await fetch(`${baseUrl}/dc/${dc_id}`);
+export async function getDC(dc_name: string): Promise<mytype.Datacenter> {
+  const response = await fetch(`${baseUrl}/dc/${dc_name}`);
   if (!response.ok) {
     return Promise.reject(new Error("Datacenter not found"));
   }
@@ -50,14 +35,10 @@ export async function getDC(dc_id: string): Promise<mytype.Datacenter> {
 }
 
 export async function modifyDC(
-  dc_id: string,
-  body: Partial<Pick<mytype.Datacenter, "name" | "height" | "ip_ranges">>,
+  dc_name: string,
+  body: Partial<Pick<mytype.Datacenter, "name" | "height">>,
 ): Promise<void> {
-  if (mode === "mock") {
-    return Promise.resolve();
-  }
-
-  const response = await fetch(`${baseUrl}/dc/${dc_id}`, {
+  const response = await fetch(`${baseUrl}/dc/${dc_name}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -70,12 +51,8 @@ export async function modifyDC(
   return;
 }
 
-export async function deleteDC(dc_id: string): Promise<void> {
-  if (mode === "mock") {
-    return Promise.resolve();
-  }
-
-  const response = await fetch(`${baseUrl}/dc/${dc_id}`, {
+export async function deleteDC(dc_name: string): Promise<void> {
+  const response = await fetch(`${baseUrl}/dc/${dc_name}`, {
     method: "DELETE",
   });
   if (!response.ok) {
@@ -85,11 +62,7 @@ export async function deleteDC(dc_id: string): Promise<void> {
 }
 
 /* Room */
-export async function addRoom(body: Pick<mytype.Room, "name" | "height" | "dc_id">) {
-  if (mode === "mock") {
-    return Promise.resolve(faker.string.uuid());
-  }
-
+export async function addRoom(body: Pick<mytype.Room, "name" | "height" | "dc_name">) {
   const response = await fetch(`${baseUrl}/room/`, {
     method: "POST",
     headers: {
@@ -103,16 +76,8 @@ export async function addRoom(body: Pick<mytype.Room, "name" | "height" | "dc_id
   return response.json();
 }
 
-export async function getRoom(room_id: string): Promise<mytype.Room> {
-  if (mode === "mock") {
-    const room = MockData.room.find((room) => room.id === room_id);
-    if (!room) {
-      return Promise.reject(new Error("Room not found"));
-    }
-    return Promise.resolve(room);
-  }
-
-  const response = await fetch(`${baseUrl}/room/${room_id}`);
+export async function getRoom(room_name: string): Promise<mytype.Room> {
+  const response = await fetch(`${baseUrl}/room/${room_name}`);
   if (!response.ok) {
     return Promise.reject(new Error("Room not found"));
   }
@@ -120,14 +85,10 @@ export async function getRoom(room_id: string): Promise<mytype.Room> {
 }
 
 export async function modifyRoom(
-  room_id: string,
-  body: Partial<Pick<mytype.Room, "name" | "height" | "dc_id">>,
+  room_name: string,
+  body: Partial<Pick<mytype.Room, "name" | "height" | "dc_name">>,
 ): Promise<void> {
-  if (mode === "mock") {
-    return Promise.resolve();
-  }
-
-  const response = await fetch(`${baseUrl}/room/${room_id}`, {
+  const response = await fetch(`${baseUrl}/room/${room_name}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -140,12 +101,8 @@ export async function modifyRoom(
   return;
 }
 
-export async function deleteRoom(room_id: string): Promise<void> {
-  if (mode === "mock") {
-    return Promise.resolve();
-  }
-
-  const response = await fetch(`${baseUrl}/room/${room_id}`, {
+export async function deleteRoom(room_name: string): Promise<void> {
+  const response = await fetch(`${baseUrl}/room/${room_name}`, {
     method: "DELETE",
   });
   if (!response.ok) {
@@ -155,11 +112,7 @@ export async function deleteRoom(room_id: string): Promise<void> {
 }
 
 /* Rack */
-export async function addRack(body: Pick<mytype.Rack, "name" | "height" | "room_id">) {
-  if (mode === "mock") {
-    return Promise.resolve(faker.string.uuid());
-  }
-
+export async function addRack(body: Pick<mytype.Rack, "name" | "height" | "room_name">) {
   const response = await fetch(`${baseUrl}/rack/`, {
     method: "POST",
     headers: {
@@ -173,16 +126,8 @@ export async function addRack(body: Pick<mytype.Rack, "name" | "height" | "room_
   return response.json();
 }
 
-export async function getRack(rack_id: string): Promise<mytype.Rack> {
-  if (mode === "mock") {
-    const rack = MockData.rack.find((rack) => rack.id === rack_id);
-    if (!rack) {
-      return Promise.reject(new Error("Rack not found"));
-    }
-    return Promise.resolve(rack);
-  }
-
-  const response = await fetch(`${baseUrl}/rack/${rack_id}`);
+export async function getRack(rack_name: string): Promise<mytype.Rack> {
+  const response = await fetch(`${baseUrl}/rack/${rack_name}`);
   if (!response.ok) {
     return Promise.reject(new Error("Rack not found"));
   }
@@ -190,14 +135,10 @@ export async function getRack(rack_id: string): Promise<mytype.Rack> {
 }
 
 export async function modifyRack(
-  rack_id: string,
-  body: Partial<Pick<mytype.Rack, "name" | "height" | "room_id" | "service_id">>,
+  rack_name: string,
+  body: Partial<Pick<mytype.Rack, "name" | "height" | "room_name" | "service_name">>,
 ): Promise<void> {
-  if (mode === "mock") {
-    return Promise.resolve();
-  }
-
-  const response = await fetch(`${baseUrl}/rack/${rack_id}`, {
+  const response = await fetch(`${baseUrl}/rack/${rack_name}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -210,12 +151,8 @@ export async function modifyRack(
   return;
 }
 
-export async function deleteRack(rack_id: string): Promise<void> {
-  if (mode === "mock") {
-    return Promise.resolve();
-  }
-
-  const response = await fetch(`${baseUrl}/rack/${rack_id}`, {
+export async function deleteRack(rack_name: string): Promise<void> {
+  const response = await fetch(`${baseUrl}/rack/${rack_name}`, {
     method: "DELETE",
   });
   if (!response.ok) {
@@ -228,10 +165,6 @@ export async function deleteRack(rack_id: string): Promise<void> {
 export async function addHost(
   body: Pick<mytype.Host, "name" | "height" | "rack_name" | "pos">,
 ): Promise<string> {
-  if (mode === "mock") {
-    return Promise.resolve(faker.string.uuid());
-  }
-
   const response = await fetch(`${baseUrl}/host/`, {
     method: "POST",
     headers: {
@@ -243,7 +176,7 @@ export async function addHost(
     return Promise.reject(new Error("Failed to add host"));
   }
   const data = await response.json();
-  return data.id as string;
+  return data.id as string; // TODO
 }
 
 export async function getAllHost(): Promise<mytype.Host[]> {
@@ -254,8 +187,8 @@ export async function getAllHost(): Promise<mytype.Host[]> {
   return response.json();
 }
 
-export async function getHost(host_id: string): Promise<mytype.Host> {
-  const response = await fetch(`${baseUrl}/host/${host_id}`);
+export async function getHost(host_name: string): Promise<mytype.Host> {
+  const response = await fetch(`${baseUrl}/host/${host_name}`);
   if (!response.ok) {
     return Promise.reject(new Error("Host not found"));
   }
@@ -263,10 +196,10 @@ export async function getHost(host_id: string): Promise<mytype.Host> {
 }
 
 export async function modifyHost(
-  host_id: string,
-  body: Partial<Pick<mytype.Host, "name" | "height" | "running" | "rack_id" | "pos">>,
+  host_name: string,
+  body: Partial<Pick<mytype.Host, "name" | "height" | "running" | "rack_name" | "pos">>,
 ): Promise<void> {
-  const response = await fetch(`${baseUrl}/host/${host_id}`, {
+  const response = await fetch(`${baseUrl}/host/${host_name}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -279,12 +212,8 @@ export async function modifyHost(
   return;
 }
 
-export async function deleteHost(host_id: string): Promise<void> {
-  if (mode === "mock") {
-    return Promise.resolve();
-  }
-
-  const response = await fetch(`${baseUrl}/host/${host_id}`, {
+export async function deleteHost(host_name: string): Promise<void> {
+  const response = await fetch(`${baseUrl}/host/${host_name}`, {
     method: "DELETE",
   });
   if (!response.ok) {
@@ -295,13 +224,8 @@ export async function deleteHost(host_id: string): Promise<void> {
 
 /* Service */
 export async function addService(
-  body: Pick<mytype.Service, "name" | "dc_id" | "n_racks" | "total_ip">,
+  body: Pick<mytype.SimpleService, "name" | "n_allocated_racks" | "allocated_subnets">,
 ): Promise<string> {
-  if (mode === "mock") {
-    console.log("addService", body);
-    return Promise.resolve(faker.string.uuid());
-  }
-
   const response = await fetch(`${baseUrl}/service/`, {
     method: "POST",
     headers: {
@@ -313,15 +237,10 @@ export async function addService(
     return Promise.reject(new Error("Failed to add service"));
   }
   const data = await response.json();
-  return data.id as string;
+  return data.id as string; // TODO
 }
 
 export async function getAllService(): Promise<mytype.SimpleService[]> {
-  if (mode === "mock") {
-    console.log("getAllService");
-    return Promise.resolve(MockData.service as mytype.SimpleService[]);
-  }
-
   const response = await fetch(`${baseUrl}/service/all`);
   if (!response.ok) {
     return Promise.reject(new Error("Failed to fetch services"));
@@ -330,16 +249,6 @@ export async function getAllService(): Promise<mytype.SimpleService[]> {
 }
 
 export async function getService(service_id: string): Promise<mytype.Service> {
-  if (mode === "mock") {
-    console.log("getService", service_id);
-
-    const service = MockData.service.find((service) => service.id === service_id);
-    if (!service) {
-      return Promise.reject(new Error("Service not found"));
-    }
-    return Promise.resolve(service);
-  }
-
   const response = await fetch(`${baseUrl}/service/${service_id}`);
   if (!response.ok) {
     return Promise.reject(new Error("Service not found"));
@@ -349,13 +258,8 @@ export async function getService(service_id: string): Promise<mytype.Service> {
 
 export async function modifyService(
   service_id: string,
-  body: Pick<mytype.Service, "name">,
+  body: Pick<mytype.SimpleService, "name">,
 ): Promise<void> {
-  if (mode === "mock") {
-    console.log("modifyService", service_id, body);
-    return Promise.resolve();
-  }
-
   const response = await fetch(`${baseUrl}/service/${service_id}`, {
     method: "PUT",
     headers: {
@@ -370,11 +274,6 @@ export async function modifyService(
 }
 
 export async function extendServiceRack(service_id: string, num: number): Promise<void> {
-  if (mode === "mock") {
-    console.log("extendServiceRack", service_id, num);
-    return Promise.resolve();
-  }
-
   const response = await fetch(`${baseUrl}/service/${service_id}/rack/extend`, {
     method: "PUT",
     headers: {
@@ -389,11 +288,6 @@ export async function extendServiceRack(service_id: string, num: number): Promis
 }
 
 export async function extendServiceIP(service_id: string, num: number): Promise<void> {
-  if (mode === "mock") {
-    console.log("extendServiceIP", service_id, num);
-    return Promise.resolve();
-  }
-
   const response = await fetch(`${baseUrl}/service/${service_id}/ip/extend`, {
     method: "PUT",
     headers: {
@@ -408,11 +302,6 @@ export async function extendServiceIP(service_id: string, num: number): Promise<
 }
 
 export async function deleteService(service_id: string): Promise<void> {
-  if (mode === "mock") {
-    console.log("deleteService", service_id);
-    return Promise.resolve();
-  }
-
   const response = await fetch(`${baseUrl}/service/${service_id}`, {
     method: "DELETE",
   });
