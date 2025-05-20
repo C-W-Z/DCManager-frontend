@@ -4,20 +4,25 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { SimpleDatacenter } from "@/lib/type";
-import { DatacenterRowActions } from "./datacenter-actions";
+import type { SimpleHost } from "@/lib/type";
+import { Link } from "react-router-dom";
+import { HostRowActions } from "./host-actions";
 
-interface DataCenterColumnsProps {
-  onSelect: (room: SimpleDatacenter) => void;
-  onUpdateSuccess: (dc: SimpleDatacenter) => void;
+interface HostColumnsProps {
+  onUpdateSuccess: (host: SimpleHost) => void;
   onDeleteSuccess: (ids: string[]) => void;
+  onMoveSuccess: (data: {
+    dc_id: string | null;
+    room_id: string | null;
+    rack_id: string | null;
+  }) => void;
 }
 
-export function dataCenterColumns({
-  onSelect,
+export function hostColumns({
   onUpdateSuccess,
   onDeleteSuccess,
-}: DataCenterColumnsProps): ColumnDef<SimpleDatacenter>[] {
+  onMoveSuccess,
+}: HostColumnsProps): ColumnDef<SimpleHost>[] {
   return [
     {
       id: "select",
@@ -51,7 +56,7 @@ export function dataCenterColumns({
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            DC Name
+            Host Name
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -60,32 +65,32 @@ export function dataCenterColumns({
         const name: string = row.getValue("name");
         return (
           <div className="pl-4 text-left font-medium">
-            <button
+            <Link
+              to={`/host/${row.original.id}`}
               className="hover:underline focus:outline-none"
-              onClick={() => onSelect(row.original)}
             >
               {name}
-            </button>
+            </Link>
           </div>
         );
       },
     },
     {
-      accessorKey: "n_rooms",
+      accessorKey: "service_name",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Rooms
+            Service
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
       cell: ({ row }) => {
-        const n_rooms: number = Number.parseInt(row.getValue("n_rooms"));
-        return <div className="pl-4 text-left font-medium">{n_rooms}</div>;
+        const service: string = row.getValue("service_name");
+        return <div className="pl-4 text-left font-medium">{service}</div>;
       },
     },
     {
@@ -107,49 +112,32 @@ export function dataCenterColumns({
       },
     },
     {
-      accessorKey: "n_racks",
+      accessorKey: "ip",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Racks
+            IP
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
       cell: ({ row }) => {
-        const n_racks: number = Number.parseInt(row.getValue("n_racks"));
-        return <div className="pl-4 text-left font-medium">{n_racks}</div>;
-      },
-    },
-    {
-      accessorKey: "n_hosts",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Hosts
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => {
-        const n_hosts: number = Number.parseInt(row.getValue("n_hosts"));
-        return <div className="pl-4 text-left font-medium">{n_hosts}</div>;
+        const ip: number = row.getValue("ip");
+        return <div className="pl-4 text-left font-medium">{ip}</div>;
       },
     },
     {
       id: "actions",
       cell: ({ row }) => (
-        <DatacenterRowActions
+        <HostRowActions
           row={row}
           onUpdateSuccess={onUpdateSuccess}
           onDeleteSuccess={onDeleteSuccess}
-        ></DatacenterRowActions>
+          onMoveSuccess={onMoveSuccess}
+        />
       ),
     },
   ];

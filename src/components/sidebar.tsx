@@ -52,14 +52,14 @@ export default function Sidebar() {
         collapsed={collapsed}
         href="/rack"
         active={currentPath === "/rack"}
-      />
+      /> */}
       <SidebarItem
         iconId="host"
         label="Hosts"
         collapsed={collapsed}
         href="/host"
         active={currentPath === "/host"}
-      /> */}
+      />
       <SidebarItem
         iconId="service"
         label="Services"

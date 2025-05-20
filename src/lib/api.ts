@@ -254,6 +254,18 @@ export async function addHost(
   return data.id as string;
 }
 
+export async function getAllHost(): Promise<mytype.SimpleHost[]> {
+  if (mode === "mock") {
+    return Promise.resolve(MockData.host as mytype.SimpleHost[]);
+  }
+
+  const response = await fetch(`${baseUrl}/host/all`);
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to fetch hosts"));
+  }
+  return response.json();
+}
+
 export async function getHost(host_id: string): Promise<mytype.Host> {
   if (mode === "mock") {
     const host = MockData.host.find((host) => host.id === host_id);
