@@ -227,13 +227,14 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
           ? `${items.length} ${getTypeName()}s`
           : `${getTypeName()} ${items[0].name}`;
       toast.success(names + " has successfully move to " + getSelectedDestinationName());
-      if (allSuccessful && onSuccess)
-        onSuccess({
-          dc_id: selectedDC,
-          room_id: selectedRoom,
-          rack_id: selectedRack,
-        });
-      else console.error("Some move operations failed");
+      if (allSuccessful) {
+        if (onSuccess)
+          onSuccess({
+            dc_id: selectedDC,
+            room_id: selectedRoom,
+            rack_id: selectedRack,
+          });
+      } else console.error("Some move operations failed");
     } catch (error) {
       console.error(`Error moving ${type}:`, error);
     } finally {

@@ -2,11 +2,11 @@ import * as mytype from "./type";
 import { faker } from "@faker-js/faker";
 import d from "./mock_data.json";
 
-const mode = import.meta.env.API_MODE;
-console.log("api mode", mode);
-
 const baseUrl = import.meta.env.VITE_API_URL;
 console.log("baseUrl", baseUrl);
+
+const mode = import.meta.env.VITE_API_MODE;
+console.log("api mode", mode);
 
 const MockData = d as unknown as mytype.MockDataJson;
 
@@ -272,7 +272,7 @@ export async function getHost(host_id: string): Promise<mytype.Host> {
 
 export async function modifyHost(
   host_id: string,
-  body: Partial<Pick<mytype.Host, "name" | "height" | "running" | "rack_id">>,
+  body: Partial<Pick<mytype.Host, "name" | "height" | "running" | "rack_id" | "pos">>,
 ): Promise<void> {
   if (mode === "mock") {
     return Promise.resolve();
