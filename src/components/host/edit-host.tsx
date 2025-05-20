@@ -12,19 +12,19 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Edit, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { simple_host_schema, SimpleHost } from "@/lib/type";
+import { host_schema, Host } from "@/lib/type";
 import { modifyHost } from "@/lib/api";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 interface EditHostDialogProps {
-  host: SimpleHost | null;
-  onUpdateSuccess?: (updatedHost: SimpleHost) => void;
+  host: Host | null;
+  onUpdateSuccess?: (updatedHost: Host) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const form_schema = simple_host_schema.pick({
+const form_schema = host_schema.pick({
   name: true,
   height: true,
   status: true,
@@ -65,7 +65,7 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
       status: formData.status,
     })
       .then(() => {
-        const updatedHost: SimpleHost = {
+        const updatedHost: Host = {
           ...host,
           name: formData.name,
           height: formData.height,
@@ -123,7 +123,7 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
             <Label htmlFor="status">Status</Label>
             <Select
               onValueChange={(value) => {
-                setFormData((prev) => ({ ...prev, status: value as SimpleHost["status"] }));
+                setFormData((prev) => ({ ...prev, status: value as Host["status"] }));
               }}
             >
               <SelectTrigger className="w-full">

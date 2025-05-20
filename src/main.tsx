@@ -16,19 +16,13 @@ import RoomTable from "@/components/explorer/tables/room-table";
 import RackTable from "@/components/explorer/tables/rack-table";
 import HostTable from "./components/explorer/tables/host-table";
 import { UserProvider } from "./context/user-context";
+import LoginPage from "./login";
 
 createRoot(document.getElementById("root")!).render(
   <UserProvider>
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <Layout>
-              <Home />
-            </Layout>
-          }
-        />
+        <Route path="/" element={<LoginPage />} />
         <Route
           path="/explorer"
           element={
