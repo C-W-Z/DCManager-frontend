@@ -24,7 +24,7 @@ export function ServiceColumns(): ColumnDef<SimpleService>[] {
         return (
           <div className="pl-4 text-left font-medium">
             <Link
-              to={`/service/${row.original.id}`}
+              to={`/service/${row.original.name}`}
               className="hover:underline focus:outline-none"
             >
               {name}

@@ -32,10 +32,10 @@ export default function ServiceView() {
           </div>
           <InfoCard>
             <>
-              <CardColumn label="UUID" data={service.id} />
-              <CardColumn label="n_hosts" data={`${service.n_hosts}`} />
-              <CardColumn label="n_racks" data={`${service.n_racks}`} />
-              <CardColumn label="total ip" data={`${service.total_ip}`} />
+              <CardColumn label="UUID" data={service.name} />
+              <CardColumn label="n_hosts" data={`${service.hosts.length}`} />
+              <CardColumn label="n_racks" data={`${service.allocated_racks.length}`} />
+              <CardColumn label="total ip" data={`${service.total_ip_list.length}`} />
               <div className="mt-4 flex flex-row items-center justify-center gap-8"></div>
             </>
           </InfoCard>
@@ -46,8 +46,8 @@ export default function ServiceView() {
           </div>
           <Separator />
           <div className="mb-4 flex h-full w-full flex-col items-start justify-start gap-2 overflow-y-scroll">
-            {service.racks.map((rack) => {
-              return <RackBlock key={rack.id} rackId={rack.id} />;
+            {service.allocated_racks.map((rack) => {
+              return <RackBlock key={rack.name} rackId={rack.name} />;
             })}
           </div>
         </div>
@@ -81,7 +81,7 @@ function RackBlock({ rackId }: { rackId: string }) {
   return (
     <div className="mb-4 grid h-fit w-full grid-cols-4 items-start gap-4 p-2 hover:bg-gray-100">
       <Link
-        to={`/rack/${rack.id}`}
+        to={`/rack/${rack.name}`}
         className="flex flex-row items-center gap-1 text-sm font-bold underline hover:text-cyan-500"
       >
         {rack.name}
@@ -91,18 +91,14 @@ function RackBlock({ rackId }: { rackId: string }) {
         {rack.hosts.map((host) => {
           return (
             <Link
-              key={host.id}
-              to={`/host/${host.id}`}
+              key={host.name}
+              to={`/host/${host.name}`}
               className="flex flex-row items-center gap-1 text-sm font-bold underline hover:text-cyan-500"
             >
               <div
                 className={cn(
                   "mr-2 h-3 w-3 rounded-full",
-                  host.status === "running"
-                    ? "bg-green-600"
-                    : host.status === "idle"
-                      ? "bg-gray-400"
-                      : "bg-red-400",
+                  host.running ? "bg-green-600" : "bg-red-400",
                 )}
               ></div>
               {host.name}
@@ -114,7 +110,7 @@ function RackBlock({ rackId }: { rackId: string }) {
       <div className="flex translate-x-4 flex-col gap-2">
         {rack.hosts.map((host) => {
           return (
-            <div key={host.id} className="text-sm text-gray-500">
+            <div key={host.name} className="text-sm text-gray-500">
               {host.ip}
             </div>
           );

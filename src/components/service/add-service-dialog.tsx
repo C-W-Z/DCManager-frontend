@@ -20,12 +20,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-import { service_schema } from "@/lib/type";
+import { simple_service_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addService } from "@/lib/api";
 import Icon from "@/components/icon";
 
-const form_schema = service_schema.pick({ name: true, n_racks: true, total_ip: true });
+// TODO: rewrite IP subnets?
+
+const form_schema = simple_service_schema.pick({ name: true, n_allocated_racks: true, allocated_subnets: true });
 
 export function AddServiceDialog() {
   const [open, setOpen] = useState(false);
@@ -37,8 +39,8 @@ export function AddServiceDialog() {
   function onSubmit(values: z.infer<typeof form_schema>) {
     addService({
       name: values.name,
-      n_racks: values.n_racks,
-      total_ip: values.total_ip,
+      n_allocated_racks: values.n_allocated_racks,
+      allocated_subnets: values.allocated_subnets,
     })
       .then(() => {
         toast.success(`Service ${values.name} added successfully!`);
@@ -83,7 +85,7 @@ export function AddServiceDialog() {
             />
             <FormField
               control={form.control}
-              name="n_racks"
+              name="n_allocated_racks"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Racks Needed (max 10)</FormLabel>
@@ -111,26 +113,24 @@ export function AddServiceDialog() {
             />
             <FormField
               control={form.control}
-              name="total_ip"
+              name="allocated_subnets"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>IP Needed (max 128)</FormLabel>
+                  <FormLabel>IP Subnet</FormLabel>
                   <FormControl>
                     <Input
-                      type="number"
+                      type="string"
                       placeholder="1"
                       {...field}
                       value={field.value || ""}
-                      min={1}
-                      max={128}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value);
-                        if (!isNaN(value)) {
-                          field.onChange(value);
-                        } else {
-                          field.onChange(0);
-                        }
-                      }}
+                      // onChange={(e) => {
+                      //   const value = parseInt(e.target.value);
+                      //   if (!isNaN(value)) {
+                      //     field.onChange(value);
+                      //   } else {
+                      //     field.onChange(0);
+                      //   }
+                      // }}
                     />
                   </FormControl>
                   <FormMessage />

@@ -86,7 +86,7 @@ export default function ServiceTable() {
       <DataTable
         columns={columns}
         data={services}
-        getRowId={(row) => row.id}
+        getRowId={(row) => row.name}
         loading={loading}
       />
     </div>
@@ -94,7 +94,7 @@ export default function ServiceTable() {
 }
 
 interface WithID {
-  id: string;
+  name: string;
 }
 
 interface DataTableProps<TData, TValue> {
