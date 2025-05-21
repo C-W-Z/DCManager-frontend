@@ -12,9 +12,9 @@ interface RackColumnsProps {
   onUpdateSuccess: (dc: SimpleRack) => void;
   onDeleteSuccess: (ids: string[]) => void;
   onMoveSuccess: (data: {
-    dc_id: string | null;
-    room_id: string | null;
-    rack_id: string | null;
+    dc_name: string | null;
+    room_name: string | null;
+    rack_name: string | null;
   }) => void;
 }
 
@@ -66,7 +66,7 @@ export function rackColumns({
         return (
           <div className="pl-4 text-left font-medium">
             <Link
-              to={`/rack/${row.original.id}`}
+              to={`/rack/${name}`}
               className="hover:underline focus:outline-none"
             >
               {name}

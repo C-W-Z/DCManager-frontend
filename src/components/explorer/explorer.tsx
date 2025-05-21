@@ -23,7 +23,7 @@ export default function Explorer() {
       getRoom(roomId)
         .then((room) => {
           setSelectedRoom(room);
-          getDC(room.dc_id).then((dc) => setSelectedDataCenter(dc));
+          getDC(room.dc_name).then((dc) => setSelectedDataCenter(dc));
         })
         .catch((error) => {
           console.error("Error loading room:", error);
@@ -53,9 +53,9 @@ export default function Explorer() {
     if (level === "datacenter-table") {
       navigate("/explorer");
     } else if (level === "room-table" && selectedDataCenter) {
-      navigate(`/explorer/dc/${selectedDataCenter.id}`);
+      navigate(`/explorer/dc/${selectedDataCenter.name}`);
     } else if (level === "rack-table" && selectedDataCenter && selectedRoom) {
-      navigate(`/explorer/room/${selectedRoom.id}`);
+      navigate(`/explorer/room/${selectedRoom.name}`);
     }
   };
 

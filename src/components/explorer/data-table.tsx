@@ -30,7 +30,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SimpleHost, SimpleRack, SimpleRoom } from "@/lib/type";
+import { Host, SimpleRack, SimpleRoom } from "@/lib/type";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTablePagination } from "./data-table-pagination";
@@ -39,7 +39,7 @@ import { DeleteConfirmation, DeleteType } from "./dialogs/delete-confirm";
 import { MoveItemDialog } from "./dialogs/move-item";
 
 interface WithID {
-  id: string;
+  name: string;
 }
 
 interface DataTableProps<TData, TValue> {
@@ -48,9 +48,9 @@ interface DataTableProps<TData, TValue> {
   getRowId: (row: TData) => string;
   loading?: boolean;
   onMoveSuccess?: (data: {
-    dc_id: string | null;
-    room_id: string | null;
-    rack_id: string | null;
+    dc_name: string | null;
+    room_name: string | null;
+    rack_name: string | null;
   }) => void;
   onDeleteSuccess?: (ids: string[]) => void;
   type: DeleteType;
@@ -107,9 +107,9 @@ export function DataTable<TData extends WithID, TValue>({
   };
 
   const handleMoveSuccess = (data: {
-    dc_id: string | null;
-    room_id: string | null;
-    rack_id: string | null;
+    dc_name: string | null;
+    room_name: string | null;
+    rack_name: string | null;
   }) => {
     if (onMoveSuccess) onMoveSuccess(data);
     table.resetRowSelection();
@@ -118,7 +118,7 @@ export function DataTable<TData extends WithID, TValue>({
   const onDeleteSelected = () => {
     const selectedRows = table.getFilteredSelectedRowModel().rows;
     if (selectedRows.length > 0) {
-      const idsToDelete = selectedRows.map((row) => row.original.id);
+      const idsToDelete = selectedRows.map((row) => row.original.name);
       setMultipleIdsToDelete(idsToDelete);
     }
   };
@@ -278,7 +278,7 @@ export function DataTable<TData extends WithID, TValue>({
       {type !== "datacenter" && (
         <MoveItemDialog
           type={type}
-          items={itemsToMove as unknown as (SimpleRoom | SimpleRack | SimpleHost)[]}
+          items={itemsToMove as unknown as (SimpleRoom | SimpleRack | Host)[]}
           onSuccess={handleMoveSuccess}
         />
       )}

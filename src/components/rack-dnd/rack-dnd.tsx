@@ -45,7 +45,7 @@ export default function RackDnD({
         </div>
 
         {state.rack.hosts.map((host, index) => {
-          if (hostId && host.id === hostId) {
+          if (hostId && host.name === hostId) {
             return (
               <HostDraggable
                 key={index}

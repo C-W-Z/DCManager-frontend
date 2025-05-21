@@ -11,17 +11,17 @@ import {
 import { EditHostDialog } from "@/components/host/edit-host";
 import { DeleteConfirmation } from "../dialogs/delete-confirm";
 import { Row } from "@tanstack/react-table";
-import type { SimpleHost } from "@/lib/type";
+import type { Host } from "@/lib/type";
 import { MoveItemDialog } from "../dialogs/move-item";
 
 interface HostRowActionsProps {
-  row: Row<SimpleHost>;
-  onUpdateSuccess: (host: SimpleHost) => void;
+  row: Row<Host>;
+  onUpdateSuccess: (host: Host) => void;
   onDeleteSuccess: (ids: string[]) => void;
   onMoveSuccess: (data: {
-    dc_id: string | null;
-    room_id: string | null;
-    rack_id: string | null;
+    dc_name: string | null;
+    room_name: string | null;
+    rack_name: string | null;
   }) => void;
 }
 
@@ -33,11 +33,11 @@ export function HostRowActions({
 }: HostRowActionsProps) {
   const host = row.original;
 
-  const [hostToEdit, setHostToEdit] = useState<SimpleHost | null>(null);
-  const [hostToMove, setHostToMove] = useState<SimpleHost[]>([]);
+  const [hostToEdit, setHostToEdit] = useState<Host | null>(null);
+  const [hostToMove, setHostToMove] = useState<Host[]>([]);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
-  const handleEdit = (host: SimpleHost) => {
+  const handleEdit = (host: Host) => {
     // 先设置为 null，强制 useEffect 在下一次设置时触发
     setHostToEdit(null);
     // 使用 setTimeout 确保在下一个渲染周期设置 hostToEdit
@@ -46,8 +46,8 @@ export function HostRowActions({
     }, 0);
   };
 
-  const handleDelete = (host: SimpleHost) => {
-    setIdsToDelete([host.id]);
+  const handleDelete = (host: Host) => {
+    setIdsToDelete([host.name]);
   };
 
   const handleDeleteSuccess = (ids: string[]) => {
@@ -55,7 +55,7 @@ export function HostRowActions({
     onDeleteSuccess(ids);
   };
 
-  const handleMove = (host: SimpleHost) => {
+  const handleMove = (host: Host) => {
     setHostToMove([]);
     setTimeout(() => {
       setHostToMove([host]);

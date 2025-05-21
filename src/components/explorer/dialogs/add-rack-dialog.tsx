@@ -22,28 +22,28 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, /*useEffect, useRef, useMemo*/ } from "react";
 import {
   rack_schema,
   type SimpleDatacenter,
   type SimpleRoom,
-  type SimpleService,
+  // type SimpleService,
 } from "@/lib/type";
 import { toast } from "sonner";
-import { addRack, getAllService } from "@/lib/api";
+import { addRack, /*getAllService*/ } from "@/lib/api";
 import { Plus } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { createPortal } from "react-dom";
+// import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+// import {
+//   Command,
+//   CommandEmpty,
+//   CommandGroup,
+//   CommandInput,
+//   CommandItem,
+//   CommandList,
+// } from "@/components/ui/command";
+// import { Check, ChevronsUpDown } from "lucide-react";
+// import { cn } from "@/lib/utils";
+// import { createPortal } from "react-dom";
 
 interface AddRackDialogProps {
   currentDC: SimpleDatacenter;
@@ -51,38 +51,40 @@ interface AddRackDialogProps {
   onSuccess?: () => void;
 }
 
+// TODO: Can not set service when create?
+
 export function AddRackDialog({ currentRoom, currentDC, onSuccess }: AddRackDialogProps) {
   const [open, setOpen] = useState(false);
-  const [popoverOpen, setPopoverOpen] = useState(false);
-  const [services, setServices] = useState<SimpleService[]>([]);
-  const [loading, setLoading] = useState(false);
-  const popoverTriggerRef = useRef<HTMLButtonElement>(null);
-  const commandInputRef = useRef<HTMLInputElement>(null);
+  // const [popoverOpen, setPopoverOpen] = useState(false);
+  // const [services, setServices] = useState<SimpleService[]>([]);
+  // const [loading, setLoading] = useState(false);
+  // const popoverTriggerRef = useRef<HTMLButtonElement>(null);
+  // const commandInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch services when dialog opens
-  useEffect(() => {
-    if (open) {
-      setLoading(true);
-      getAllService()
-        .then((data) => {
-          setServices(data);
-        })
-        .catch((error) => {
-          console.error("Failed to fetch services:", error);
-          toast.error("Failed to load services");
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [open]);
+  // useEffect(() => {
+  //   if (open) {
+  //     setLoading(true);
+  //     getAllService()
+  //       .then((data) => {
+  //         setServices(data);
+  //       })
+  //       .catch((error) => {
+  //         console.error("Failed to fetch services:", error);
+  //         toast.error("Failed to load services");
+  //       })
+  //       .finally(() => {
+  //         setLoading(false);
+  //       });
+  //   }
+  // }, [open]);
 
   // Focus CommandInput when Popover opens
-  useEffect(() => {
-    if (popoverOpen && commandInputRef.current) {
-      commandInputRef.current.focus();
-    }
-  }, [popoverOpen]);
+  // useEffect(() => {
+  //   if (popoverOpen && commandInputRef.current) {
+  //     commandInputRef.current.focus();
+  //   }
+  // }, [popoverOpen]);
 
   const form_schema = rack_schema
     .pick({
@@ -91,7 +93,7 @@ export function AddRackDialog({ currentRoom, currentDC, onSuccess }: AddRackDial
     })
     .extend({
       height: z.coerce.number().int().min(42).max(currentRoom.height),
-      service_id: z.string().optional(),
+      // service_name: z.string().optional(),
     });
 
   const form = useForm<z.infer<typeof form_schema>>({
@@ -99,7 +101,7 @@ export function AddRackDialog({ currentRoom, currentDC, onSuccess }: AddRackDial
     defaultValues: {
       name: "",
       height: 42,
-      service_id: "",
+      // service_name: "",
     },
   });
 
@@ -107,9 +109,7 @@ export function AddRackDialog({ currentRoom, currentDC, onSuccess }: AddRackDial
     addRack({
       name: values.name,
       height: values.height,
-      room_id: currentRoom.id,
-      dc_id: currentDC.id,
-      service_id: values.service_id || "",
+      room_name: currentRoom.name,
     })
       .then(() => {
         setOpen(false);
@@ -122,113 +122,113 @@ export function AddRackDialog({ currentRoom, currentDC, onSuccess }: AddRackDial
       });
   }
 
-  const ServicePopover = useMemo(() => {
-    return function ServicePopoverComponent() {
-      const [searchQuery, setSearchQuery] = useState("");
+  // const ServicePopover = useMemo(() => {
+  //   return function ServicePopoverComponent() {
+  //     const [searchQuery, setSearchQuery] = useState("");
 
-      // Filter services based on search query
-      const filteredServices = searchQuery
-        ? services.filter((service) =>
-            service.name.toLowerCase().includes(searchQuery.toLowerCase()),
-          )
-        : services;
+  //     // Filter services based on search query
+  //     const filteredServices = searchQuery
+  //       ? services.filter((service) =>
+  //           service.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  //         )
+  //       : services;
 
-      return (
-        <Popover
-          open={popoverOpen}
-          onOpenChange={(open) => {
-            setPopoverOpen(open);
-            if (!open) {
-              setSearchQuery(""); // Clear search when closing
-              popoverTriggerRef.current?.focus();
-            }
-          }}
-          modal={true}
-        >
-          <PopoverTrigger asChild>
-            <FormControl>
-              <Button
-                ref={popoverTriggerRef}
-                variant="outline"
-                role="combobox"
-                className="justify-between border-black"
-                disabled={loading}
-              >
-                {loading
-                  ? "Loading services..."
-                  : form.getValues("service_id")
-                    ? services.find((service) => service.id === form.getValues("service_id"))
-                        ?.name || "None"
-                    : "None"}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0" />
-              </Button>
-            </FormControl>
-          </PopoverTrigger>
-          {createPortal(
-            <PopoverContent
-              className="z-[200] p-0"
-              align="start"
-              side="bottom"
-              onClick={(e) => e.stopPropagation()}
-              onWheel={(e) => e.stopPropagation()}
-            >
-              <Command>
-                <CommandInput
-                  ref={commandInputRef}
-                  placeholder="Search service..."
-                  value={searchQuery}
-                  onValueChange={setSearchQuery}
-                  onClick={(e) => e.stopPropagation()}
-                  aria-label="Search services"
-                />
-                <CommandList>
-                  <CommandEmpty>No service found.</CommandEmpty>
-                  <CommandGroup>
-                    <CommandItem
-                      value="none"
-                      onSelect={() => {
-                        form.setValue("service_id", "");
-                        setPopoverOpen(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          form.getValues("service_id") === "" ? "opacity-100" : "opacity-0",
-                        )}
-                      />
-                      None
-                    </CommandItem>
-                    {filteredServices.map((service) => (
-                      <CommandItem
-                        key={service.id}
-                        value={service.name}
-                        onSelect={() => {
-                          form.setValue("service_id", service.id);
-                          setPopoverOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            form.getValues("service_id") === service.id
-                              ? "opacity-100"
-                              : "opacity-0",
-                          )}
-                        />
-                        {service.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>,
-            document.body,  // Render PopoverContent at the root
-          )}
-        </Popover>
-      );
-    };
-  }, [services, form, popoverOpen, loading]);
+  //     return (
+  //       <Popover
+  //         open={popoverOpen}
+  //         onOpenChange={(open) => {
+  //           setPopoverOpen(open);
+  //           if (!open) {
+  //             setSearchQuery(""); // Clear search when closing
+  //             popoverTriggerRef.current?.focus();
+  //           }
+  //         }}
+  //         modal={true}
+  //       >
+  //         <PopoverTrigger asChild>
+  //           <FormControl>
+  //             <Button
+  //               ref={popoverTriggerRef}
+  //               variant="outline"
+  //               role="combobox"
+  //               className="justify-between border-black"
+  //               disabled={loading}
+  //             >
+  //               {loading
+  //                 ? "Loading services..."
+  //                 : form.getValues("service_name")
+  //                   ? services.find((service) => service.name === form.getValues("service_name"))
+  //                       ?.name || "None"
+  //                   : "None"}
+  //               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0" />
+  //             </Button>
+  //           </FormControl>
+  //         </PopoverTrigger>
+  //         {createPortal(
+  //           <PopoverContent
+  //             className="z-[200] p-0"
+  //             align="start"
+  //             side="bottom"
+  //             onClick={(e) => e.stopPropagation()}
+  //             onWheel={(e) => e.stopPropagation()}
+  //           >
+  //             <Command>
+  //               <CommandInput
+  //                 ref={commandInputRef}
+  //                 placeholder="Search service..."
+  //                 value={searchQuery}
+  //                 onValueChange={setSearchQuery}
+  //                 onClick={(e) => e.stopPropagation()}
+  //                 aria-label="Search services"
+  //               />
+  //               <CommandList>
+  //                 <CommandEmpty>No service found.</CommandEmpty>
+  //                 <CommandGroup>
+  //                   <CommandItem
+  //                     value="none"
+  //                     onSelect={() => {
+  //                       form.setValue("service_name", "");
+  //                       setPopoverOpen(false);
+  //                     }}
+  //                   >
+  //                     <Check
+  //                       className={cn(
+  //                         "mr-2 h-4 w-4",
+  //                         form.getValues("service_name") === "" ? "opacity-100" : "opacity-0",
+  //                       )}
+  //                     />
+  //                     None
+  //                   </CommandItem>
+  //                   {filteredServices.map((service) => (
+  //                     <CommandItem
+  //                       key={service.name}
+  //                       value={service.name}
+  //                       onSelect={() => {
+  //                         form.setValue("service_name", service.name);
+  //                         setPopoverOpen(false);
+  //                       }}
+  //                     >
+  //                       <Check
+  //                         className={cn(
+  //                           "mr-2 h-4 w-4",
+  //                           form.getValues("service_name") === service.name
+  //                             ? "opacity-100"
+  //                             : "opacity-0",
+  //                         )}
+  //                       />
+  //                       {service.name}
+  //                     </CommandItem>
+  //                   ))}
+  //                 </CommandGroup>
+  //               </CommandList>
+  //             </Command>
+  //           </PopoverContent>,
+  //           document.body,  // Render PopoverContent at the root
+  //         )}
+  //       </Popover>
+  //     );
+  //   };
+  // }, [services, form, popoverOpen, loading]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -289,9 +289,9 @@ export function AddRackDialog({ currentRoom, currentDC, onSuccess }: AddRackDial
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
-              name="service_id"
+              name="service_name"
               render={() => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Service</FormLabel>
@@ -299,7 +299,7 @@ export function AddRackDialog({ currentRoom, currentDC, onSuccess }: AddRackDial
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel

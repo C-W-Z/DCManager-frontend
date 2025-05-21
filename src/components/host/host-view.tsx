@@ -21,7 +21,7 @@ export default function HostView() {
       .then((host) => {
         setHost(host);
 
-        getRack(host.rack_id)
+        getRack(host.rack_name)
           .then((rack) => {
             setRack(rack);
           })
@@ -59,7 +59,7 @@ function createInitialState(rack: Rack): RackDroppable {
 
   rack.hosts.forEach((host) => {
     for (let i = 0; i < host.height; i++) {
-      spaces[host.pos - 1 + i] = host.id;
+      spaces[host.pos - 1 + i] = host.name;
     }
   });
 
@@ -94,10 +94,10 @@ function Wrapper({
     setHost({ ...host, pos: newPos });
   }
 
-  function onMoveSuccess(data: { rack_id: string | null }) {
-    if (data.rack_id) {
-      setHost({ ...host, rack_id: data.rack_id });
-      navigate(`/rack/${data.rack_id}`);
+  function onMoveSuccess(data: { rack_name: string | null }) {
+    if (data.rack_name) {
+      setHost({ ...host, rack_name: data.rack_name });
+      navigate(`/rack/${data.rack_name}`);
     }
   }
 
@@ -112,20 +112,21 @@ function Wrapper({
           <InfoCard>
             <>
               <Separator />
-              <CardColumn label="Data Center" data={host.dc_id} />
-              <CardColumn label="Room" data={host.room_id} />
-              <CardColumn label="Rack" data={host.rack_id} link={`/rack/${host.rack_id}`} />
+              <CardColumn label="Data Center" data={host.dc_name} />
+              <CardColumn label="Room" data={host.room_name} />
+              <CardColumn label="Rack" data={host.rack_name} link={`/rack/${host.rack_name}`} />
               <CardColumn label="Position" data={`${host.pos}`} />
               <Separator />
-              <CardColumn label="UUID" data={host.id} />
+              <CardColumn label="UUID" data={host.name} />
               <CardColumn label="Height" data={`${host.height}`} />
               <CardColumn label="IP" data={host.ip} />
               <CardColumn
                 label="Service"
-                data={host.service_id}
-                link={`/service/${host.service_id}`}
+                data={host.service_name}
+                link={`/service/${host.service_name}`}
               />
-              <CardColumn label="Status" data={host.status} />
+              {/* TODO: not sure is this ok? */}
+              <CardColumn label="Status" data={host.running ? "running" : "stopped"} />
               <div className="mt-4 flex flex-row items-center justify-center gap-8">
                 <Button
                   variant="outline"
@@ -145,7 +146,7 @@ function Wrapper({
                   onClick={() => {
                     setDeleteIds([]);
                     setTimeout(() => {
-                      setDeleteIds([host.id]);
+                      setDeleteIds([host.name]);
                     }, 0);
                   }}
                 >
@@ -168,7 +169,7 @@ function Wrapper({
             <Icon id="move" className="size-4 fill-white" />
             <p className="pr-2">Move Host To Other Rack</p>
           </Button>
-          <RackDnD context={HostContext} hostId={host.id} onMoveUpdate={onMoveUpdate} />
+          <RackDnD context={HostContext} hostId={host.name} onMoveUpdate={onMoveUpdate} />
           <div className="text-sm text-gray-500">Drag the host to move in rack.</div>
         </div>
       </div>

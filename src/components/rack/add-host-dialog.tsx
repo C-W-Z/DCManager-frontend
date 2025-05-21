@@ -28,7 +28,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-import { Rack, SimpleHost, host_schema } from "@/lib/type";
+import { Rack, Host, host_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addHost } from "@/lib/api";
 import Icon from "@/components/icon";
@@ -59,19 +59,18 @@ export function AddHostDialog({ context }: { context: RackContextType }) {
       name: values.name,
       height: values.height,
       pos: newPos,
-      rack_id: state.rack.id,
-      room_id: state.rack.room_id,
-      dc_id: state.rack.dc_id,
-      service_id: state.rack.service_id,
+      rack_name: state.rack.name,
     })
-      .then((hostId) => {
-        const newHost: SimpleHost = {
-          id: hostId,
+      .then((name) => {
+        const newHost: Host = {
           name: values.name,
           height: values.height,
-          status: "idle",
+          running: false,
           ip: "",
-          rack_id: state.rack.id,
+          rack_name: state.rack.name,
+          dc_name: state.rack.dc_name,
+          room_name: state.rack.room_name,
+          service_name: state.rack.service_name,
           pos: newPos,
         };
 

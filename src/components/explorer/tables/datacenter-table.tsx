@@ -61,12 +61,12 @@ export default function DataCenterTable() {
 
   const onUpdateSuccess = (updatedDC: SimpleDatacenter) => {
     if (updatedDC) {
-      setDataCenters((prev) => prev.map((dc) => (dc.id === updatedDC.id ? updatedDC : dc)));
+      setDataCenters((prev) => prev.map((dc) => (dc.name === updatedDC.name ? updatedDC : dc)));
     }
   };
 
   const onDeleteSuccess = (idsToDelete: string[]) => {
-    const updatedDCs = dataCenters.filter((dc) => !idsToDelete.includes(dc.id));
+    const updatedDCs = dataCenters.filter((dc) => !idsToDelete.includes(dc.name));
     setDataCenters(updatedDCs);
     calculateTotalCounts(updatedDCs);
   };
@@ -76,7 +76,7 @@ export default function DataCenterTable() {
   };
 
   const columns = dataCenterColumns({
-    onSelect: (dc) => onSelect(`/explorer/dc/${dc.id}`),
+    onSelect: (dc) => onSelect(`/explorer/dc/${dc.name}`),
     onUpdateSuccess,
     onDeleteSuccess,
   });
@@ -102,7 +102,7 @@ export default function DataCenterTable() {
       <DataTable
         columns={columns}
         data={dataCenters}
-        getRowId={(row) => row.id}
+        getRowId={(row) => row.name}
         loading={loading}
         onDeleteSuccess={onDeleteSuccess}
         type="datacenter"

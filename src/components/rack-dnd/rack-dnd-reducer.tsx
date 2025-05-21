@@ -1,10 +1,10 @@
-import { Rack, SimpleHost } from "@/lib/type";
+import { Rack, Host } from "@/lib/type";
 
 export type RackDroppable = {
   rack: Rack;
   spaces: string[];
   dragging?: {
-    id: string;
+    name: string;
     initialPos: number;
     nextPos: number;
     valid: boolean;
@@ -12,10 +12,10 @@ export type RackDroppable = {
 };
 
 export type Action =
-  | { type: "ADD_HOST"; payload: { host: SimpleHost } }
-  | { type: "DRAG_STARTED"; payload: { host: SimpleHost } }
-  | { type: "DRAG_MOVED"; payload: { host: SimpleHost; pos: number } }
-  | { type: "DRAG_ENDED"; payload: { host: SimpleHost } }
+  | { type: "ADD_HOST"; payload: { host: Host } }
+  | { type: "DRAG_STARTED"; payload: { host: Host } }
+  | { type: "DRAG_MOVED"; payload: { host: Host; pos: number } }
+  | { type: "DRAG_ENDED"; payload: { host: Host } }
   | { type: "ANIMATION_ENDED" };
 
 export type RackContextType = React.Context<{
@@ -24,7 +24,7 @@ export type RackContextType = React.Context<{
 } | null>;
 
 export function RackDnDReducer(state: RackDroppable, action: Action) {
-  function clearHostFromSpaces(host: SimpleHost, spaces: string[]) {
+  function clearHostFromSpaces(host: Host, spaces: string[]) {
     const newSpace = [...spaces];
     for (let i = 0; i < host.height; i++) {
       newSpace[host.pos - 1 + i] = "space";
@@ -32,17 +32,17 @@ export function RackDnDReducer(state: RackDroppable, action: Action) {
     return newSpace;
   }
 
-  function setHostToSpaces(host: SimpleHost, spaces: string[]) {
+  function setHostToSpaces(host: Host, spaces: string[]) {
     const newSpace = [...spaces];
     for (let i = 0; i < host.height; i++) {
-      newSpace[host.pos - 1 + i] = host.id;
+      newSpace[host.pos - 1 + i] = host.name;
     }
     return newSpace;
   }
 
-  function isHostFit(host: SimpleHost, pos: number, spaces: string[]) {
+  function isHostFit(host: Host, pos: number, spaces: string[]) {
     for (let i = 0; i < host.height; i++) {
-      if (spaces[pos - 1 + i] !== "space" && spaces[pos - 1 + i] !== host.id) {
+      if (spaces[pos - 1 + i] !== "space" && spaces[pos - 1 + i] !== host.name) {
         return false;
       }
     }
@@ -67,7 +67,7 @@ export function RackDnDReducer(state: RackDroppable, action: Action) {
       const { host } = action.payload;
 
       nextState.dragging = {
-        id: host.id,
+        name: host.name,
         initialPos: host.pos,
         nextPos: host.pos,
         valid: true,
@@ -98,7 +98,7 @@ export function RackDnDReducer(state: RackDroppable, action: Action) {
         if (nextState.dragging.valid) {
           newPos = nextState.dragging.nextPos;
 
-          const hostIndex = nextState.rack.hosts.findIndex((h) => h.id === host.id);
+          const hostIndex = nextState.rack.hosts.findIndex((h) => h.name === host.name);
           nextState.rack.hosts[hostIndex].pos = newPos;
           // nextState.rack.hosts.sort((a, b) => a.pos - b.pos);
         }

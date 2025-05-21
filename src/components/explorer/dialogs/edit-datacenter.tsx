@@ -24,6 +24,8 @@ interface EditDatacenterDialogProps {
   onUpdateSuccess?: (updatedDC: SimpleDatacenter) => void;
 }
 
+// TODO: Remove IP ranges
+
 export function EditDatacenterDialog({
   datacenter,
   onUpdateSuccess,
@@ -45,7 +47,7 @@ export function EditDatacenterDialog({
     if (!datacenter) return;
     setOpen(true);
     setError(null);
-    getDC(datacenter.id)
+    getDC(datacenter.name)
       .then((dc: Datacenter) => {
         setFormData({
           name: dc.name,
@@ -115,7 +117,7 @@ export function EditDatacenterDialog({
     // 过滤掉空的IP范围
     const validIpRanges = ipRanges.filter((range) => range.start_ip && range.end_ip);
 
-    modifyDC(datacenter.id, {
+    modifyDC(datacenter.name, {
       name: formData.name,
       height: Number.parseInt(formData.height),
       ip_ranges: validIpRanges,

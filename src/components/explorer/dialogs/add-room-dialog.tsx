@@ -50,7 +50,7 @@ export function AddRoomDialog({ currentDC }: AddRoomDialogProps) {
     addRoom({
       name: values.name,
       height: values.height,
-      dc_id: currentDC.id,
+      dc_name: currentDC.name,
     })
       .then(() => {
         setOpen(false);

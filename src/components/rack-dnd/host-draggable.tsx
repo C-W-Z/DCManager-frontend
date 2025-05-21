@@ -1,4 +1,4 @@
-import { SimpleHost } from "@/lib/type";
+import { Host } from "@/lib/type";
 import { motion, PanInfo, useMotionValue, useMotionValueEvent } from "motion/react";
 import { height2Px, pos2translateY, HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,7 @@ import { RackContextType } from "@/components/rack-dnd/rack-dnd-reducer";
 import { useEffect } from "react";
 
 interface HostDraggableProps {
-  host: SimpleHost;
+  host: Host;
   constraintsRef: React.RefObject<HTMLDivElement | null>;
   scrollRef: React.RefObject<HTMLDivElement | null>;
   context: RackContextType;
@@ -42,7 +42,7 @@ export default function HostDraggable({
   }, [dragY, host.height, scrollRef]);
 
   function handleOnDrag(_: MouseEvent, info: PanInfo) {
-    if (state.dragging?.id === host.id) {
+    if (state.dragging?.name === host.name) {
       // update pos
       const y = host.pos * (HOST_HEIGHT + RACK_GAP) - info.offset.y - translateY.get();
       const pos = Math.min(
@@ -90,7 +90,7 @@ export default function HostDraggable({
   function handleDragEnd() {
     dispatch({ type: "DRAG_ENDED", payload: { host } });
 
-    if (state.dragging?.id === host.id) {
+    if (state.dragging?.name === host.name) {
       if (state.dragging.valid) {
         toast.success(
           `Host ${host.name} successfully moved to position ${state.dragging.nextPos}`,
@@ -98,8 +98,8 @@ export default function HostDraggable({
 
         const newPos = state.dragging.nextPos;
 
-        modifyHost(host.id, {
-          rack_id: state.rack.id,
+        modifyHost(host.name, {
+          rack_name: state.rack.name,
           pos: newPos,
         })
           .then(() => {
@@ -141,24 +141,17 @@ export default function HostDraggable({
           y: dragY,
           translateY: translateY,
           height: height2Px(host.height),
-          zIndex: state.dragging?.id === host.id ? 99 : 1,
+          zIndex: state.dragging?.name === host.name ? 99 : 1,
         }}
       >
-        <Link to={`/host/${host.id}`} className="text-sm font-bold hover:underline">
+        <Link to={`/host/${host.name}`} className="text-sm font-bold hover:underline">
           {host.name}
         </Link>
         <div
-          className={cn(
-            "h-3 w-3 rounded-full",
-            host.status === "running"
-              ? "bg-green-600"
-              : host.status === "idle"
-                ? "bg-gray-400"
-                : "bg-red-400",
-          )}
+          className={cn("h-3 w-3 rounded-full", host.running ? "bg-green-600" : "bg-red-400")}
         ></div>
       </motion.div>
-      {state.dragging?.id === host.id && (
+      {state.dragging?.name === host.name && (
         <>
           <motion.div
             className="absolute top-0 left-0 z-10 inline-flex w-full items-center justify-center rounded-lg bg-gray-300 opacity-70"

@@ -44,7 +44,7 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
   const commandInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: "",
-    service_id: "", // Use service_id instead of service_name
+    service_name: "", // Use service_name instead of service_name
     height: "",
   });
 
@@ -74,7 +74,7 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
     setOpen(true);
     setFormData({
       name: rack.name,
-      service_id: rack.service_id || "", // Use service_id
+      service_name: rack.service_name || "", // Use service_name
       height: rack.height.toString(),
     });
   }, [rack]);
@@ -96,19 +96,17 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
     e.preventDefault();
     setError(null);
 
-    modifyRack(rack.id, {
+    modifyRack(rack.name, {
       name: formData.name,
-      service_id: formData.service_id || "", // Use service_id
+      service_name: formData.service_name || "", // Use service_name
       height: Number.parseInt(formData.height),
-      room_id: rack.room_id,
+      room_name: rack.room_name,
     })
       .then(() => {
         const updatedRack: SimpleRack = {
           ...rack,
           name: formData.name,
-          service_id: formData.service_id,
-          service_name:
-            services.find((service) => service.id === formData.service_id)?.name || "",
+          service_name: formData.service_name,
           height: Number.parseInt(formData.height),
         };
         toast.success(`Rack ${formData.name} edited successfully`);
@@ -154,8 +152,8 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
             >
               {loading
                 ? "Loading services..."
-                : formData.service_id
-                  ? services.find((service) => service.id === formData.service_id)?.name ||
+                : formData.service_name
+                  ? services.find((service) => service.name === formData.service_name)?.name ||
                     "None"
                   : "None"}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0" />
@@ -184,31 +182,31 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
                     <CommandItem
                       value="none"
                       onSelect={() => {
-                        setFormData((prev) => ({ ...prev, service_id: "" }));
+                        setFormData((prev) => ({ ...prev, service_name: "" }));
                         setPopoverOpen(false);
                       }}
                     >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          formData.service_id === "" ? "opacity-100" : "opacity-0",
+                          formData.service_name === "" ? "opacity-100" : "opacity-0",
                         )}
                       />
                       None
                     </CommandItem>
                     {filteredServices.map((service) => (
                       <CommandItem
-                        key={service.id}
+                        key={service.name}
                         value={service.name}
                         onSelect={() => {
-                          setFormData((prev) => ({ ...prev, service_id: service.id }));
+                          setFormData((prev) => ({ ...prev, service_name: service.name }));
                           setPopoverOpen(false);
                         }}
                       >
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            formData.service_id === service.id ? "opacity-100" : "opacity-0",
+                            formData.service_name === service.name ? "opacity-100" : "opacity-0",
                           )}
                         />
                         {service.name}
@@ -223,7 +221,7 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
         </Popover>
       );
     };
-  }, [services, formData.service_id, popoverOpen, loading]);
+  }, [services, formData.service_name, popoverOpen, loading]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -275,7 +273,7 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="service_id">Service</Label>
+            <Label htmlFor="service_name">Service</Label>
             <ServicePopover />
           </div>
           <DialogFooter>

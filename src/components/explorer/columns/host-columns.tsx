@@ -4,17 +4,17 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { SimpleHost } from "@/lib/type";
+import type { Host } from "@/lib/type";
 import { Link } from "react-router-dom";
 import { HostRowActions } from "./host-actions";
 
 interface HostColumnsProps {
-  onUpdateSuccess: (host: SimpleHost) => void;
+  onUpdateSuccess: (host: Host) => void;
   onDeleteSuccess: (ids: string[]) => void;
   onMoveSuccess: (data: {
-    dc_id: string | null;
-    room_id: string | null;
-    rack_id: string | null;
+    dc_name: string | null;
+    room_name: string | null;
+    rack_name: string | null;
   }) => void;
 }
 
@@ -22,7 +22,7 @@ export function hostColumns({
   onUpdateSuccess,
   onDeleteSuccess,
   onMoveSuccess,
-}: HostColumnsProps): ColumnDef<SimpleHost>[] {
+}: HostColumnsProps): ColumnDef<Host>[] {
   return [
     {
       id: "select",
@@ -66,7 +66,7 @@ export function hostColumns({
         return (
           <div className="pl-4 text-left font-medium">
             <Link
-              to={`/host/${row.original.id}`}
+              to={`/host/${name}`}
               className="hover:underline focus:outline-none"
             >
               {name}

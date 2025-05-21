@@ -1,16 +1,10 @@
 import { height2Px } from "@/lib/constant";
 import { cn } from "@/lib/utils";
-import { SimpleHost } from "@/lib/type";
+import { Host } from "@/lib/type";
 import { pos2translateY } from "@/lib/constant";
 import { Link } from "react-router-dom";
 
-export const HostComponent = ({
-  host,
-  rackHeight,
-}: {
-  host: SimpleHost;
-  rackHeight: number;
-}) => {
+export const HostComponent = ({ host, rackHeight }: { host: Host; rackHeight: number }) => {
   const translateY = pos2translateY(host.pos, host.height, rackHeight);
 
   return (
@@ -21,18 +15,11 @@ export const HostComponent = ({
         transform: `translateY(${translateY}px)`,
       }}
     >
-      <Link to={`/host/${host.id}`} className="text-sm font-bold hover:underline">
+      <Link to={`/host/${host.name}`} className="text-sm font-bold hover:underline">
         {host.name}
       </Link>
       <div
-        className={cn(
-          "h-3 w-3 rounded-full",
-          host.status === "running"
-            ? "bg-green-600"
-            : host.status === "idle"
-              ? "bg-gray-400"
-              : "bg-red-400",
-        )}
+        className={cn("h-3 w-3 rounded-full", host.running ? "bg-green-600" : "bg-red-400")}
       ></div>
     </div>
   );

@@ -21,9 +21,9 @@ interface RoomRowActionsProps {
   onUpdateSuccess: (room: SimpleRoom) => void;
   onDeleteSuccess: (ids: string[]) => void;
   onMoveSuccess: (data: {
-    dc_id: string | null;
-    room_id: string | null;
-    rack_id: string | null;
+    dc_name: string | null;
+    room_name: string | null;
+    rack_name: string | null;
   }) => void;
 }
 
@@ -49,7 +49,7 @@ export function RoomRowActions({
   };
 
   const handleDeleteDataCenter = (room: SimpleRoom) => {
-    setIdsToDelete([room.id]);
+    setIdsToDelete([room.name]);
   };
 
   const handleDeleteSuccess = (ids: string[]) => {

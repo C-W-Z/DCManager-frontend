@@ -50,7 +50,7 @@ function createInitialState(rack: Rack): RackDroppable {
 
   rack.hosts.forEach((host) => {
     for (let i = 0; i < host.height; i++) {
-      spaces[host.pos - 1 + i] = host.id;
+      spaces[host.pos - 1 + i] = host.name;
     }
   });
 
@@ -83,10 +83,10 @@ function Wrapper({ rack, setRack }: { rack: Rack; setRack: (_: Rack | null) => v
           <InfoCard>
             <>
               <Separator />
-              <CardColumn label="Data Center" data={rack.dc_id} />
-              <CardColumn label="Room" data={rack.room_id} />
+              <CardColumn label="Data Center" data={rack.dc_name} />
+              <CardColumn label="Room" data={rack.room_name} />
               <Separator />
-              <CardColumn label="UUID" data={rack.id} />
+              <CardColumn label="UUID" data={rack.name} />
               <CardColumn
                 label="Capacity"
                 data={`${rack.height - rack.capacity}/${rack.height}`}
@@ -95,7 +95,7 @@ function Wrapper({ rack, setRack }: { rack: Rack; setRack: (_: Rack | null) => v
               <CardColumn
                 label="Service"
                 data={rack.service_name}
-                link={`/service/${rack.service_id}`}
+                link={`/service/${rack.service_name}`}
               />
               <div className="mt-4 flex flex-row items-center justify-center gap-8">
                 <Button
@@ -127,7 +127,7 @@ function Wrapper({ rack, setRack }: { rack: Rack; setRack: (_: Rack | null) => v
                   onClick={() => {
                     setDeleteIds([]);
                     setTimeout(() => {
-                      setDeleteIds([rack.id]);
+                      setDeleteIds([rack.name]);
                     }, 0);
                   }}
                 >

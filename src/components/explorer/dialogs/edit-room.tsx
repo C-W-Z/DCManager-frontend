@@ -51,10 +51,10 @@ export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
     e.preventDefault();
     setError(null);
 
-    modifyRoom(room.id, {
+    modifyRoom(room.name, {
       name: formData.name,
       height: Number.parseInt(formData.height),
-      dc_id: room.dc_id,
+      dc_name: room.dc_name,
     })
       .then(() => {
         // 如果修改成功，更新父组件中的数据

@@ -43,7 +43,7 @@ export function DatacenterRowActions({
 
   const handleDeleteDataCenter = (dc: SimpleDatacenter) => {
     // 设置要删除的 ID
-    setIdsToDelete([dc.id]);
+    setIdsToDelete([dc.name]);
   };
 
   const handleDeleteSuccess = (ids: string[]) => {

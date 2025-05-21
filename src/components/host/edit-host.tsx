@@ -27,8 +27,10 @@ interface EditHostDialogProps {
 const form_schema = host_schema.pick({
   name: true,
   height: true,
-  status: true,
+  running: true,
 });
+
+// TODO: fix status -> running
 
 export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
   const [open, setOpen] = useState(false);
@@ -36,7 +38,7 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
   const [formData, setFormData] = useState<z.infer<typeof form_schema>>({
     name: "",
     height: 0,
-    status: "idle",
+    running: false,
   });
 
   useEffect(() => {
@@ -45,7 +47,7 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
     setFormData({
       name: host.name,
       height: host.height,
-      status: host.status,
+      running: host.running,
     });
   }, [host]);
 
@@ -59,17 +61,17 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
     e.preventDefault();
     setError(null);
 
-    modifyHost(host.id, {
+    modifyHost(host.name, {
       name: formData.name,
       height: formData.height,
-      status: formData.status,
+      running: formData.running,
     })
       .then(() => {
         const updatedHost: Host = {
           ...host,
           name: formData.name,
           height: formData.height,
-          status: formData.status,
+          running: formData.running,
         };
         if (onUpdateSuccess) onUpdateSuccess(updatedHost);
         setOpen(false);

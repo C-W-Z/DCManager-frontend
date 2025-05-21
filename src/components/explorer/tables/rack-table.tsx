@@ -42,20 +42,20 @@ export default function RackTable() {
   const onUpdateSuccess = (updatedRack: SimpleRack) => {
     if (updatedRack) {
       setRacks((prev) =>
-        prev.map((rack) => (rack.id === updatedRack.id ? updatedRack : rack)),
+        prev.map((rack) => (rack.name === updatedRack.name ? updatedRack : rack)),
       );
     }
   };
 
   const onDeleteSuccess = (idsToDelete: string[]) => {
-    const updatedRacks = racks.filter((rack) => !idsToDelete.includes(rack.id));
+    const updatedRacks = racks.filter((rack) => !idsToDelete.includes(rack.name));
     setRacks(updatedRacks);
   };
 
   const onMoveSuccess = (data: {
-    dc_id: string | null;
-    room_id: string | null;
-    rack_id: string | null;
+    dc_name: string | null;
+    room_name: string | null;
+    rack_name: string | null;
   }) => {
     // Handle the move success logic here
     console.log("Move success:", data);
@@ -96,7 +96,7 @@ export default function RackTable() {
       <DataTable
         columns={columns}
         data={racks}
-        getRowId={(row) => row.id}
+        getRowId={(row) => row.name}
         loading={loading}
         onMoveSuccess={onMoveSuccess}
         onDeleteSuccess={onDeleteSuccess}

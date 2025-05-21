@@ -44,20 +44,20 @@ export default function RoomTable() {
   const onUpdateSuccess = (updatedRoom: SimpleRoom) => {
     if (updatedRoom) {
       setRooms((prev) =>
-        prev.map((room) => (room.id === updatedRoom.id ? updatedRoom : room)),
+        prev.map((room) => (room.name === updatedRoom.name ? updatedRoom : room)),
       );
     }
   };
 
   const onDeleteSuccess = (idsToDelete: string[]) => {
-    const updatedRooms = rooms.filter((room) => !idsToDelete.includes(room.id));
+    const updatedRooms = rooms.filter((room) => !idsToDelete.includes(room.name));
     setRooms(updatedRooms);
   };
 
   const onMoveSuccess = (data: {
-    dc_id: string | null;
-    room_id: string | null;
-    rack_id: string | null;
+    dc_name: string | null;
+    room_name: string | null;
+    rack_name: string | null;
   }) => {
     // Handle the move success logic here
     console.log("Move success:", data);
@@ -71,7 +71,7 @@ export default function RoomTable() {
   };
 
   const columns = roomColumns({
-    onSelect: (room) => onSelect(`/explorer/room/${room.id}`),
+    onSelect: (room) => onSelect(`/explorer/room/${room.name}`),
     onUpdateSuccess,
     onDeleteSuccess,
     onMoveSuccess,
@@ -98,7 +98,7 @@ export default function RoomTable() {
       <DataTable
         columns={columns}
         data={rooms}
-        getRowId={(row) => row.id}
+        getRowId={(row) => row.name}
         loading={loading}
         onMoveSuccess={onMoveSuccess}
         onDeleteSuccess={onDeleteSuccess}

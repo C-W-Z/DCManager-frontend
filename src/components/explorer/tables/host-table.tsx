@@ -2,12 +2,12 @@
 
 import { DataTable } from "@/components/explorer/data-table";
 import { hostColumns } from "@/components/explorer/columns/host-columns";
-import type { SimpleHost } from "@/lib/type";
+import type { Host } from "@/lib/type";
 import { getAllHost } from "@/lib/api";
 import { useEffect, useState, useCallback } from "react";
 
 export default function HostTable() {
-  const [host, setHost] = useState<SimpleHost[]>([]);
+  const [host, setHost] = useState<Host[]>([]);
   const [loading, setLoading] = useState(false);
 
   const loadDataCenters = useCallback(() => {
@@ -29,21 +29,21 @@ export default function HostTable() {
     loadDataCenters();
   }, [loadDataCenters]);
 
-  const onUpdateSuccess = (updatedDC: SimpleHost) => {
+  const onUpdateSuccess = (updatedDC: Host) => {
     if (updatedDC) {
-      setHost((prev) => prev.map((dc) => (dc.id === updatedDC.id ? updatedDC : dc)));
+      setHost((prev) => prev.map((dc) => (dc.name === updatedDC.name ? updatedDC : dc)));
     }
   };
 
   const onDeleteSuccess = (idsToDelete: string[]) => {
-    const updatedDCs = host.filter((dc) => !idsToDelete.includes(dc.id));
+    const updatedDCs = host.filter((dc) => !idsToDelete.includes(dc.name));
     setHost(updatedDCs);
   };
 
   const onMoveSuccess = (data: {
-    dc_id: string | null;
-    room_id: string | null;
-    rack_id: string | null;
+    dc_name: string | null;
+    room_name: string | null;
+    rack_name: string | null;
   }) => {
     // Handle the move success logic here
     console.log("Move success:", data);
@@ -78,9 +78,10 @@ export default function HostTable() {
       <DataTable
         columns={columns}
         data={host}
-        getRowId={(row) => row.id}
+        getRowId={(row) => row.name}
         loading={loading}
         onDeleteSuccess={onDeleteSuccess}
+        onMoveSuccess={onMoveSuccess}
         type="host"
       />
     </div>
