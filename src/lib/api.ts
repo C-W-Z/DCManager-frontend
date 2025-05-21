@@ -224,7 +224,7 @@ export async function deleteHost(host_name: string): Promise<void> {
 
 /* Service */
 export async function addService(
-  body: Pick<mytype.SimpleService, "name" | "n_allocated_racks" | "allocated_subnets">,
+  body: Pick<mytype.SimpleService, "name" | "n_allocated_racks" | "allocated_subnet">,
 ): Promise<string> {
   const response = await fetch(`${baseUrl}/service/`, {
     method: "POST",

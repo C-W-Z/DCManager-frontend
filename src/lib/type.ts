@@ -88,7 +88,7 @@ export const simple_service_schema = z.object({
   name: z.string(),
   n_allocated_racks: z.number().int(),
   n_hosts: z.number().int(),
-  allocated_subnets: z.string(),
+  allocated_subnet: z.string(),
   total_ip_list: z.array(z.string().ip()),
   available_ip_list: z.array(z.string().ip()),
 });

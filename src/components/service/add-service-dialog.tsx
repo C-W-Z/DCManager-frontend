@@ -19,31 +19,86 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { simple_service_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addService } from "@/lib/api";
 import Icon from "@/components/icon";
+import { Plus, Trash2 } from "lucide-react";
+import { Label } from "../ui/label";
 
-// TODO: rewrite IP subnets?
+const form_schema = simple_service_schema.pick({
+  name: true,
+  allocated_subnet: true,
+});
 
-const form_schema = simple_service_schema.pick({ name: true, n_allocated_racks: true, allocated_subnets: true });
+type RackAllocation = { dc_name: string; n_racks: number };
 
 export function AddServiceDialog() {
   const [open, setOpen] = useState(false);
+  const [allocatedRacks, setAllocatedRacks] = useState<RackAllocation[]>([]);
+  const [hasEmptyAllocatedRacks, setHasEmptyAllocatedRacks] = useState(false);
 
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
+    defaultValues: {
+      name: "",
+      allocated_subnet: "",
+    },
   });
 
+  useEffect(() => {
+    const hasEmpty = allocatedRacks.some((rack) => !rack.dc_name.trim() || rack.n_racks === 0);
+    setHasEmptyAllocatedRacks(hasEmpty);
+  }, [allocatedRacks]);
+
+  const handleAllocatedRacksChange = (
+    index: number,
+    field: "dc_name" | "n_racks",
+    value: string,
+  ) => {
+    setAllocatedRacks((prev) =>
+      prev.map((rack, i) =>
+        i === index
+          ? {
+              ...rack,
+              [field]: field === "n_racks" ? parseInt(value) || 0 : value,
+            }
+          : rack,
+      ),
+    );
+  };
+
+  const addAllocatedRacks = () => {
+    setAllocatedRacks((prev) => [...prev, { dc_name: "", n_racks: 0 }]);
+  };
+
+  const removeAllocatedRacks = (index: number) => {
+    setAllocatedRacks((prev) => prev.filter((_, i) => i !== index));
+  };
+
   function onSubmit(values: z.infer<typeof form_schema>) {
+    const n_allocated_racks = allocatedRacks.reduce(
+      (acc, rack) => {
+        if (rack.dc_name.trim() && rack.n_racks > 0) {
+          acc[rack.dc_name] = rack.n_racks;
+        }
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    console.log(n_allocated_racks);
+
     addService({
       name: values.name,
-      n_allocated_racks: values.n_allocated_racks,
-      allocated_subnets: values.allocated_subnets,
+      n_allocated_racks,
+      allocated_subnet: values.allocated_subnet,
     })
       .then(() => {
         toast.success(`Service ${values.name} added successfully!`);
+        form.reset();
+        setAllocatedRacks([]);
       })
       .catch((error) => {
         console.error("Error adding service:", error);
@@ -77,6 +132,7 @@ export function AddServiceDialog() {
                       placeholder="Cloud-Service-A"
                       {...field}
                       value={field.value || ""}
+                      required
                     />
                   </FormControl>
                   <FormMessage />
@@ -85,63 +141,94 @@ export function AddServiceDialog() {
             />
             <FormField
               control={form.control}
-              name="n_allocated_racks"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Racks Needed (max 10)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="1"
-                      {...field}
-                      value={field.value || ""}
-                      min={1}
-                      max={10}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value);
-                        if (!isNaN(value)) {
-                          field.onChange(value);
-                        } else {
-                          field.onChange(0);
-                        }
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="allocated_subnets"
+              name="allocated_subnet"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>IP Subnet</FormLabel>
                   <FormControl>
                     <Input
-                      type="string"
-                      placeholder="1"
+                      type="text"
+                      placeholder="192.168.1.0/24"
                       {...field}
                       value={field.value || ""}
-                      // onChange={(e) => {
-                      //   const value = parseInt(e.target.value);
-                      //   if (!isNaN(value)) {
-                      //     field.onChange(value);
-                      //   } else {
-                      //     field.onChange(0);
-                      //   }
-                      // }}
+                      required
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>Racks in Data Centers</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addAllocatedRacks}
+                  className="h-8"
+                >
+                  <Plus className="mr-1 h-4 w-4" /> Add Data Center
+                </Button>
+              </div>
+              {allocatedRacks.length === 0 ? (
+                <div className="rounded-md border border-dashed p-4 text-center text-sm text-gray-500">
+                  No Data Center has been set. Click the button above to add one.
+                </div>
+              ) : (
+                <div className="max-h-[240px] space-y-3 overflow-y-auto pr-2">
+                  {allocatedRacks.map((rack, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <Input
+                          placeholder="DC Name"
+                          value={rack.dc_name}
+                          onChange={(e) =>
+                            handleAllocatedRacksChange(index, "dc_name", e.target.value)
+                          }
+                          className={rack.dc_name.trim() ? "" : "border-red-300"}
+                        />
+                      </div>
+                      <div className="flex w-8 items-center justify-center">
+                        <span className="text-gray-500">to</span>
+                      </div>
+                      <div className="flex-1">
+                        <Input
+                          type="number"
+                          placeholder="Number of Racks"
+                          value={rack.n_racks.toString()}
+                          onChange={(e) =>
+                            handleAllocatedRacksChange(index, "n_racks", e.target.value)
+                          }
+                          className={rack.n_racks > 0 ? "" : "border-red-300"}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeAllocatedRacks(index)}
+                        className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {hasEmptyAllocatedRacks && (
+                <p className="text-sm text-red-500">
+                  Please choose all DC names and number of racks or delete the blanks
+                </p>
+              )}
+            </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit">Add</Button>
+              <Button type="submit" disabled={hasEmptyAllocatedRacks}>
+                Add
+              </Button>
             </DialogFooter>
           </form>
         </Form>
