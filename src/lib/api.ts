@@ -19,6 +19,36 @@ export async function addDC(body: Pick<mytype.Datacenter, "name" | "height">) {
 }
 
 export async function getAllDC(): Promise<mytype.SimpleDatacenter[]> {
+  return [
+    {
+      name: "DC-North-01",
+      height: 42,
+      n_rooms: 5,
+      n_racks: 50,
+      n_hosts: 200,
+    },
+    {
+      name: "DC-South-02",
+      height: 48,
+      n_rooms: 3,
+      n_racks: 30,
+      n_hosts: 120,
+    },
+    {
+      name: "DC-East-03",
+      height: 40,
+      n_rooms: 4,
+      n_racks: 40,
+      n_hosts: 160,
+    },
+    {
+      name: "DC-West-04",
+      height: 45,
+      n_rooms: 6,
+      n_racks: 60,
+      n_hosts: 240,
+    },
+  ];
   const response = await fetch(`${baseUrl}/dc/all`);
   if (!response.ok) {
     return Promise.reject(new Error("Failed to fetch datacenters"));
