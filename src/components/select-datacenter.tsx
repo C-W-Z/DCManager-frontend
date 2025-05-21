@@ -19,6 +19,8 @@ interface DataCenterSelectProps {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
+  allocatedRacks: { dc_name: string; n_racks: number }[];
+  index: number;
 }
 
 export function DataCenterSelect({
@@ -26,16 +28,28 @@ export function DataCenterSelect({
   value,
   onChange,
   disabled,
+  allocatedRacks,
+  index,
 }: DataCenterSelectProps) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Filter data centers based on search query
+  // Filter data centers based on search query and exclude already selected dc_names
   const filteredDataCenters = searchQuery
-    ? dataCenters.filter((dc) => dc.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    : dataCenters;
+    ? dataCenters.filter((dc) => {
+        const isAlreadySelected = allocatedRacks.some(
+          (rack, i) => i !== index && rack.dc_name === dc.name,
+        );
+        return !isAlreadySelected && dc.name.toLowerCase().includes(searchQuery.toLowerCase());
+      })
+    : dataCenters.filter((dc) => {
+        const isAlreadySelected = allocatedRacks.some(
+          (rack, i) => i !== index && rack.dc_name === dc.name,
+        );
+        return !isAlreadySelected;
+      });
 
   // Focus CommandInput when Popover opens
   useEffect(() => {
