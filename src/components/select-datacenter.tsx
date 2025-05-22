@@ -96,7 +96,7 @@ export function DataCenterSelect({
           className="w-full justify-between border-black"
           disabled={disabled}
         >
-          {disabled ? "Loading data centers..." : value || "None"}
+          {value || "None"}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0" />
         </Button>
       </PopoverTrigger>
