@@ -44,6 +44,7 @@ export default function ServiceBoard() {
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-12">
+      <div className="text-2xl font-bold">Services</div>
       <div className="flex flex-row justify-end gap-4">
         <LoadingButton isLoading={loading} onClick={() => LoadService(user.username)}>
           Refresh
@@ -73,7 +74,7 @@ function ServiceCard({ service }: { service: SimpleService }) {
         <CardDescription>Card Description</CardDescription>
       </CardHeader>
       <CardContent>
-        <p>Card Content</p>
+        <p>Total Hosts: {service.n_hosts}</p>
       </CardContent>
       <CardFooter>
         <p>Card Footer</p>

@@ -1465,8 +1465,8 @@
             "name": "TPE1-R103-RACK-4",
             "height": 60,
             "capacity": 60,
-            "n_hosts": 0,
-            "service_name": "",
+            "n_hosts": 4,
+            "service_name": "nginx-proxy-a",
             "room_name": "TPE1-ROOM-103"
           },
           {
@@ -1474,12 +1474,57 @@
             "height": 60,
             "capacity": 60,
             "n_hosts": 0,
-            "service_name": "",
+            "service_name": "nginx-proxy-a",
             "room_name": "TPE1-ROOM-103"
           }
         ]
       },
-      "hosts": [],
+      "hosts": [
+        {
+          "name": "nginx-proxy-a-host-1",
+          "height": 2,
+          "ip": "192.168.8.0",
+          "running": false,
+          "service_name": "nginx-proxy-a",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-103",
+          "rack_name": "TPE1-R103-RACK-4",
+          "pos": 1
+        },
+        {
+          "name": "nginx-proxy-a-host-2",
+          "height": 3,
+          "ip": "192.168.8.1",
+          "running": false,
+          "service_name": "nginx-proxy-a",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-103",
+          "rack_name": "TPE1-R103-RACK-4",
+          "pos": 3
+        },
+        {
+          "name": "nginx-proxy-a-host-3",
+          "height": 2,
+          "ip": "192.168.8.2",
+          "running": true,
+          "service_name": "nginx-proxy-a",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-103",
+          "rack_name": "TPE1-R103-RACK-4",
+          "pos": 6
+        },
+        {
+          "name": "nginx-proxy-a-host-4",
+          "height": 4,
+          "ip": "192.168.8.3",
+          "running": true,
+          "service_name": "nginx-proxy-a",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-103",
+          "rack_name": "TPE1-R103-RACK-4",
+          "pos": 8
+        }
+      ],
       "username": "user1",
       "allocated_subnets": ["192.168.8.0/30"],
       "total_ip_list": ["192.168.8.0", "192.168.8.1", "192.168.8.2", "192.168.8.3"],
@@ -1493,8 +1538,8 @@
             "name": "TPE1-R101-RACK-1",
             "height": 60,
             "capacity": 60,
-            "n_hosts": 0,
-            "service_name": "",
+            "n_hosts": 4,
+            "service_name": "auth-service-b",
             "room_name": "TPE1-ROOM-101"
           },
           {
@@ -1502,15 +1547,15 @@
             "height": 60,
             "capacity": 60,
             "n_hosts": 0,
-            "service_name": "",
+            "service_name": "auth-service-b",
             "room_name": "TPE1-ROOM-103"
           },
           {
             "name": "TPE1-R103-RACK-1",
             "height": 60,
             "capacity": 60,
-            "n_hosts": 0,
-            "service_name": "",
+            "n_hosts": 4,
+            "service_name": "auth-service-b",
             "room_name": "TPE1-ROOM-103"
           }
         ],
@@ -1519,8 +1564,8 @@
             "name": "TYO1-R101-RACK-1",
             "height": 60,
             "capacity": 60,
-            "n_hosts": 0,
-            "service_name": "",
+            "n_hosts": 2,
+            "service_name": "auth-service-b",
             "room_name": "TYO1-ROOM-101"
           },
           {
@@ -1528,20 +1573,142 @@
             "height": 60,
             "capacity": 60,
             "n_hosts": 0,
-            "service_name": "",
+            "service_name": "auth-service-b",
             "room_name": "TYO1-ROOM-104"
           },
           {
             "name": "TYO1-R102-RACK-1",
             "height": 42,
             "capacity": 42,
-            "n_hosts": 0,
-            "service_name": "",
+            "n_hosts": 1,
+            "service_name": "auth-service-b",
             "room_name": "TYO1-ROOM-102"
           }
         ]
       },
-      "hosts": [],
+      "hosts": [
+        {
+          "name": "auth-service-b-host-1",
+          "height": 1,
+          "ip": "192.168.199.0",
+          "running": false,
+          "service_name": "auth-service-b",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-101",
+          "rack_name": "TPE1-R101-RACK-1",
+          "pos": 1
+        },
+        {
+          "name": "auth-service-b-host-2",
+          "height": 2,
+          "ip": "192.168.199.1",
+          "running": false,
+          "service_name": "auth-service-b",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-101",
+          "rack_name": "TPE1-R101-RACK-1",
+          "pos": 2
+        },
+        {
+          "name": "auth-service-b-host-3",
+          "height": 2,
+          "ip": "192.168.199.2",
+          "running": true,
+          "service_name": "auth-service-b",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-101",
+          "rack_name": "TPE1-R101-RACK-1",
+          "pos": 4
+        },
+        {
+          "name": "auth-service-b-host-4",
+          "height": 1,
+          "ip": "192.168.199.3",
+          "running": false,
+          "service_name": "auth-service-b",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-101",
+          "rack_name": "TPE1-R101-RACK-1",
+          "pos": 6
+        },
+        {
+          "name": "auth-service-b-host-5",
+          "height": 4,
+          "ip": "192.168.199.4",
+          "running": false,
+          "service_name": "auth-service-b",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-103",
+          "rack_name": "TPE1-R103-RACK-1",
+          "pos": 1
+        },
+        {
+          "name": "auth-service-b-host-6",
+          "height": 2,
+          "ip": "192.168.199.5",
+          "running": true,
+          "service_name": "auth-service-b",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-103",
+          "rack_name": "TPE1-R103-RACK-1",
+          "pos": 5
+        },
+        {
+          "name": "auth-service-b-host-7",
+          "height": 1,
+          "ip": "192.168.199.6",
+          "running": true,
+          "service_name": "auth-service-b",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-103",
+          "rack_name": "TPE1-R103-RACK-1",
+          "pos": 7
+        },
+        {
+          "name": "auth-service-b-host-8",
+          "height": 3,
+          "ip": "192.168.199.7",
+          "running": true,
+          "service_name": "auth-service-b",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-103",
+          "rack_name": "TPE1-R103-RACK-1",
+          "pos": 8
+        },
+        {
+          "name": "auth-service-b-host-9",
+          "height": 3,
+          "ip": "192.168.199.8",
+          "running": true,
+          "service_name": "auth-service-b",
+          "dc_name": "TOKYO-A1",
+          "room_name": "TYO1-ROOM-101",
+          "rack_name": "TYO1-R101-RACK-1",
+          "pos": 1
+        },
+        {
+          "name": "auth-service-b-host-10",
+          "height": 1,
+          "ip": "192.168.199.9",
+          "running": true,
+          "service_name": "auth-service-b",
+          "dc_name": "TOKYO-A1",
+          "room_name": "TYO1-ROOM-101",
+          "rack_name": "TYO1-R101-RACK-1",
+          "pos": 4
+        },
+        {
+          "name": "auth-service-b-host-11",
+          "height": 2,
+          "ip": "192.168.199.10",
+          "running": true,
+          "service_name": "auth-service-b",
+          "dc_name": "TOKYO-A1",
+          "room_name": "TYO1-ROOM-102",
+          "rack_name": "TYO1-R102-RACK-1",
+          "pos": 1
+        }
+      ],
       "username": "user1",
       "allocated_subnets": ["192.168.199.0/26"],
       "total_ip_list": [
@@ -1674,16 +1841,16 @@
             "name": "TPE2-R102-RACK-2",
             "height": 42,
             "capacity": 42,
-            "n_hosts": 0,
-            "service_name": "",
+            "n_hosts": 2,
+            "service_name": "palworld-server-a",
             "room_name": "TPE2-ROOM-102"
           },
           {
             "name": "TPE2-R102-RACK-4",
             "height": 42,
             "capacity": 42,
-            "n_hosts": 0,
-            "service_name": "",
+            "n_hosts": 4,
+            "service_name": "palworld-server-a",
             "room_name": "TPE2-ROOM-102"
           }
         ],
@@ -1692,8 +1859,8 @@
             "name": "TYO1-R104-RACK-1",
             "height": 60,
             "capacity": 60,
-            "n_hosts": 0,
-            "service_name": "",
+            "n_hosts": 2,
+            "service_name": "palworld-server-a",
             "room_name": "TYO1-ROOM-104"
           },
           {
@@ -1701,12 +1868,101 @@
             "height": 60,
             "capacity": 60,
             "n_hosts": 0,
-            "service_name": "",
+            "service_name": "palworld-server-a",
             "room_name": "TYO1-ROOM-104"
           }
         ]
       },
-      "hosts": [],
+      "hosts": [
+        {
+          "name": "palworld-server-a-host-1",
+          "height": 1,
+          "ip": "192.168.10.0",
+          "running": false,
+          "service_name": "palworld-server-a",
+          "dc_name": "TAIPEI-C2",
+          "room_name": "TPE2-ROOM-102",
+          "rack_name": "TPE2-R102-RACK-2",
+          "pos": 1
+        },
+        {
+          "name": "palworld-server-a-host-2",
+          "height": 4,
+          "ip": "192.168.10.1",
+          "running": true,
+          "service_name": "palworld-server-a",
+          "dc_name": "TAIPEI-C2",
+          "room_name": "TPE2-ROOM-102",
+          "rack_name": "TPE2-R102-RACK-2",
+          "pos": 2
+        },
+        {
+          "name": "palworld-server-a-host-3",
+          "height": 2,
+          "ip": "192.168.10.2",
+          "running": true,
+          "service_name": "palworld-server-a",
+          "dc_name": "TAIPEI-C2",
+          "room_name": "TPE2-ROOM-102",
+          "rack_name": "TPE2-R102-RACK-4",
+          "pos": 1
+        },
+        {
+          "name": "palworld-server-a-host-4",
+          "height": 4,
+          "ip": "192.168.10.3",
+          "running": false,
+          "service_name": "palworld-server-a",
+          "dc_name": "TAIPEI-C2",
+          "room_name": "TPE2-ROOM-102",
+          "rack_name": "TPE2-R102-RACK-4",
+          "pos": 3
+        },
+        {
+          "name": "palworld-server-a-host-5",
+          "height": 1,
+          "ip": "192.168.11.0",
+          "running": false,
+          "service_name": "palworld-server-a",
+          "dc_name": "TAIPEI-C2",
+          "room_name": "TPE2-ROOM-102",
+          "rack_name": "TPE2-R102-RACK-4",
+          "pos": 7
+        },
+        {
+          "name": "palworld-server-a-host-6",
+          "height": 1,
+          "ip": "192.168.11.1",
+          "running": true,
+          "service_name": "palworld-server-a",
+          "dc_name": "TAIPEI-C2",
+          "room_name": "TPE2-ROOM-102",
+          "rack_name": "TPE2-R102-RACK-4",
+          "pos": 8
+        },
+        {
+          "name": "palworld-server-a-host-7",
+          "height": 3,
+          "ip": "192.168.11.2",
+          "running": false,
+          "service_name": "palworld-server-a",
+          "dc_name": "TOKYO-A1",
+          "room_name": "TYO1-ROOM-104",
+          "rack_name": "TYO1-R104-RACK-1",
+          "pos": 1
+        },
+        {
+          "name": "palworld-server-a-host-8",
+          "height": 4,
+          "ip": "192.168.11.3",
+          "running": false,
+          "service_name": "palworld-server-a",
+          "dc_name": "TOKYO-A1",
+          "room_name": "TYO1-ROOM-104",
+          "rack_name": "TYO1-R104-RACK-1",
+          "pos": 4
+        }
+      ],
       "username": "user2",
       "allocated_subnets": ["192.168.10.0/30", "192.168.11.0/30"],
       "total_ip_list": [
@@ -1729,7 +1985,7 @@
             "name": "TPE1-R102-RACK-3",
             "height": 42,
             "capacity": 42,
-            "n_hosts": 0,
+            "n_hosts": 5,
             "service_name": "",
             "room_name": "TPE1-ROOM-102"
           }
@@ -1739,7 +1995,7 @@
             "name": "TPE2-R101-RACK-2",
             "height": 42,
             "capacity": 42,
-            "n_hosts": 0,
+            "n_hosts": 4,
             "service_name": "",
             "room_name": "TPE2-ROOM-101"
           }
@@ -1749,13 +2005,157 @@
             "name": "TYO1-R102-RACK-2",
             "height": 42,
             "capacity": 42,
-            "n_hosts": 0,
+            "n_hosts": 4,
             "service_name": "",
             "room_name": "TYO1-ROOM-102"
           }
         ]
       },
-      "hosts": [],
+      "hosts": [
+        {
+          "name": "web-hosting-service-host-1",
+          "height": 1,
+          "ip": "192.168.100.128",
+          "running": true,
+          "service_name": "web-hosting-service",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-102",
+          "rack_name": "TPE1-R102-RACK-3",
+          "pos": 1
+        },
+        {
+          "name": "web-hosting-service-host-2",
+          "height": 1,
+          "ip": "192.168.100.129",
+          "running": true,
+          "service_name": "web-hosting-service",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-102",
+          "rack_name": "TPE1-R102-RACK-3",
+          "pos": 2
+        },
+        {
+          "name": "web-hosting-service-host-3",
+          "height": 3,
+          "ip": "192.168.100.130",
+          "running": false,
+          "service_name": "web-hosting-service",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-102",
+          "rack_name": "TPE1-R102-RACK-3",
+          "pos": 3
+        },
+        {
+          "name": "web-hosting-service-host-4",
+          "height": 4,
+          "ip": "192.168.100.131",
+          "running": false,
+          "service_name": "web-hosting-service",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-102",
+          "rack_name": "TPE1-R102-RACK-3",
+          "pos": 6
+        },
+        {
+          "name": "web-hosting-service-host-5",
+          "height": 1,
+          "ip": "192.168.100.132",
+          "running": false,
+          "service_name": "web-hosting-service",
+          "dc_name": "TAIPEI-A1",
+          "room_name": "TPE1-ROOM-102",
+          "rack_name": "TPE1-R102-RACK-3",
+          "pos": 10
+        },
+        {
+          "name": "web-hosting-service-host-6",
+          "height": 1,
+          "ip": "192.168.100.133",
+          "running": true,
+          "service_name": "web-hosting-service",
+          "dc_name": "TAIPEI-C2",
+          "room_name": "TPE2-ROOM-101",
+          "rack_name": "TPE2-R101-RACK-2",
+          "pos": 1
+        },
+        {
+          "name": "web-hosting-service-host-7",
+          "height": 2,
+          "ip": "192.168.100.134",
+          "running": false,
+          "service_name": "web-hosting-service",
+          "dc_name": "TAIPEI-C2",
+          "room_name": "TPE2-ROOM-101",
+          "rack_name": "TPE2-R101-RACK-2",
+          "pos": 2
+        },
+        {
+          "name": "web-hosting-service-host-8",
+          "height": 3,
+          "ip": "192.168.100.135",
+          "running": true,
+          "service_name": "web-hosting-service",
+          "dc_name": "TAIPEI-C2",
+          "room_name": "TPE2-ROOM-101",
+          "rack_name": "TPE2-R101-RACK-2",
+          "pos": 4
+        },
+        {
+          "name": "web-hosting-service-host-9",
+          "height": 4,
+          "ip": "192.168.100.136",
+          "running": true,
+          "service_name": "web-hosting-service",
+          "dc_name": "TAIPEI-C2",
+          "room_name": "TPE2-ROOM-101",
+          "rack_name": "TPE2-R101-RACK-2",
+          "pos": 7
+        },
+        {
+          "name": "web-hosting-service-host-10",
+          "height": 2,
+          "ip": "192.168.100.137",
+          "running": true,
+          "service_name": "web-hosting-service",
+          "dc_name": "TOKYO-A1",
+          "room_name": "TYO1-ROOM-102",
+          "rack_name": "TYO1-R102-RACK-2",
+          "pos": 1
+        },
+        {
+          "name": "web-hosting-service-host-11",
+          "height": 3,
+          "ip": "192.168.100.138",
+          "running": true,
+          "service_name": "web-hosting-service",
+          "dc_name": "TOKYO-A1",
+          "room_name": "TYO1-ROOM-102",
+          "rack_name": "TYO1-R102-RACK-2",
+          "pos": 3
+        },
+        {
+          "name": "web-hosting-service-host-12",
+          "height": 1,
+          "ip": "192.168.100.139",
+          "running": true,
+          "service_name": "web-hosting-service",
+          "dc_name": "TOKYO-A1",
+          "room_name": "TYO1-ROOM-102",
+          "rack_name": "TYO1-R102-RACK-2",
+          "pos": 6
+        },
+        {
+          "name": "web-hosting-service-host-13",
+          "height": 4,
+          "ip": "192.168.100.140",
+          "running": true,
+          "service_name": "web-hosting-service",
+          "dc_name": "TOKYO-A1",
+          "room_name": "TYO1-ROOM-102",
+          "rack_name": "TYO1-R102-RACK-2",
+          "pos": 7
+        }
+      ],
       "username": "user2",
       "allocated_subnets": ["192.168.100.128/28", "172.36.40.0/30"],
       "total_ip_list": [
