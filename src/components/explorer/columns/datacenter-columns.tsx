@@ -6,17 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { SimpleDatacenter, User } from "@/lib/type";
 import { DatacenterRowActions } from "./datacenter-actions";
+import { Link } from "react-router-dom";
 
 interface DataCenterColumnsProps {
-  onSelect: (room: SimpleDatacenter) => void;
   onUpdateSuccess: (dc: SimpleDatacenter) => void;
   onDeleteSuccess: (ids: string[]) => void;
   user?: User;
 }
 
-function getCommonColumns(
-  onSelect: (room: SimpleDatacenter) => void,
-): ColumnDef<SimpleDatacenter>[] {
+function getCommonColumns(): ColumnDef<SimpleDatacenter>[] {
   return [
     {
       accessorKey: "name",
@@ -29,18 +27,18 @@ function getCommonColumns(
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => (
-        <div className="pl-4 text-left font-medium">
-          <button
-            className="hover:underline focus:outline-none"
-            onClick={() => onSelect(row.original)}
-          >
-            {row.getValue("name")}
-          </button>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const name: string = row.getValue("name");
+        return (
+          <div className="pl-4 text-left font-medium">
+            <Link to={`/explorer/dc/${name}`} className="hover:underline focus:outline-none">
+              {name}
+            </Link>
+          </div>
+        );
+      },
     },
-    ...["n_rooms", "height", "n_racks", "n_hosts"].map((key) => ({
+    ...["height", "n_rooms", "n_racks", "n_hosts"].map((key) => ({
       accessorKey: key,
       header: ({ column }: { column: Column<SimpleDatacenter> }) => (
         <Button
@@ -67,12 +65,11 @@ function getCommonColumns(
 }
 
 export function dataCenterColumns({
-  onSelect,
   onUpdateSuccess,
   onDeleteSuccess,
   user,
 }: DataCenterColumnsProps): ColumnDef<SimpleDatacenter>[] {
-  const baseColumns = getCommonColumns(onSelect);
+  const baseColumns = getCommonColumns();
 
   // admin 有 actions 欄位
   if (user?.role === "admin") {

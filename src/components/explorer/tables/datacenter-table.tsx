@@ -10,16 +10,12 @@ import {
   type Count,
   DataCenterSummary,
 } from "@/components/explorer/summary/datacenter-summary";
-import { useOutletContext } from "react-router-dom";
 import { useUser } from "@/context/use-user";
 
-interface OutletContext {
-  onSelect: (path: string) => void;
-}
 
 export default function DataCenterTable() {
   const { user } = useUser();
-  const { onSelect } = useOutletContext<OutletContext>();
+
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
   const [totalCounts, setTotalCounts] = useState<Count>({ dc: 0, room: 0, rack: 0, host: 0 });
   const [loading, setLoading] = useState(false);
@@ -80,7 +76,6 @@ export default function DataCenterTable() {
   };
 
   const columns = dataCenterColumns({
-    onSelect: (dc) => onSelect(`/explorer/dc/${dc.name}`),
     onUpdateSuccess,
     onDeleteSuccess,
     user: user || undefined,
