@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { LoadingButton } from "@/components/loading-button";
 
 export default function ServiceBoard() {
   const [services, setServices] = useState<SimpleService[]>([]);
@@ -42,15 +43,13 @@ export default function ServiceBoard() {
   }
 
   return (
-    <div className="flex h-full w-full flex-col px-12 pt-12">
-      <button
-        onClick={() => LoadService(user.username)}
-        className="rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
-        disabled={loading}
-      >
-        {loading ? "Loading..." : "Refresh"}
-      </button>
-      <AddServiceDialog />
+    <div className="flex h-full w-full flex-col gap-4 p-12">
+      <div className="flex flex-row justify-end gap-4">
+        <LoadingButton isLoading={loading} onClick={() => LoadService(user.username)}>
+          Refresh
+        </LoadingButton>
+        <AddServiceDialog />
+      </div>
       {services.length === 0 ? (
         <div>
           <h1 className="text-lg font-semibold">No services found.</h1>

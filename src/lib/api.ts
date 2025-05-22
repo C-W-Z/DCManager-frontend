@@ -13,6 +13,8 @@ export async function addDC(
   body: Pick<t.Datacenter, "name" | "height">,
 ): Promise<t.Datacenter> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const newDC = {
       ...body,
       n_rooms: 0,
@@ -39,6 +41,8 @@ export async function addDC(
 
 export async function getAllDC(): Promise<t.SimpleDatacenter[]> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     return MockData.data_centers as t.SimpleDatacenter[];
   } else {
     const response = await fetch(`${baseUrl}/dc/all`);
@@ -51,6 +55,8 @@ export async function getAllDC(): Promise<t.SimpleDatacenter[]> {
 
 export async function getDC(dc_name: string): Promise<t.Datacenter> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const dc = MockData.data_centers.find((dc) => dc.name === dc_name);
     if (!dc) {
       return Promise.reject(new Error("Datacenter not found"));
@@ -70,6 +76,8 @@ export async function modifyDC(
   body: Partial<Pick<t.Datacenter, "name" | "height">>,
 ): Promise<t.Datacenter> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const dc = MockData.data_centers.find((dc) => dc.name === dc_name);
     if (!dc) {
       return Promise.reject(new Error("Datacenter not found"));
@@ -93,6 +101,8 @@ export async function modifyDC(
 
 export async function deleteDC(dc_name: string): Promise<void> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const index = MockData.data_centers.findIndex((dc) => dc.name === dc_name);
     if (index === -1) {
       return Promise.reject(new Error("Datacenter not found"));
@@ -115,6 +125,8 @@ export async function addRoom(
   body: Pick<t.Room, "name" | "height" | "dc_name">,
 ): Promise<t.Room> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const newRoom = {
       ...body,
       n_racks: 0,
@@ -140,6 +152,8 @@ export async function addRoom(
 
 export async function getRoom(room_name: string): Promise<t.Room> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const room = MockData.rooms.find((room) => room.name === room_name);
     if (!room) {
       return Promise.reject(new Error("Room not found"));
@@ -159,6 +173,8 @@ export async function modifyRoom(
   body: Partial<Pick<t.Room, "name" | "height" | "dc_name">>,
 ): Promise<t.Room> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const room = MockData.rooms.find((room) => room.name === room_name);
     if (!room) {
       return Promise.reject(new Error("Room not found"));
@@ -182,6 +198,8 @@ export async function modifyRoom(
 
 export async function deleteRoom(room_name: string): Promise<void> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const index = MockData.rooms.findIndex((room) => room.name === room_name);
     if (index === -1) {
       return Promise.reject(new Error("Room not found"));
@@ -204,6 +222,8 @@ export async function addRack(
   body: Pick<t.Rack, "name" | "height" | "room_name">,
 ): Promise<t.Rack> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const room = MockData.rooms.find((room) => room.name === body.room_name);
     if (!room) {
       return Promise.reject(new Error("Room not found"));
@@ -235,6 +255,8 @@ export async function addRack(
 
 export async function getRack(rack_name: string): Promise<t.Rack> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const rack = MockData.racks.find((rack) => rack.name === rack_name);
     if (!rack) {
       return Promise.reject(new Error("Rack not found"));
@@ -254,6 +276,8 @@ export async function modifyRack(
   body: Partial<Pick<t.Rack, "name" | "height" | "room_name" | "service_name">>,
 ): Promise<t.Rack> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const rack = MockData.racks.find((rack) => rack.name === rack_name);
     if (!rack) {
       return Promise.reject(new Error("Rack not found"));
@@ -277,6 +301,8 @@ export async function modifyRack(
 
 export async function deleteRack(rack_name: string): Promise<void> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const index = MockData.racks.findIndex((rack) => rack.name === rack_name);
     if (index === -1) {
       return Promise.reject(new Error("Rack not found"));
@@ -299,6 +325,8 @@ export async function addHost(
   body: Pick<t.Host, "name" | "height" | "rack_name" | "pos">,
 ): Promise<t.Host> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const rack = MockData.racks.find((rack) => rack.name === body.rack_name);
     if (!rack) {
       return Promise.reject(new Error("Rack not found"));
@@ -335,6 +363,8 @@ export async function addHost(
 
 export async function getAllHost(): Promise<t.Host[]> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     return MockData.hosts as t.Host[];
   } else {
     const response = await fetch(`${baseUrl}/host/all`);
@@ -347,6 +377,8 @@ export async function getAllHost(): Promise<t.Host[]> {
 
 export async function getHost(host_name: string): Promise<t.Host> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const host = MockData.hosts.find((host) => host.name === host_name);
     if (!host) {
       return Promise.reject(new Error("Host not found"));
@@ -366,6 +398,8 @@ export async function modifyHost(
   body: Partial<Pick<t.Host, "name" | "height" | "running" | "rack_name" | "pos">>,
 ): Promise<t.Host> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const host = MockData.hosts.find((host) => host.name === host_name);
     if (!host) {
       return Promise.reject(new Error("Host not found"));
@@ -389,6 +423,8 @@ export async function modifyHost(
 
 export async function deleteHost(host_name: string): Promise<void> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const index = MockData.hosts.findIndex((host) => host.name === host_name);
     if (index === -1) {
       return Promise.reject(new Error("Host not found"));
@@ -410,6 +446,8 @@ export async function addService(
   body: Pick<t.SimpleService, "name" | "n_allocated_racks" | "allocated_subnets" | "username">,
 ): Promise<t.Service> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     // 這裡沒有做任何分配
     const newService = {
       name: body.name,
@@ -442,6 +480,8 @@ export async function addService(
 
 export async function getAllService(): Promise<t.SimpleService[]> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     return MockData.services.map(
       (service) =>
         ({
@@ -471,6 +511,8 @@ export async function getAllService(): Promise<t.SimpleService[]> {
 
 export async function getUserService(username: string): Promise<t.SimpleService[]> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     return MockData.services
       .filter((service) => service.username === username)
       .map(
@@ -502,6 +544,8 @@ export async function getUserService(username: string): Promise<t.SimpleService[
 
 export async function getService(service_name: string): Promise<t.Service> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const service = MockData.services.find((service) => service.name === service_name);
     if (!service) {
       return Promise.reject(new Error("Service not found"));
@@ -522,6 +566,8 @@ export async function modifyService(
   body: Partial<Pick<t.SimpleService, "name" | "n_allocated_racks" | "allocated_subnets">>,
 ): Promise<t.Service> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     // 這裡沒有做任何修改
     const service = MockData.services.find((service) => service.name === service_name);
     if (!service) {
@@ -545,6 +591,8 @@ export async function modifyService(
 
 export async function deleteService(service_name: string): Promise<void> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const index = MockData.services.findIndex((service) => service.name === service_name);
     if (index === -1) {
       return Promise.reject(new Error("Service not found"));
@@ -565,10 +613,13 @@ export async function deleteService(service_name: string): Promise<void> {
 /* User */
 export async function addUser(body: Pick<t.User, "username" | "role">): Promise<t.User> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const newUser = {
       ...body,
     } as t.User;
     MockData.users.push(newUser);
+
     return newUser;
   } else {
     // TODO: 這裡的 Endpoint 還沒決定
@@ -588,6 +639,8 @@ export async function addUser(body: Pick<t.User, "username" | "role">): Promise<
 
 export async function getUserRole(username: string): Promise<t.User> {
   if (mode === "mock") {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const user = MockData.users.find((user) => user.username === username);
     if (!user) {
       return Promise.reject(new Error("User not found"));
