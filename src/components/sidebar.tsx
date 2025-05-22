@@ -64,7 +64,13 @@ export default function Sidebar() {
         href="/host"
         active={currentPath === "/host"}
       />
-      <SidebarItem iconId="service" label="Services" collapsed={collapsed} href="/service" />
+      <SidebarItem
+        iconId="service"
+        label="Services"
+        collapsed={collapsed}
+        href="/service"
+        active={currentPath === "/service"}
+      />
       <div className="flex-1"></div>
       <SidebarItem
         label="Logout"
@@ -75,7 +81,7 @@ export default function Sidebar() {
       >
         <LogOut />
       </SidebarItem>
-      <SidebarItem iconId="settings" label="Setting" collapsed={collapsed} />
+      {/* <SidebarItem iconId="settings" label="Setting" collapsed={collapsed} /> */}
     </div>
   );
 }
