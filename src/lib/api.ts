@@ -1,342 +1,563 @@
-import * as mytype from "./type";
+import * as t from "./type";
+import d from "./mock_data.json";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 console.log("baseUrl", baseUrl);
+const mode = import.meta.env.VITE_API_MODE;
+console.log("mode", mode);
+
+const MockData = d as t.MockDataJson;
 
 /* Datacenter */
-export async function addDC(body: Pick<mytype.Datacenter, "name" | "height">) {
-  const response = await fetch(`${baseUrl}/dc/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to add datacenter"));
+export async function addDC(
+  body: Pick<t.Datacenter, "name" | "height">,
+): Promise<t.Datacenter> {
+  if (mode === "mock") {
+    const newDC = {
+      ...body,
+      n_rooms: 0,
+      n_racks: 0,
+      n_hosts: 0,
+      rooms: [],
+    } as t.Datacenter;
+    MockData.data_centers.push(newDC);
+    return newDC;
+  } else {
+    const response = await fetch(`${baseUrl}/dc/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to add datacenter"));
+    }
+    return response.json();
   }
-  return response.json();
 }
 
-export async function getAllDC(): Promise<mytype.SimpleDatacenter[]> {
-  return [
-    {
-      name: "DC-North-01",
-      height: 42,
-      n_rooms: 5,
-      n_racks: 50,
-      n_hosts: 200,
-    },
-    {
-      name: "DC-South-02",
-      height: 48,
-      n_rooms: 3,
-      n_racks: 30,
-      n_hosts: 120,
-    },
-    {
-      name: "DC-East-03",
-      height: 40,
-      n_rooms: 4,
-      n_racks: 40,
-      n_hosts: 160,
-    },
-    {
-      name: "DC-West-04",
-      height: 45,
-      n_rooms: 6,
-      n_racks: 60,
-      n_hosts: 240,
-    },
-  ];
-  const response = await fetch(`${baseUrl}/dc/all`);
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to fetch datacenters"));
+export async function getAllDC(): Promise<t.SimpleDatacenter[]> {
+  if (mode === "mock") {
+    return MockData.data_centers as t.SimpleDatacenter[];
+  } else {
+    const response = await fetch(`${baseUrl}/dc/all`);
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to fetch datacenters"));
+    }
+    return response.json();
   }
-  return response.json();
 }
 
-export async function getDC(dc_name: string): Promise<mytype.Datacenter> {
-  const response = await fetch(`${baseUrl}/dc/${dc_name}`);
-  if (!response.ok) {
-    return Promise.reject(new Error("Datacenter not found"));
+export async function getDC(dc_name: string): Promise<t.Datacenter> {
+  if (mode === "mock") {
+    const dc = MockData.data_centers.find((dc) => dc.name === dc_name);
+    if (!dc) {
+      return Promise.reject(new Error("Datacenter not found"));
+    }
+    return dc as t.Datacenter;
+  } else {
+    const response = await fetch(`${baseUrl}/dc/${dc_name}`);
+    if (!response.ok) {
+      return Promise.reject(new Error("Datacenter not found"));
+    }
+    return response.json();
   }
-  return response.json();
 }
 
 export async function modifyDC(
   dc_name: string,
-  body: Partial<Pick<mytype.Datacenter, "name" | "height">>,
-): Promise<void> {
-  const response = await fetch(`${baseUrl}/dc/${dc_name}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to edit datacenter"));
+  body: Partial<Pick<t.Datacenter, "name" | "height">>,
+): Promise<t.Datacenter> {
+  if (mode === "mock") {
+    const dc = MockData.data_centers.find((dc) => dc.name === dc_name);
+    if (!dc) {
+      return Promise.reject(new Error("Datacenter not found"));
+    }
+    Object.assign(dc, body);
+    return dc as t.Datacenter;
+  } else {
+    const response = await fetch(`${baseUrl}/dc/${dc_name}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to edit datacenter"));
+    }
+    return response.json();
   }
-  return;
 }
 
 export async function deleteDC(dc_name: string): Promise<void> {
-  const response = await fetch(`${baseUrl}/dc/${dc_name}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to delete datacenter"));
+  if (mode === "mock") {
+    const index = MockData.data_centers.findIndex((dc) => dc.name === dc_name);
+    if (index === -1) {
+      return Promise.reject(new Error("Datacenter not found"));
+    }
+    MockData.data_centers.splice(index, 1);
+    return Promise.resolve();
+  } else {
+    const response = await fetch(`${baseUrl}/dc/${dc_name}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to delete datacenter"));
+    }
+    return Promise.resolve();
   }
-  return;
 }
 
 /* Room */
-export async function addRoom(body: Pick<mytype.Room, "name" | "height" | "dc_name">) {
-  const response = await fetch(`${baseUrl}/room/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to add room"));
+export async function addRoom(
+  body: Pick<t.Room, "name" | "height" | "dc_name">,
+): Promise<t.Room> {
+  if (mode === "mock") {
+    const newRoom = {
+      ...body,
+      n_racks: 0,
+      n_hosts: 0,
+      racks: [],
+    } as t.Room;
+    MockData.rooms.push(newRoom);
+    return newRoom;
+  } else {
+    const response = await fetch(`${baseUrl}/room/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to add room"));
+    }
+    return response.json();
   }
-  return response.json();
 }
 
-export async function getRoom(room_name: string): Promise<mytype.Room> {
-  const response = await fetch(`${baseUrl}/room/${room_name}`);
-  if (!response.ok) {
-    return Promise.reject(new Error("Room not found"));
+export async function getRoom(room_name: string): Promise<t.Room> {
+  if (mode === "mock") {
+    const room = MockData.rooms.find((room) => room.name === room_name);
+    if (!room) {
+      return Promise.reject(new Error("Room not found"));
+    }
+    return room as t.Room;
+  } else {
+    const response = await fetch(`${baseUrl}/room/${room_name}`);
+    if (!response.ok) {
+      return Promise.reject(new Error("Room not found"));
+    }
+    return response.json();
   }
-  return response.json();
 }
 
 export async function modifyRoom(
   room_name: string,
-  body: Partial<Pick<mytype.Room, "name" | "height" | "dc_name">>,
-): Promise<void> {
-  const response = await fetch(`${baseUrl}/room/${room_name}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to edit room"));
+  body: Partial<Pick<t.Room, "name" | "height" | "dc_name">>,
+): Promise<t.Room> {
+  if (mode === "mock") {
+    const room = MockData.rooms.find((room) => room.name === room_name);
+    if (!room) {
+      return Promise.reject(new Error("Room not found"));
+    }
+    Object.assign(room, body);
+    return room as t.Room;
+  } else {
+    const response = await fetch(`${baseUrl}/room/${room_name}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to edit room"));
+    }
+    return response.json();
   }
-  return;
 }
 
 export async function deleteRoom(room_name: string): Promise<void> {
-  const response = await fetch(`${baseUrl}/room/${room_name}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to delete room"));
+  if (mode === "mock") {
+    const index = MockData.rooms.findIndex((room) => room.name === room_name);
+    if (index === -1) {
+      return Promise.reject(new Error("Room not found"));
+    }
+    MockData.rooms.splice(index, 1);
+    return Promise.resolve();
+  } else {
+    const response = await fetch(`${baseUrl}/room/${room_name}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to delete room"));
+    }
+    return Promise.resolve();
   }
-  return;
 }
 
 /* Rack */
-export async function addRack(body: Pick<mytype.Rack, "name" | "height" | "room_name">) {
-  const response = await fetch(`${baseUrl}/rack/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to add rack"));
+export async function addRack(
+  body: Pick<t.Rack, "name" | "height" | "room_name">,
+): Promise<t.Rack> {
+  if (mode === "mock") {
+    const room = MockData.rooms.find((room) => room.name === body.room_name);
+    if (!room) {
+      return Promise.reject(new Error("Room not found"));
+    }
+    const newRack = {
+      ...body,
+      capacity: body.height,
+      n_hosts: 0,
+      hosts: [],
+      service_name: "",
+      dc_name: room.dc_name,
+    } as t.Rack;
+    MockData.racks.push(newRack);
+    return newRack;
+  } else {
+    const response = await fetch(`${baseUrl}/rack/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to add rack"));
+    }
+    return response.json();
   }
-  return response.json();
 }
 
-export async function getRack(rack_name: string): Promise<mytype.Rack> {
-  const response = await fetch(`${baseUrl}/rack/${rack_name}`);
-  if (!response.ok) {
-    return Promise.reject(new Error("Rack not found"));
+export async function getRack(rack_name: string): Promise<t.Rack> {
+  if (mode === "mock") {
+    const rack = MockData.racks.find((rack) => rack.name === rack_name);
+    if (!rack) {
+      return Promise.reject(new Error("Rack not found"));
+    }
+    return rack as t.Rack;
+  } else {
+    const response = await fetch(`${baseUrl}/rack/${rack_name}`);
+    if (!response.ok) {
+      return Promise.reject(new Error("Rack not found"));
+    }
+    return response.json();
   }
-  return response.json();
 }
 
 export async function modifyRack(
   rack_name: string,
-  body: Partial<Pick<mytype.Rack, "name" | "height" | "room_name" | "service_name">>,
-): Promise<void> {
-  const response = await fetch(`${baseUrl}/rack/${rack_name}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to edit rack"));
+  body: Partial<Pick<t.Rack, "name" | "height" | "room_name" | "service_name">>,
+): Promise<t.Rack> {
+  if (mode === "mock") {
+    const rack = MockData.racks.find((rack) => rack.name === rack_name);
+    if (!rack) {
+      return Promise.reject(new Error("Rack not found"));
+    }
+    Object.assign(rack, body);
+    return rack as t.Rack;
+  } else {
+    const response = await fetch(`${baseUrl}/rack/${rack_name}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to edit rack"));
+    }
+    return response.json();
   }
-  return;
 }
 
 export async function deleteRack(rack_name: string): Promise<void> {
-  const response = await fetch(`${baseUrl}/rack/${rack_name}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to delete rack"));
+  if (mode === "mock") {
+    const index = MockData.racks.findIndex((rack) => rack.name === rack_name);
+    if (index === -1) {
+      return Promise.reject(new Error("Rack not found"));
+    }
+    MockData.racks.splice(index, 1);
+    return Promise.resolve();
+  } else {
+    const response = await fetch(`${baseUrl}/rack/${rack_name}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to delete rack"));
+    }
+    return Promise.resolve();
   }
-  return;
 }
 
 /* Host */
 export async function addHost(
-  body: Pick<mytype.Host, "name" | "height" | "rack_name" | "pos">,
-): Promise<string> {
-  const response = await fetch(`${baseUrl}/host/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to add host"));
+  body: Pick<t.Host, "name" | "height" | "rack_name" | "pos">,
+): Promise<t.Host> {
+  if (mode === "mock") {
+    const rack = MockData.racks.find((rack) => rack.name === body.rack_name);
+    if (!rack) {
+      return Promise.reject(new Error("Rack not found"));
+    }
+    const room = MockData.rooms.find((room) => room.name === rack.room_name);
+    if (!room) {
+      return Promise.reject(new Error("Room not found"));
+    }
+
+    const newHost = {
+      ...body,
+      ip: "11.4.5.14",
+      running: false,
+      service_name: rack.service_name,
+      dc_name: room.dc_name,
+      room_name: rack.room_name,
+    } as t.Host;
+    MockData.hosts.push(newHost);
+    return newHost;
+  } else {
+    const response = await fetch(`${baseUrl}/host/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to add host"));
+    }
+    return response.json();
   }
-  const data = await response.json();
-  return data.id as string; // TODO
 }
 
-export async function getAllHost(): Promise<mytype.Host[]> {
-  const response = await fetch(`${baseUrl}/host/all`);
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to fetch hosts"));
+export async function getAllHost(): Promise<t.Host[]> {
+  if (mode === "mock") {
+    return MockData.hosts as t.Host[];
+  } else {
+    const response = await fetch(`${baseUrl}/host/all`);
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to fetch hosts"));
+    }
+    return response.json();
   }
-  return response.json();
 }
 
-export async function getHost(host_name: string): Promise<mytype.Host> {
-  const response = await fetch(`${baseUrl}/host/${host_name}`);
-  if (!response.ok) {
-    return Promise.reject(new Error("Host not found"));
+export async function getHost(host_name: string): Promise<t.Host> {
+  if (mode === "mock") {
+    const host = MockData.hosts.find((host) => host.name === host_name);
+    if (!host) {
+      return Promise.reject(new Error("Host not found"));
+    }
+    return host as t.Host;
+  } else {
+    const response = await fetch(`${baseUrl}/host/${host_name}`);
+    if (!response.ok) {
+      return Promise.reject(new Error("Host not found"));
+    }
+    return response.json();
   }
-  return response.json();
 }
 
 export async function modifyHost(
   host_name: string,
-  body: Partial<Pick<mytype.Host, "name" | "height" | "running" | "rack_name" | "pos">>,
-): Promise<void> {
-  const response = await fetch(`${baseUrl}/host/${host_name}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to edit host"));
+  body: Partial<Pick<t.Host, "name" | "height" | "running" | "rack_name" | "pos">>,
+): Promise<t.Host> {
+  if (mode === "mock") {
+    const host = MockData.hosts.find((host) => host.name === host_name);
+    if (!host) {
+      return Promise.reject(new Error("Host not found"));
+    }
+    Object.assign(host, body);
+    return host as t.Host;
+  } else {
+    const response = await fetch(`${baseUrl}/host/${host_name}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to edit host"));
+    }
+    return response.json();
   }
-  return;
 }
 
 export async function deleteHost(host_name: string): Promise<void> {
+  if (mode === "mock") {
+    const index = MockData.hosts.findIndex((host) => host.name === host_name);
+    if (index === -1) {
+      return Promise.reject(new Error("Host not found"));
+    }
+    MockData.hosts.splice(index, 1);
+    return Promise.resolve();
+  }
   const response = await fetch(`${baseUrl}/host/${host_name}`, {
     method: "DELETE",
   });
   if (!response.ok) {
     return Promise.reject(new Error("Failed to delete host"));
   }
-  return;
+  return Promise.resolve();
 }
 
 /* Service */
 export async function addService(
-  body: Pick<mytype.SimpleService, "name" | "n_allocated_racks" | "allocated_subnet">,
-): Promise<string> {
-  const response = await fetch(`${baseUrl}/service/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to add service"));
+  body: Pick<t.SimpleService, "name" | "n_allocated_racks" | "allocated_subnets" | "username">,
+): Promise<t.Service> {
+  if (mode === "mock") {
+    // 這裡沒有做任何分配
+    const newService = {
+      name: body.name,
+      allocated_racks: {
+        mockDC1: [],
+        mockDC2: [],
+      },
+      hosts: [],
+      allocated_subnets: body.allocated_subnets,
+      username: body.username,
+      total_ip_list: [],
+      available_ip_list: [],
+    } as t.Service;
+    MockData.services.push(newService);
+    return newService;
+  } else {
+    const response = await fetch(`${baseUrl}/service/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to add service"));
+    }
+    return response.json();
   }
-  const data = await response.json();
-  return data.id as string; // TODO
 }
 
-export async function getAllService(): Promise<mytype.SimpleService[]> {
-  const response = await fetch(`${baseUrl}/service/all`);
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to fetch services"));
+export async function getAllService(): Promise<t.SimpleService[]> {
+  if (mode === "mock") {
+    return MockData.services.map(
+      (service) =>
+        ({
+          name: service.name,
+          n_allocated_racks: Object.keys(service.allocated_racks).reduce(
+            (acc, dc) => {
+              acc[dc] = service.allocated_racks[dc].length;
+              return acc;
+            },
+            {} as Record<string, number>,
+          ),
+          n_hosts: service.hosts.length,
+          username: service.username,
+          allocated_subnets: service.allocated_subnets,
+          total_ip_list: service.total_ip_list,
+          available_ip_list: service.available_ip_list,
+        }) as t.SimpleService,
+    );
+  } else {
+    const response = await fetch(`${baseUrl}/service/all`);
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to fetch services"));
+    }
+    return response.json();
   }
-  return response.json();
 }
 
-export async function getService(service_id: string): Promise<mytype.Service> {
-  const response = await fetch(`${baseUrl}/service/${service_id}`);
-  if (!response.ok) {
-    return Promise.reject(new Error("Service not found"));
+export async function getUserService(username: string): Promise<t.SimpleService[]> {
+  if (mode === "mock") {
+    return MockData.services
+      .filter((service) => service.username === username)
+      .map(
+        (service) =>
+          ({
+            name: service.name,
+            n_allocated_racks: Object.keys(service.allocated_racks).reduce(
+              (acc, dc) => {
+                acc[dc] = service.allocated_racks[dc].length;
+                return acc;
+              },
+              {} as Record<string, number>,
+            ),
+            n_hosts: service.hosts.length,
+            username: service.username,
+            allocated_subnets: service.allocated_subnets,
+            total_ip_list: service.total_ip_list,
+            available_ip_list: service.available_ip_list,
+          }) as t.SimpleService,
+      );
+  } else {
+    const response = await fetch(`${baseUrl}/service/user/${username}`);
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to fetch user services"));
+    }
+    return response.json();
   }
-  return response.json();
 }
 
+export async function getService(service_name: string): Promise<t.Service> {
+  if (mode === "mock") {
+    const service = MockData.services.find((service) => service.name === service_name);
+    if (!service) {
+      return Promise.reject(new Error("Service not found"));
+    }
+    return service as t.Service;
+  } else {
+    const response = await fetch(`${baseUrl}/service/${service_name}`);
+    if (!response.ok) {
+      return Promise.reject(new Error("Service not found"));
+    }
+    return response.json();
+  }
+}
+
+// important: <n_allocated_racks> <allocated_subnets> 在這裡表示增加的量，而非最終修改值
 export async function modifyService(
-  service_id: string,
-  body: Pick<mytype.SimpleService, "name">,
-): Promise<void> {
-  const response = await fetch(`${baseUrl}/service/${service_id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to modify service"));
+  service_name: string,
+  body: Partial<Pick<t.SimpleService, "name" | "n_allocated_racks" | "allocated_subnets">>,
+): Promise<t.Service> {
+  if (mode === "mock") {
+    // 這裡沒有做任何修改
+    const service = MockData.services.find((service) => service.name === service_name);
+    if (!service) {
+      return Promise.reject(new Error("Service not found"));
+    }
+    return service as t.Service;
+  } else {
+    const response = await fetch(`${baseUrl}/service/${service_name}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to edit service"));
+    }
+    return response.json();
   }
-  return;
 }
 
-export async function extendServiceRack(service_id: string, num: number): Promise<void> {
-  const response = await fetch(`${baseUrl}/service/${service_id}/rack/extend`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ num }),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to extend service rack"));
+export async function deleteService(service_name: string): Promise<void> {
+  if (mode === "mock") {
+    const index = MockData.services.findIndex((service) => service.name === service_name);
+    if (index === -1) {
+      return Promise.reject(new Error("Service not found"));
+    }
+    MockData.services.splice(index, 1);
+    return Promise.resolve();
+  } else {
+    const response = await fetch(`${baseUrl}/service/${service_name}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to delete service"));
+    }
+    return Promise.resolve();
   }
-  return;
-}
-
-export async function extendServiceIP(service_id: string, num: number): Promise<void> {
-  const response = await fetch(`${baseUrl}/service/${service_id}/ip/extend`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ num }),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to extend service IP"));
-  }
-  return;
-}
-
-export async function deleteService(service_id: string): Promise<void> {
-  const response = await fetch(`${baseUrl}/service/${service_id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to delete service"));
-  }
-  return;
 }

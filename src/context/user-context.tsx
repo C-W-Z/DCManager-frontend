@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, type ReactNode } from "react";
 import { type User, UserContext } from "./use-user";
 

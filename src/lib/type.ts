@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { User } from "@/context/use-user";
 
 export type Host = z.infer<typeof host_schema>;
 export const host_schema = z.object({
@@ -76,9 +77,10 @@ export const simple_datacenter_schema = datacenter_schema.pick({
 export type Service = z.infer<typeof service_schema>;
 export const service_schema = z.object({
   name: z.string(),
-  allocated_racks: z.array(simple_rack_schema),
+  allocated_racks: z.record(z.string(), z.array(simple_rack_schema)),
   hosts: z.array(host_schema),
-  allocated_subnets: z.string(),
+  username: z.string(),
+  allocated_subnets: z.array(z.string()),
   total_ip_list: z.array(z.string().ip()),
   available_ip_list: z.array(z.string().ip()),
 });
@@ -86,17 +88,19 @@ export const service_schema = z.object({
 export type SimpleService = z.infer<typeof simple_service_schema>;
 export const simple_service_schema = z.object({
   name: z.string(),
-  n_allocated_racks: z.number().int(),
+  n_allocated_racks: z.record(z.string(), z.number().int()),
   n_hosts: z.number().int(),
-  allocated_subnet: z.string(),
+  username: z.string(),
+  allocated_subnets: z.array(z.string()),
   total_ip_list: z.array(z.string().ip()),
   available_ip_list: z.array(z.string().ip()),
 });
 
 export type MockDataJson = {
-  dc: Datacenter[];
-  room: Room[];
-  rack: Rack[];
-  host: Host[];
-  service: Service[];
+  data_centers: Datacenter[];
+  rooms: Room[];
+  racks: Rack[];
+  hosts: Host[];
+  services: Service[];
+  users: User[];
 };
