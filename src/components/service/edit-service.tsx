@@ -20,27 +20,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
-import { simple_service_schema, SimpleDatacenter } from "@/lib/type";
+import { Service, simple_service_schema, SimpleDatacenter } from "@/lib/type";
 import { toast } from "sonner";
-import { addService, getAllDC } from "@/lib/api";
-import Icon from "@/components/icon";
-import { Plus, Trash2 } from "lucide-react";
+import { getAllDC, modifyService } from "@/lib/api";
+import { Edit, Plus, Trash2 } from "lucide-react";
 import { Label } from "../ui/label";
 import { DataCenterSelect } from "../select-datacenter";
-import { useUser } from "@/context/use-user";
 
 // Update form_schema to make allocated_subnet a string array
 const form_schema = z.object({
   name: simple_service_schema.shape.name,
   allocated_subnet: z.string().min(1, "IP Subnet is required").array(),
-  // .min(1, "At least one IP Subnet is required"),
 });
 
 type RackAllocation = { dc_name: string; n_racks: number };
 
-export function AddServiceDialog() {
-  const { user } = useUser();
+interface EditServiceDialogProps {
+  service: Service;
+  onUpdateSuccess?: () => void;
+}
 
+export function EditServiceDialog({ service, onUpdateSuccess }: EditServiceDialogProps) {
   const [open, setOpen] = useState(false);
   const [allocatedRacks, setAllocatedRacks] = useState<RackAllocation[]>([]);
   const [allocatedSubnets, setAllocatedSubnets] = useState<string[]>([""]);
@@ -53,8 +53,8 @@ export function AddServiceDialog() {
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
     defaultValues: {
-      name: "",
-      allocated_subnet: [""],
+      name: service.name,
+      allocated_subnet: service.allocated_subnets,
     },
   });
 
@@ -139,8 +139,6 @@ export function AddServiceDialog() {
   };
 
   function onSubmit(values: z.infer<typeof form_schema>) {
-    if (!user) return
-
     setErrorMessage(null);
     const n_allocated_racks = allocatedRacks.reduce(
       (acc, rack) => {
@@ -152,19 +150,18 @@ export function AddServiceDialog() {
       {} as Record<string, number>,
     );
 
-    setLoading(true);
-
     console.log({
       name: values.name,
       n_allocated_racks,
       allocated_subnet: values.allocated_subnet,
     });
 
-    addService({
+    setLoading(true);
+
+    modifyService(service.name, {
       name: values.name,
       n_allocated_racks,
       allocated_subnets: values.allocated_subnet,
-      username: user.username,
     })
       .then(() => {
         toast.success(`Service ${values.name} added successfully!`);
@@ -172,6 +169,7 @@ export function AddServiceDialog() {
         setAllocatedRacks([]);
         setAllocatedSubnets([""]);
         setOpen(false);
+        if (onUpdateSuccess) onUpdateSuccess();
       })
       .catch((error) => {
         console.error("Error adding service:", error);
@@ -200,13 +198,13 @@ export function AddServiceDialog() {
     >
       <DialogTrigger asChild>
         <Button className="flex h-fit w-fit flex-row items-center justify-start gap-3 text-sm font-bold">
-          <Icon id="add" className="size-4 fill-white" />
-          <p className="pr-2">New Service</p>
+          <Edit />
+          <p className="pr-2">Edit</p>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[400px] [&>button]:hidden">
         <DialogHeader>
-          <DialogTitle>Add New Service</DialogTitle>
+          <DialogTitle>Edit Service</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
