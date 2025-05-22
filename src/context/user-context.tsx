@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { UserContext } from "./use-user";
 import { User } from "@/lib/type";
 
@@ -10,22 +10,32 @@ export function UserProvider({ children }: { children: ReactNode }) {
     };
   });
 
-  // useEffect(() => {
-  // fetch user
-  // login() if fetch success
-  // }, []);
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    const storedRole = localStorage.getItem("role");
+    if (storedUsername && storedRole) {
+      setUser({
+        username: JSON.parse(storedUsername),
+        role: JSON.parse(storedRole),
+      });
+    } else {
+      setUser(null);
+    }
+  }, []);
 
   const login = (username: string, role: "admin" | "normal") => {
     setUser({
       username,
       role,
     });
-    console.log(`login as ${username} (${role})`);
+    localStorage.setItem("username", JSON.stringify(username));
+    localStorage.setItem("role", JSON.stringify(role));
   };
 
   const logout = () => {
-    if (user) console.log(`logout as ${user.username} (${user.role})`);
     setUser(null);
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
   };
 
   return (

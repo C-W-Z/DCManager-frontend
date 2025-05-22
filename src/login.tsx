@@ -50,9 +50,7 @@ export default function LoginPage() {
     getUserRole(values.username)
       .then((user) => {
         login(user.username, user.role);
-        toast.success(
-          "Successfully logged in as " + user.username + " (role: " + user.role + ")",
-        );
+        toast.success("Successfully logged in as " + user.username + " (" + user.role + ")");
 
         if (user.role === "admin") {
           navigate("/explorer");
