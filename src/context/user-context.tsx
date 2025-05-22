@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { type User, UserContext } from "./use-user";
+import { UserContext } from "./use-user";
+import { User } from "@/lib/type";
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
     return {
       username: "admin",
-      user_role: "admin",
+      role: "admin",
     };
   });
 
@@ -16,16 +17,16 @@ export function UserProvider({ children }: { children: ReactNode }) {
   // login() if fetch success
   // }, []);
 
-  const login = (username: string, user_role: "admin" | "normal") => {
+  const login = (username: string, role: "admin" | "normal") => {
     setUser({
       username,
-      user_role,
+      role,
     });
-    console.log(`login as ${username} (${user_role})`);
+    console.log(`login as ${username} (${role})`);
   };
 
   const logout = () => {
-    if (user) console.log(`logout as ${user.username} (${user.user_role})`);
+    if (user) console.log(`logout as ${user.username} (${user.role})`);
     setUser(null);
   };
 

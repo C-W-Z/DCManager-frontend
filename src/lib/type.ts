@@ -93,6 +93,13 @@ export const simple_service_schema = z.object({
   available_ip_list: z.array(z.string().ip()),
 });
 
+export type User = z.infer<typeof user_schema>;
+export const user_schema = z.object({
+  username: z.string(),
+  role: z.enum(['admin', 'normal']),
+});
+
+
 export type MockDataJson = {
   dc: Datacenter[];
   room: Room[];
