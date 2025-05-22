@@ -4,7 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { SimpleRack } from "@/lib/type";
+import type { SimpleRack, User } from "@/lib/type";
 import { Link } from "react-router-dom";
 import { RackRowActions } from "./rack-actions";
 
@@ -16,38 +16,11 @@ interface RackColumnsProps {
     room_name: string | null;
     rack_name: string | null;
   }) => void;
+  user?: User;
 }
 
-export function rackColumns({
-  onUpdateSuccess,
-  onDeleteSuccess,
-  onMoveSuccess,
-}: RackColumnsProps): ColumnDef<SimpleRack>[] {
+function getCommonColumns(): ColumnDef<SimpleRack>[] {
   return [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-          className="ml-1 h-5 w-5"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          className="ml-1 h-5 w-5"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
     {
       accessorKey: "name",
       header: ({ column }) => {
@@ -65,10 +38,7 @@ export function rackColumns({
         const name: string = row.getValue("name");
         return (
           <div className="pl-4 text-left font-medium">
-            <Link
-              to={`/rack/${name}`}
-              className="hover:underline focus:outline-none"
-            >
+            <Link to={`/rack/${name}`} className="hover:underline focus:outline-none">
               {name}
             </Link>
           </div>
@@ -135,16 +105,57 @@ export function rackColumns({
         return <div className="pl-4 text-left font-medium">{n_hosts}</div>;
       },
     },
-    {
-      id: "actions",
-      cell: ({ row }) => (
-        <RackRowActions
-          row={row}
-          onUpdateSuccess={onUpdateSuccess}
-          onDeleteSuccess={onDeleteSuccess}
-          onMoveSuccess={onMoveSuccess}
-        />
-      ),
-    },
   ];
+}
+
+export function rackColumns({
+  onUpdateSuccess,
+  onDeleteSuccess,
+  onMoveSuccess,
+  user,
+}: RackColumnsProps): ColumnDef<SimpleRack>[] {
+  const baseColumns = getCommonColumns();
+
+  if (user?.role === "admin") {
+    return [
+      {
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+            className="ml-1 h-5 w-5"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+            className="ml-1 h-5 w-5"
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+      },
+      ...baseColumns,
+      {
+        id: "actions",
+        cell: ({ row }) => (
+          <RackRowActions
+            row={row}
+            onUpdateSuccess={onUpdateSuccess}
+            onDeleteSuccess={onDeleteSuccess}
+            onMoveSuccess={onMoveSuccess}
+          />
+        ),
+      },
+    ];
+  }
+
+  return baseColumns;
 }

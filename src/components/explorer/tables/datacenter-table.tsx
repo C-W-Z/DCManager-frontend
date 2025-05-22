@@ -15,7 +15,6 @@ import { useUser } from "@/context/use-user";
 
 export default function DataCenterTable() {
   const { user } = useUser();
-
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
   const [totalCounts, setTotalCounts] = useState<Count>({ dc: 0, room: 0, rack: 0, host: 0 });
   const [loading, setLoading] = useState(false);
