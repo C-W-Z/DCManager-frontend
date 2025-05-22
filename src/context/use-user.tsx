@@ -3,7 +3,7 @@ import { createContext, useContext } from "react";
 
 interface UserContextType {
   user: User | null;
-  login: (username: string, user_role: "admin" | "normal") => void;
+  login: (username: string, role: "admin" | "normal") => void;
   logout: () => void;
 }
 

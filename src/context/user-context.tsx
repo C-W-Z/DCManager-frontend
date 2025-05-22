@@ -3,12 +3,7 @@ import { UserContext } from "./use-user";
 import { User } from "@/lib/type";
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    return {
-      username: "admin",
-      role: "admin",
-    };
-  });
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
