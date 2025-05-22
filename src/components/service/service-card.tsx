@@ -12,7 +12,7 @@ export function ServiceCard({ service }: { service: SimpleService }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Card Title</CardTitle>
+        <CardTitle>{service.name}</CardTitle>
         <CardDescription>Card Description</CardDescription>
       </CardHeader>
       <CardContent>

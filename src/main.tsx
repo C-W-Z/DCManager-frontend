@@ -9,7 +9,7 @@ import Explorer from "@/components/explorer/explorer";
 import Layout from "./layout";
 import HostView from "./components/host/host-view";
 import RackView from "./components/rack/rack-view";
-import ServiceTable from "./components/service/service-table";
+import ServiceBoard from "./components/service/service-board";
 import ServiceView from "./components/service/service-view";
 import DataCenterTable from "@/components/explorer/tables/datacenter-table";
 import RoomTable from "@/components/explorer/tables/room-table";
@@ -65,7 +65,7 @@ createRoot(document.getElementById("root")!).render(
           path="/service"
           element={
             <Layout>
-              <ServiceTable />
+              <ServiceBoard />
             </Layout>
           }
         />
