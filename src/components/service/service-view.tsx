@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import Icon from "@/components/icon";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { EditServiceDialog } from "./edit-service";
 
 export default function ServiceView() {
   const serviceId = useParams().serviceId as string;
@@ -34,11 +35,13 @@ export default function ServiceView() {
             <>
               <CardColumn label="UUID" data={service.name} />
               <CardColumn label="n_hosts" data={`${service.hosts.length}`} />
-              <CardColumn label="n_racks" data={`${service.allocated_racks.length}`} />
+              <CardColumn label="n_racks" data={`${Object.values(service.allocated_racks).length}`} />
               <CardColumn label="total ip" data={`${service.total_ip_list.length}`} />
               <div className="mt-4 flex flex-row items-center justify-center gap-8"></div>
             </>
           </InfoCard>
+          <EditServiceDialog service={service} />
+
           <div className="grid w-full grid-cols-4 gap-4">
             <div className="text-sm text-gray-500">Racks</div>
             <div className="text-sm text-gray-500">Hosts</div>
@@ -46,9 +49,11 @@ export default function ServiceView() {
           </div>
           <Separator />
           <div className="mb-4 flex h-full w-full flex-col items-start justify-start gap-2 overflow-y-scroll">
-            {service.allocated_racks.map((rack) => {
-              return <RackBlock key={rack.name} rackId={rack.name} />;
-            })}
+            {Object.values(service.allocated_racks)
+              .flat()
+              .map((rack) => (
+                <RackBlock key={rack.name} rackId={rack.name} />
+              ))}
           </div>
         </div>
       ) : (
