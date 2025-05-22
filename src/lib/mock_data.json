@@ -2,19 +2,19 @@
   "users": [
     {
       "username": "admin",
-      "user_role": "manager"
+      "role": "manager"
     },
     {
       "username": "user1",
-      "user_role": "normal"
+      "role": "normal"
     },
     {
       "username": "user2",
-      "user_role": "normal"
+      "role": "normal"
     },
     {
       "username": "user3",
-      "user_role": "normal"
+      "role": "normal"
     }
   ],
   "data_centers": [

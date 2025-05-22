@@ -561,3 +561,44 @@ export async function deleteService(service_name: string): Promise<void> {
     return Promise.resolve();
   }
 }
+
+/* User */
+export async function addUser(body: Pick<t.User, "username" | "role">): Promise<t.User> {
+  if (mode === "mock") {
+    const newUser = {
+      ...body,
+    } as t.User;
+    MockData.users.push(newUser);
+    return newUser;
+  } else {
+    // TODO: 這裡的 Endpoint 還沒決定
+    const response = await fetch(`${baseUrl}/user/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      return Promise.reject(new Error("Failed to add user"));
+    }
+    return response.json();
+  }
+}
+
+export async function getUserRole(username: string): Promise<t.User> {
+  if (mode === "mock") {
+    const user = MockData.users.find((user) => user.username === username);
+    if (!user) {
+      return Promise.reject(new Error("User not found"));
+    }
+    return user as t.User;
+  } else {
+    // TODO: 這裡的 Endpoint 還沒決定
+    const response = await fetch(`${baseUrl}/user/${username}`);
+    if (!response.ok) {
+      return Promise.reject(new Error("User not found"));
+    }
+    return response.json();
+  }
+}

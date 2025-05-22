@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { User } from "@/context/use-user";
 
 export type Host = z.infer<typeof host_schema>;
 export const host_schema = z.object({
@@ -99,9 +98,8 @@ export const simple_service_schema = z.object({
 export type User = z.infer<typeof user_schema>;
 export const user_schema = z.object({
   username: z.string(),
-  role: z.enum(['admin', 'normal']),
+  role: z.enum(["admin", "normal"]),
 });
-
 
 export type MockDataJson = {
   data_centers: Datacenter[];
