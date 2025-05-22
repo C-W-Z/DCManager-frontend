@@ -3,10 +3,12 @@
 import { DataTable } from "@/components/explorer/data-table";
 import { hostColumns } from "@/components/explorer/columns/host-columns";
 import type { Host } from "@/lib/type";
-import { getAllHost } from "@/lib/api";
+import { getAllHost, getUserService } from "@/lib/api";
 import { useEffect, useState, useCallback } from "react";
+import { useUser } from "@/context/use-user";
 
 export default function HostTable() {
+  const { user } = useUser();
   const [host, setHost] = useState<Host[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -14,16 +16,25 @@ export default function HostTable() {
     setLoading(true);
     getAllHost()
       .then((hosts) => {
-        setHost(hosts);
+        if (user?.role === "normal") {
+          return getUserService(user.username).then((serviceList) => {
+            const updatedHost = hosts.filter((h) =>
+              serviceList.some((s) => s.name === h.service_name),
+            );
+            setHost(updatedHost);
+          });
+        } else {
+          setHost(hosts);
+        }
       })
       .catch((error) => {
-        console.error("Error fetching all dc data:", error);
+        console.error("Error loading data:", error);
         setHost([]);
       })
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [user?.role, user?.username]);
 
   useEffect(() => {
     loadDataCenters();

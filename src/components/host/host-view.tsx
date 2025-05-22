@@ -10,13 +10,16 @@ import { EditHostDialog } from "./edit-host";
 import { RackDroppable, RackDnDReducer, Action } from "@/components/rack-dnd/rack-dnd-reducer";
 import RackDnD from "@/components/rack-dnd/rack-dnd";
 import { MoveItemDialog } from "../explorer/dialogs/move-item";
+import { LoadingView } from "../loading-view";
 
 export default function HostView() {
   const hostId = useParams().hostId as string;
+  const [loading, setLoading] = useState<boolean>(false);
   const [rack, setRack] = useState<Rack | null>(null);
   const [host, setHost] = useState<Host | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     getHost(hostId)
       .then((host) => {
         setHost(host);
@@ -35,6 +38,16 @@ export default function HostView() {
         setHost(null);
       });
   }, [hostId]);
+
+  useEffect(() => {
+    if (loading && host && rack) {
+      setLoading(false);
+    }
+  }, [loading, host, rack]);
+
+  if (loading) {
+    return <LoadingView text={`Loading host ${hostId}...`} />;
+  }
 
   return (
     <>
@@ -114,7 +127,11 @@ function Wrapper({
               <Separator />
               <CardColumn label="Data Center" data={host.dc_name} />
               <CardColumn label="Room" data={host.room_name} />
-              <CardColumn label="Rack" data={host.rack_name} link={`/rack/${host.rack_name}`} />
+              <CardColumn
+                label="Rack"
+                data={host.rack_name}
+                link={`/rack/${host.rack_name}`}
+              />
               <CardColumn label="Position" data={`${host.pos}`} />
               <Separator />
               <CardColumn label="UUID" data={host.name} />

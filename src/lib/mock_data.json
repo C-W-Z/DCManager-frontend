@@ -202,7 +202,7 @@
           "height": 60,
           "capacity": 50,
           "n_hosts": 4,
-          "service_name": "",
+          "service_name": "auth-service-b",
           "room_name": "TPE1-ROOM-103"
         },
         {
@@ -210,7 +210,7 @@
           "height": 60,
           "capacity": 60,
           "n_hosts": 0,
-          "service_name": "",
+          "service_name": "nginx-proxy-a",
           "room_name": "TPE1-ROOM-103"
         },
         {
@@ -218,7 +218,7 @@
           "height": 60,
           "capacity": 60,
           "n_hosts": 0,
-          "service_name": "",
+          "service_name": "auth-service-b",
           "room_name": "TPE1-ROOM-103"
         },
         {
@@ -226,7 +226,7 @@
           "height": 60,
           "capacity": 49,
           "n_hosts": 4,
-          "service_name": "",
+          "service_name": "nginx-proxy-a",
           "room_name": "TPE1-ROOM-103"
         },
         {

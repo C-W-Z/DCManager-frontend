@@ -6,6 +6,7 @@ import { getRoom } from "@/lib/api";
 import { AddRackDialog } from "@/components/explorer/dialogs/add-rack-dialog";
 import { RackSummary } from "../summary/rack-summary";
 import { useParams, useOutletContext } from "react-router-dom";
+import { useUser } from "@/context/use-user";
 
 interface OutletContext {
   datacenter: SimpleDatacenter | null;
@@ -13,6 +14,7 @@ interface OutletContext {
 }
 
 export default function RackTable() {
+  const { user } = useUser();
   const { datacenter, room } = useOutletContext<OutletContext>();
   const { roomId } = useParams<{ roomId: string }>();
   const [racks, setRacks] = useState<SimpleRack[]>([]);
@@ -72,6 +74,7 @@ export default function RackTable() {
     onUpdateSuccess,
     onDeleteSuccess,
     onMoveSuccess,
+    user: user || undefined,
   });
 
   return (
@@ -89,7 +92,7 @@ export default function RackTable() {
           >
             {loading ? "Loading..." : "Refresh"}
           </button>
-          {datacenter && room && <AddRackDialog currentDC={datacenter} currentRoom={room} />}
+          {user?.role === "admin" && datacenter && room && <AddRackDialog currentDC={datacenter} currentRoom={room} />}
         </div>
       </div>
 
