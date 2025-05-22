@@ -26,9 +26,10 @@ import {
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useUser } from "./context/use-user";
+import { user_schema } from "./lib/type";
 
-const formSchema = z.object({
-  username: z.string(),
+const formSchema = user_schema.pick({ username: true }).extend({
+  password: z.string(),
 });
 
 export default function LoginPage() {
@@ -94,6 +95,26 @@ export default function LoginPage() {
                         <Input
                           placeholder="admin"
                           type="text"
+                          // autoComplete="name"
+                          disabled={isLoading}
+                          {...field}
+                          required
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="password"
+                          type="password"
                           // autoComplete="name"
                           disabled={isLoading}
                           {...field}

@@ -19,6 +19,8 @@ interface DataCenterSelectProps {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
+  allocatedRacks: { dc_name: string; n_racks: number }[];
+  index: number;
 }
 
 export function DataCenterSelect({
@@ -26,23 +28,51 @@ export function DataCenterSelect({
   value,
   onChange,
   disabled,
+  allocatedRacks,
+  index,
 }: DataCenterSelectProps) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Filter data centers based on search query
+  // Filter data centers based on search query and exclude already selected dc_names
   const filteredDataCenters = searchQuery
-    ? dataCenters.filter((dc) => dc.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    : dataCenters;
+    ? dataCenters.filter((dc) => {
+        const isAlreadySelected = allocatedRacks.some(
+          (rack, i) => i !== index && rack.dc_name === dc.name,
+        );
+        return !isAlreadySelected && dc.name.toLowerCase().includes(searchQuery.toLowerCase());
+      })
+    : dataCenters.filter((dc) => {
+        const isAlreadySelected = allocatedRacks.some(
+          (rack, i) => i !== index && rack.dc_name === dc.name,
+        );
+        return !isAlreadySelected;
+      });
 
-  // Focus CommandInput when Popover opens
+  // Focus CommandInput when Popover opens with retry logic
   useEffect(() => {
-    console.log("open change");
+    // console.log("Popover open change:", open, "inputRef:", inputRef.current);
     if (open && inputRef.current) {
-      console.log("foucus");
+      // console.log("Attempting to focus CommandInput");
       inputRef.current.focus();
+    } else if (open) {
+      // Retry focusing if inputRef is not yet available
+      let attempts = 0;
+      const maxAttempts = 3;
+      const interval = setInterval(() => {
+        if (inputRef.current) {
+          // console.log("Retrying focus CommandInput, attempt:", attempts + 1);
+          inputRef.current.focus();
+          clearInterval(interval);
+        } else if (attempts >= maxAttempts) {
+          // console.log("Failed to focus CommandInput after", maxAttempts, "attempts");
+          clearInterval(interval);
+        }
+        attempts++;
+      }, 100);
+      return () => clearInterval(interval);
     }
   }, [open]);
 
@@ -50,13 +80,13 @@ export function DataCenterSelect({
     <Popover
       open={open}
       onOpenChange={(isOpen) => {
+        // console.log("Popover onOpenChange:", isOpen);
         setOpen(isOpen);
         if (!isOpen) {
           setSearchQuery("");
           triggerRef.current?.focus();
         }
       }}
-      modal={true}
     >
       <PopoverTrigger asChild>
         <Button
@@ -71,20 +101,13 @@ export function DataCenterSelect({
         </Button>
       </PopoverTrigger>
       {createPortal(
-        <PopoverContent
-          className="z-[200] p-0"
-          align="start"
-          side="bottom"
-          onClick={(e) => e.stopPropagation()}
-          onWheel={(e) => e.stopPropagation()}
-        >
+        <PopoverContent className="z-[200] p-0" align="start" side="bottom">
           <Command>
             <CommandInput
               ref={inputRef}
               placeholder="Search data centers..."
               value={searchQuery}
               onValueChange={setSearchQuery}
-              onClick={(e) => e.stopPropagation()}
               aria-label="Search data centers"
             />
             <CommandList className="max-h-[200px] overflow-y-auto">
