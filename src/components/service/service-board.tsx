@@ -45,7 +45,10 @@ export default function ServiceBoard() {
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-12">
-      <div className="text-2xl font-bold">Your Services</div>
+      <div className="mb-4 flex flex-row items-center gap-2">
+        <Icon id="service" className="size-8" />
+        <div className="text-2xl font-bold">Your Services</div>
+      </div>
       <div className="flex flex-row justify-end gap-4">
         <LoadingButton isLoading={loading} onClick={() => LoadService(user.username)}>
           Refresh
