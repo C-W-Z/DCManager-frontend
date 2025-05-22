@@ -95,7 +95,7 @@ export function AddServiceDialog() {
         i === index
           ? {
               ...rack,
-              [field]: field === "n_racks" ? parseInt(value) || 0 : value,
+              [field]: field === "n_racks" ? parseInt(value) || 1 : value,
             }
           : rack,
       ),
@@ -104,7 +104,7 @@ export function AddServiceDialog() {
   };
 
   const addAllocatedRacks = () => {
-    setAllocatedRacks((prev) => [...prev, { dc_name: "", n_racks: 0 }]);
+    setAllocatedRacks((prev) => [...prev, { dc_name: "", n_racks: 1 }]);
     setErrorMessage(null);
   };
 
@@ -151,6 +151,10 @@ export function AddServiceDialog() {
     );
 
     setLoading(true);
+
+    console.log({name: values.name,
+      n_allocated_racks,
+      allocated_subnet: values.allocated_subnet})
 
     addService({
       name: values.name,
@@ -327,6 +331,7 @@ export function AddServiceDialog() {
                           type="number"
                           placeholder="Number of Racks"
                           value={rack.n_racks.toString()}
+                          min={1}
                           onChange={(e) =>
                             handleAllocatedRacksChange(index, "n_racks", e.target.value)
                           }
@@ -350,7 +355,7 @@ export function AddServiceDialog() {
               )}
               {hasEmptyAllocatedRacks && (
                 <p className="text-sm text-red-500">
-                  Please choose all DC names and number of racks or delete the blanks
+                  Please choose all DC names or delete the blanks
                 </p>
               )}
               {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
@@ -374,6 +379,9 @@ export function AddServiceDialog() {
           </form>
         </Form>
       </DialogContent>
+      {open && (
+        <div className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50"></div>
+      )}
     </Dialog>
   );
 }
