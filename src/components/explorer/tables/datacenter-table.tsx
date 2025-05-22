@@ -11,12 +11,14 @@ import {
   DataCenterSummary,
 } from "@/components/explorer/summary/datacenter-summary";
 import { useOutletContext } from "react-router-dom";
+import { useUser } from "@/context/use-user";
 
 interface OutletContext {
   onSelect: (path: string) => void;
 }
 
 export default function DataCenterTable() {
+  const { user } = useUser();
   const { onSelect } = useOutletContext<OutletContext>();
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
   const [totalCounts, setTotalCounts] = useState<Count>({ dc: 0, room: 0, rack: 0, host: 0 });
@@ -61,7 +63,9 @@ export default function DataCenterTable() {
 
   const onUpdateSuccess = (updatedDC: SimpleDatacenter) => {
     if (updatedDC) {
-      setDataCenters((prev) => prev.map((dc) => (dc.name === updatedDC.name ? updatedDC : dc)));
+      setDataCenters((prev) =>
+        prev.map((dc) => (dc.name === updatedDC.name ? updatedDC : dc)),
+      );
     }
   };
 
@@ -79,6 +83,7 @@ export default function DataCenterTable() {
     onSelect: (dc) => onSelect(`/explorer/dc/${dc.name}`),
     onUpdateSuccess,
     onDeleteSuccess,
+    user: user || undefined,
   });
 
   return (
@@ -95,7 +100,7 @@ export default function DataCenterTable() {
           >
             {loading ? "Loading..." : "Refresh"}
           </button>
-          <AddDatacenterDialog />
+          {user?.role === "admin" && <AddDatacenterDialog />}
         </div>
       </div>
 
