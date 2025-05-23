@@ -16,7 +16,7 @@ import RoomTable from "@/components/explorer/tables/room-table";
 import RackTable from "@/components/explorer/tables/rack-table";
 import HostTable from "./components/explorer/tables/host-table";
 import { UserProvider } from "./context/user-context";
-import LoginPage from "./login";
+import LoginPage from "@/view/login";
 import BulkAddHostView from "@/view/bulk-add-host-view";
 
 createRoot(document.getElementById("root")!).render(

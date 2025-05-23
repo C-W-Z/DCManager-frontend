@@ -25,9 +25,9 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { useUser } from "./context/use-user";
-import { user_schema } from "./lib/type";
-import { getUserRole } from "./lib/api";
+import { useUser } from "@/context/use-user";
+import { user_schema } from "@/lib/type";
+import { getUserRole } from "@/lib/api";
 
 const formSchema = user_schema.pick({ username: true }).extend({
   password: z.string(),
