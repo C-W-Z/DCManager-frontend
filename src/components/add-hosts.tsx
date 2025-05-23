@@ -16,15 +16,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock } from "lucide-react";
 import { useParams } from "react-router-dom";
 
 interface CsvRow {
-  room_name: string;
+  rack_name: string;
   new_host_name: string;
   height: string;
   position: string;
+}
+
+interface PreviewRow extends CsvRow {
+  status: "Pending" | "Added" | "Failed";
+  error?: string;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -41,6 +45,8 @@ export default function AddHosts() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [previewData, setPreviewData] = useState<PreviewRow[]>([]);
+  const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(false);
 
   // Reusable function to refresh racks and positions
   const refreshRacks = useCallback(async () => {
@@ -90,7 +96,7 @@ export default function AddHosts() {
       const positions = availablePositions[rack.name] || [];
       positions.forEach((pos) => {
         csvData.push({
-          room_name: rack.room_name,
+          rack_name: rack.name,
           new_host_name: "",
           height: "1",
           position: pos.toString(),
@@ -100,72 +106,158 @@ export default function AddHosts() {
 
     const csv = Papa.unparse(csvData, {
       header: true,
-      columns: ["room_name", "new_host_name", "height", "position"],
+      columns: ["rack_name", "new_host_name", "height", "position"],
     });
 
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     saveAs(blob, `${serviceName}_host_template.csv`);
   };
 
-  // Handle CSV upload
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle CSV upload and preview
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setLoading(true);
     setError(null);
     setSuccess(null);
+    setIsPreviewVisible(false);
 
     Papa.parse<CsvRow>(file, {
       header: true,
       skipEmptyLines: true,
-      complete: async (result) => {
-        try {
-          for (const row of result.data) {
-            const { room_name, new_host_name, height, position } = row;
-            const rack = racks.find(
-              (r) =>
-                r.room_name === room_name &&
-                availablePositions[r.name]?.includes(parseInt(position)),
-            );
+      complete: (result) => {
+        const parsedData = result.data.map(
+          (row) =>
+            ({
+              ...row,
+              status: "Pending",
+            }) as PreviewRow,
+        );
 
-            if (!rack) {
-              throw new Error(
-                `Invalid rack or position for room: ${room_name}, position: ${position}`,
-              );
-            }
+        // Validate rows
+        const isValid = parsedData.every((row) => {
+          const rack = racks.find(
+            (r) =>
+              r.name === row.rack_name &&
+              availablePositions[r.name]?.includes(parseInt(row.position)),
+          );
+          const isHeightValid = !isNaN(parseInt(row.height)) && parseInt(row.height) > 0;
+          const isPositionValid = !isNaN(parseInt(row.position));
+          const isHostNameValid = row.new_host_name.length > 0;
 
-            if (new_host_name.length === 0) {
-              throw new Error(`Some new host name is empty`);
-            }
-
-            console.log({
-              name: new_host_name,
-              height: parseInt(height),
-              rack_name: rack.name,
-              pos: parseInt(position),
-            });
-
-            await addHost({
-              name: new_host_name,
-              height: parseInt(height),
-              rack_name: rack.name,
-              pos: parseInt(position),
-            });
+          if (!rack) {
+            row.status = "Failed";
+            row.error = `Invalid rack or position, room: ${row.rack_name}, position: ${row.position}`;
+            return false;
           }
-          setSuccess("Hosts added successfully");
-          await refreshRacks();
-        } catch (err) {
-          setError("Failed to add hosts: " + (err as Error).message);
-        } finally {
-          setLoading(false);
+          if (!isHostNameValid) {
+            row.status = "Failed";
+            row.error = "Host name cannot be empty";
+            return false;
+          }
+          if (!isHeightValid) {
+            row.status = "Failed";
+            row.error = "Height must be a positive number";
+            return false;
+          }
+          if (!isPositionValid) {
+            row.status = "Failed";
+            row.error = "Position must be a valid number";
+            return false;
+          }
+          return true;
+        });
+
+        if (!isValid) {
+          setError("Some rows in the CSV are invalid. Please review the preview.");
         }
+
+        setPreviewData(parsedData);
+        setIsPreviewVisible(true);
       },
       error: (err) => {
         setError("Failed to parse CSV: " + err.message);
-        setLoading(false);
       },
     });
+  };
+
+  // Handle adding hosts from preview
+  const handleAddHosts = async () => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      for (let i = 0; i < previewData.length; i++) {
+        const row = previewData[i];
+        if (row.status !== "Pending") continue; // Skip already processed rows
+
+        // setPreviewData((prev) =>
+        //   prev.map((r, index) => (index === i ? { ...r, status: "Pending" } : r)),
+        // );
+
+        try {
+          const rack = racks.find(
+            (r) =>
+              r.name === row.rack_name &&
+              availablePositions[r.name]?.includes(parseInt(row.position)),
+          );
+
+          if (!rack) {
+            throw new Error(
+              `Invalid rack or position, rack: ${row.rack_name}, position: ${row.position}`,
+            );
+          }
+
+          await addHost({
+            name: row.new_host_name,
+            height: parseInt(row.height),
+            rack_name: rack.name,
+            pos: parseInt(row.position),
+          });
+
+          setPreviewData((prev) =>
+            prev.map((r, index) => (index === i ? { ...r, status: "Added" } : r)),
+          );
+        } catch (err) {
+          setPreviewData((prev) =>
+            prev.map((r, index) =>
+              index === i ? { ...r, status: "Failed", error: (err as Error).message } : r,
+            ),
+          );
+        }
+      }
+
+      let attempts = 0;
+      const maxAttempts = 3;
+      const interval = setInterval(async () => {
+        if (previewData.every((row) => row.status !== "Pending")) {
+          const allSuccessful = previewData.every((row) => row.status === "Added");
+          console.log("check all success", previewData)
+          if (allSuccessful) {
+            setSuccess("All hosts added successfully");
+            setIsPreviewVisible(false);
+            setPreviewData([]);
+          } else {
+            setError("Some hosts failed to add. Please review the preview.");
+          }
+
+          await refreshRacks();
+          clearInterval(interval);
+        } else if (attempts >= maxAttempts) {
+          console.log("max attempts", previewData)
+          setError("Some hosts failed to add. Please review the preview.");
+          await refreshRacks();
+          clearInterval(interval);
+        }
+        attempts++;
+      }, 100);
+      return () => clearInterval(interval);
+    } catch (err) {
+      setError("Failed to process hosts: " + (err as Error).message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -187,7 +279,7 @@ export default function AddHosts() {
           </Alert>
         )}
 
-        <div className="mb-6 flex gap-4">
+        <div className="mb-6 flex items-center gap-4">
           <Button
             onClick={downloadTemplate}
             disabled={loading || racks.length === 0}
@@ -195,19 +287,71 @@ export default function AddHosts() {
           >
             Download CSV Template
           </Button>
-          <div className="self-center">
-            Upload CSV:
-          </div>
-          <div>
-            <Input
-              type="file"
-              accept=".csv"
-              onChange={handleFileUpload}
-              disabled={loading}
-              className="hover:cursor-pointer"
-            />
-          </div>
+          <div>Upload CSV:</div>
+          <Input
+            type="file"
+            accept=".csv"
+            onChange={handleFileUpload}
+            disabled={loading}
+            className="w-auto hover:cursor-pointer"
+          />
+          {isPreviewVisible && (
+            <Button
+              onClick={handleAddHosts}
+              disabled={loading || previewData.some((row) => row.status !== "Pending")}
+              className="bg-green-500 hover:bg-green-600"
+            >
+              Start Adding Hosts
+            </Button>
+          )}
         </div>
+
+        {isPreviewVisible && (
+          <div className="mb-6">
+            <h2 className="mb-2 text-xl font-semibold">CSV Preview</h2>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Rack</TableHead>
+                  <TableHead>New Host Name</TableHead>
+                  <TableHead>Height</TableHead>
+                  <TableHead>Position</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {previewData.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{row.rack_name}</TableCell>
+                    <TableCell>{row.new_host_name}</TableCell>
+                    <TableCell>{row.height}</TableCell>
+                    <TableCell>{row.position}</TableCell>
+                    <TableCell className="flex items-center gap-2">
+                      {row.status === "Pending" && (
+                        <>
+                          <Clock className="h-4 w-4 text-yellow-500" />
+                          <span>Pending</span>
+                        </>
+                      )}
+                      {row.status === "Added" && (
+                        <>
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          <span>Added</span>
+                        </>
+                      )}
+                      {row.status === "Failed" && (
+                        <>
+                          <AlertCircle className="h-4 w-4 text-red-500" />
+                          <span>Failed: {row.error}</span>
+                        </>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
 
         {loading ? (
           <LoadingView text="Loading..." />
