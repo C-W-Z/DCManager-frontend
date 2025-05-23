@@ -122,19 +122,27 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
+            <Label htmlFor="running">Status</Label>
             <Select
+              defaultValue={host?.running ? "running" : "stopped"}
               onValueChange={(value) => {
-                setFormData((prev) => ({ ...prev, status: value as Host["status"] }));
+                setFormData((prev) => ({ ...prev, running: value === "running" }));
               }}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="running">Running</SelectItem>
-                <SelectItem value="idle">Idle</SelectItem>
-                <SelectItem value="stopped">Stopped</SelectItem>
+                <SelectItem
+                  value="running"
+                >
+                  Running
+                </SelectItem>
+                <SelectItem
+                  value="stopped"
+                >
+                  Stopped
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
