@@ -164,7 +164,7 @@ export async function deleteRack(rack_name: string): Promise<void> {
 /* Host */
 export async function addHost(
   body: Pick<mytype.Host, "name" | "height" | "rack_name" | "pos">,
-): Promise<string> {
+): Promise<mytype.Host> {
   const response = await fetch(`${baseUrl}/host/`, {
     method: "POST",
     headers: {
@@ -175,8 +175,7 @@ export async function addHost(
   if (!response.ok) {
     return Promise.reject(new Error("Failed to add host"));
   }
-  const data = await response.json();
-  return data.id as string; // TODO
+  return response.json();
 }
 
 export async function getAllHost(): Promise<mytype.Host[]> {
@@ -224,8 +223,8 @@ export async function deleteHost(host_name: string): Promise<void> {
 
 /* Service */
 export async function addService(
-  body: Pick<mytype.SimpleService, "name" | "n_allocated_racks" | "allocated_subnets">,
-): Promise<string> {
+  body: Pick<mytype.SimpleService, "name" | "n_allocated_racks" | "allocated_subnet">,
+): Promise<mytype.Service> {
   const response = await fetch(`${baseUrl}/service/`, {
     method: "POST",
     headers: {
@@ -236,8 +235,7 @@ export async function addService(
   if (!response.ok) {
     return Promise.reject(new Error("Failed to add service"));
   }
-  const data = await response.json();
-  return data.id as string; // TODO
+  return response.json();
 }
 
 export async function getAllService(): Promise<mytype.SimpleService[]> {
@@ -269,34 +267,6 @@ export async function modifyService(
   });
   if (!response.ok) {
     return Promise.reject(new Error("Failed to modify service"));
-  }
-  return;
-}
-
-export async function extendServiceRack(service_id: string, num: number): Promise<void> {
-  const response = await fetch(`${baseUrl}/service/${service_id}/rack/extend`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ num }),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to extend service rack"));
-  }
-  return;
-}
-
-export async function extendServiceIP(service_id: string, num: number): Promise<void> {
-  const response = await fetch(`${baseUrl}/service/${service_id}/ip/extend`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ num }),
-  });
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to extend service IP"));
   }
   return;
 }
