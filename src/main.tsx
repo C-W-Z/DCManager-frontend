@@ -37,10 +37,10 @@ createRoot(document.getElementById("root")!).render(
           <Route path="room/:roomId" element={<RackTable />} />
         </Route>
         <Route
-          path="/add-hosts"
+          path="/add-hosts/:serviceId"
           element={
             <Layout>
-              <AddHosts serviceName="nginx-proxy-a"/>
+              <AddHosts />
             </Layout>
           }
         />
