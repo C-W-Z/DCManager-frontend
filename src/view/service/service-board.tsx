@@ -1,5 +1,5 @@
 import { SimpleService } from "@/lib/type";
-import { getUserService } from "@/lib/api";
+import { getAllService, getUserService } from "@/lib/api";
 import { useEffect, useState, useCallback } from "react";
 import { AddServiceDialog } from "./add-service-dialog";
 import { useUser } from "@/context/use-user";
@@ -16,26 +16,41 @@ export default function ServiceBoard() {
   const [loading, setLoading] = useState(false);
   const { user, setAccessableService } = useUser();
 
-  const LoadService = useCallback((username: string) => {
+  const LoadService = useCallback(() => {
+    if (!user) return;
+
     setLoading(true);
 
-    getUserService(username)
-      .then((serviceList) => {
-        setServices(serviceList);
-        setAccessableService(serviceList.map((service) => service.name));
-      })
-      .catch((error) => {
-        console.error("Error fetching all service data:", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [setAccessableService]);
+    if (user.role === "admin") {
+      getAllService()
+        .then((serviceList) => {
+          setServices(serviceList);
+          setAccessableService(serviceList.map((service) => service.name));
+        })
+        .catch((error) => {
+          console.error("Error fetching all service data:", error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      getUserService(user.username)
+        .then((serviceList) => {
+          setServices(serviceList);
+          setAccessableService(serviceList.map((service) => service.name));
+        })
+        .catch((error) => {
+          console.error("Error fetching all service data:", error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [setAccessableService, user]);
 
   useEffect(() => {
-    if (!user) return;
-    LoadService(user.username);
-  }, [LoadService, user]);
+    LoadService();
+  }, [LoadService]);
 
   if (!user) {
     return <FallbackView text={"請登入以瀏覽此頁面。"} />;
@@ -54,7 +69,7 @@ export default function ServiceBoard() {
         </div>
         <div>
           <div className="flex flex-row justify-end gap-4">
-            <LoadingButton isLoading={loading} onClick={() => LoadService(user.username)}>
+            <LoadingButton isLoading={loading} onClick={() => LoadService()}>
               Refresh
             </LoadingButton>
             <AddServiceDialog />

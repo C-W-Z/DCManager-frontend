@@ -50,7 +50,7 @@ export default function ServiceView() {
     return <FallbackView text={`Service: ${serviceName} not found.`} />;
   }
 
-  if (user.username !== service.username) {
+  if (user.username !== service.username && user.role !== "admin") {
     return <FallbackView text={`你沒有權限瀏覽 ${service.name}`} />;
   }
 

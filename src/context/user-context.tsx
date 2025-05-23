@@ -49,7 +49,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loadAccessableService = useCallback(() => {
-    if (!user) return;
+    if (!user || user.role === "admin") return;
     getUserService(user.username)
       .then((serviceList) => {
         setAccessableService(serviceList.map((service) => service.name));
