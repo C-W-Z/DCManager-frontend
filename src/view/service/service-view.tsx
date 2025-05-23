@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import Icon from "@/components/icon";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { EditServiceDialog } from "./edit-service";
+import { EditServiceDialog } from "./edit-service-dialog";
 import { useUser } from "@/context/use-user";
 import { LoadingView } from "@/components/loading-view";
 import { FallbackView } from "@/components/fallback-view";
@@ -85,8 +85,8 @@ export default function ServiceView() {
         <div className="flex-1"></div>
         <Button className="flex h-fit w-fit flex-row items-center justify-start gap-3 text-sm font-bold">
           <Plus />
-          <Link to={`/add-hosts/${service.name}`} className="h-fit pr-2">
-            Bulk Add Hosts
+          <Link to={`/bulk-add-host/${service.name}`} className="h-fit pr-2">
+            批量新增主機
           </Link>
         </Button>
         <EditServiceDialog service={service} />

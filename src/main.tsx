@@ -17,7 +17,7 @@ import RackTable from "@/components/explorer/tables/rack-table";
 import HostTable from "./components/explorer/tables/host-table";
 import { UserProvider } from "./context/user-context";
 import LoginPage from "./login";
-import AddHosts from "./view/service/bulk-add-host-view";
+import BulkAddHostView from "@/view/bulk-add-host-view";
 
 createRoot(document.getElementById("root")!).render(
   <UserProvider>
@@ -37,10 +37,10 @@ createRoot(document.getElementById("root")!).render(
           <Route path="room/:roomId" element={<RackTable />} />
         </Route>
         <Route
-          path="/add-hosts/:serviceId"
+          path="/bulk-add-host/:serviceId"
           element={
             <Layout>
-              <AddHosts />
+              <BulkAddHostView />
             </Layout>
           }
         />

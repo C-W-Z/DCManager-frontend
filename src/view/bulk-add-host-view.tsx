@@ -4,7 +4,7 @@ import { Service, simple_rack_schema } from "@/lib/type";
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
 import { z } from "zod";
-import { LoadingView } from "../../components/loading-view";
+import { LoadingView } from "@/components/loading-view";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -253,9 +253,7 @@ export default function BulkAddHostView() {
 
   return (
     <div className="m-12">
-      <h1 className="mb-4 text-2xl font-bold">
-        Bulk Host Addition for Service: {serviceName}
-      </h1>
+      <h1 className="mb-4 text-2xl font-bold">批量新增主機至服務: {serviceName}</h1>
       <div className="w-full">
         {error && (
           <Alert variant="destructive" className="mb-4">
