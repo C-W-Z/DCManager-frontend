@@ -10,6 +10,8 @@ import { EditServiceDialog } from "./edit-service";
 import { useUser } from "@/context/use-user";
 import { LoadingView } from "../loading-view";
 import { FallbackView } from "../fallback-view";
+import { Button } from "../ui/button";
+import { Plus } from "lucide-react";
 
 export default function ServiceView() {
   const serviceId = useParams().serviceId as string;
@@ -85,6 +87,15 @@ export default function ServiceView() {
           </p>
         </div>
         <div className="flex-1"></div>
+        <Button className="flex h-fit w-fit flex-row items-center justify-start gap-3 text-sm font-bold">
+          <Plus />
+          <Link
+            to={`/add-hosts/${service.name}`}
+            className="pr-2 h-fit"
+          >
+            Bulk Add Hosts
+          </Link>
+        </Button>
         <EditServiceDialog service={service} />
       </div>
 
