@@ -12,6 +12,7 @@ import { DeleteConfirmation } from "../explorer/dialogs/delete-confirm";
 import { EditRackDialog } from "../explorer/dialogs/edit-rack";
 import { MoveItemDialog } from "../explorer/dialogs/move-item";
 import { LoadingView } from "../loading-view";
+import { useUser } from "@/context/use-user";
 
 const RackContext = createContext<{
   state: RackDroppable;
@@ -36,14 +37,14 @@ export default function RackView() {
   }, [rackId]);
 
   useEffect(() => {
-      if (loading  && rack) {
-        setLoading(false);
-      }
-    }, [loading, rack]);
-
-    if (loading) {
-      return <LoadingView text={`Loading rack ${rackId}...`} />;
+    if (loading && rack) {
+      setLoading(false);
     }
+  }, [loading, rack]);
+
+  if (loading) {
+    return <LoadingView text={`Loading rack ${rackId}...`} />;
+  }
 
   return (
     <>
@@ -80,6 +81,7 @@ function createInitialState(rack: Rack): RackDroppable {
 }
 
 function Wrapper({ rack, setRack }: { rack: Rack; setRack: (_: Rack | null) => void }) {
+  const { user } = useUser();
   const [state, dispatch] = useReducer(RackDnDReducer, rack, createInitialState);
   const [deleteIds, setDeleteIds] = useState<string[]>([]);
   const [editRack, setEditRack] = useState<Rack | null>(null);
@@ -110,43 +112,45 @@ function Wrapper({ rack, setRack }: { rack: Rack; setRack: (_: Rack | null) => v
                 data={rack.service_name}
                 link={`/service/${rack.service_name}`}
               />
-              <div className="mt-4 flex flex-row items-center justify-center gap-8">
-                <Button
-                  variant="outline"
-                  className="w-24"
-                  onClick={() => {
-                    setEditRack(null);
-                    setTimeout(() => {
-                      setEditRack(rack);
-                    }, 0);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setRacksToMove([]);
-                    setTimeout(() => {
-                      setRacksToMove([rack]);
-                    }, 0);
-                  }}
-                >
-                  Move Rack
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="w-24"
-                  onClick={() => {
-                    setDeleteIds([]);
-                    setTimeout(() => {
-                      setDeleteIds([rack.name]);
-                    }, 0);
-                  }}
-                >
-                  DELETE
-                </Button>
-              </div>
+              {user?.role === "admin" && (
+                <div className="mt-4 flex flex-row items-center justify-center gap-8">
+                  <Button
+                    variant="outline"
+                    className="w-24"
+                    onClick={() => {
+                      setEditRack(null);
+                      setTimeout(() => {
+                        setEditRack(rack);
+                      }, 0);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setRacksToMove([]);
+                      setTimeout(() => {
+                        setRacksToMove([rack]);
+                      }, 0);
+                    }}
+                  >
+                    Move Rack
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="w-24"
+                    onClick={() => {
+                      setDeleteIds([]);
+                      setTimeout(() => {
+                        setDeleteIds([rack.name]);
+                      }, 0);
+                    }}
+                  >
+                    DELETE
+                  </Button>
+                </div>
+              )}
             </>
           </InfoCard>
         </div>
