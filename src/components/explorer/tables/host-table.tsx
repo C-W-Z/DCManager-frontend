@@ -6,6 +6,7 @@ import type { Host } from "@/lib/type";
 import { getAllHost, getUserService } from "@/lib/api";
 import { useEffect, useState, useCallback } from "react";
 import { useUser } from "@/context/use-user";
+import Icon from "@/components/icon";
 
 export default function HostTable() {
   const { user } = useUser();
@@ -73,8 +74,12 @@ export default function HostTable() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Hosts</h1>
+      <div className="flex items-start justify-between">
+        <div className="mb-4 flex flex-row items-center gap-2">
+          <Icon id="host" className="size-8" />
+          <div className="text-2xl font-bold">Hosts</div>
+        </div>
+
         <div className="flex items-center gap-4">
           <button
             onClick={handleRefresh}

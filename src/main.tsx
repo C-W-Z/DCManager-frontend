@@ -17,6 +17,7 @@ import RackTable from "@/components/explorer/tables/rack-table";
 import HostTable from "./components/explorer/tables/host-table";
 import { UserProvider } from "./context/user-context";
 import LoginPage from "./login";
+import AddHosts from "./components/add-hosts";
 
 createRoot(document.getElementById("root")!).render(
   <UserProvider>
@@ -35,6 +36,14 @@ createRoot(document.getElementById("root")!).render(
           <Route path="dc/:dcId" element={<RoomTable />} />
           <Route path="room/:roomId" element={<RackTable />} />
         </Route>
+        <Route
+          path="/add-hosts/:serviceId"
+          element={
+            <Layout>
+              <AddHosts />
+            </Layout>
+          }
+        />
         <Route
           path="/host"
           element={

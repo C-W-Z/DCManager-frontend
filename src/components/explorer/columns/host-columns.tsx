@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import type { Host } from "@/lib/type";
 import { Link } from "react-router-dom";
 import { HostRowActions } from "./host-actions";
+import { cn } from "@/lib/utils";
 
 interface HostColumnsProps {
   onUpdateSuccess: (host: Host) => void;
@@ -49,6 +50,34 @@ export function hostColumns({
       enableHiding: false,
     },
     {
+      accessorKey: "running",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Status
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => {
+        const running: boolean = row.original.running;
+        return (
+          <div className="item-center flex">
+            <div
+              className={cn(
+                "mr-2 ml-1 h-3 w-3 self-center rounded-full",
+                running ? "bg-green-600" : "bg-red-400",
+              )}
+            ></div>
+            {running ? "Running" : "Stopped"}
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "name",
       header: ({ column }) => {
         return (
@@ -64,11 +93,8 @@ export function hostColumns({
       cell: ({ row }) => {
         const name: string = row.getValue("name");
         return (
-          <div className="pl-4 text-left font-medium">
-            <Link
-              to={`/host/${name}`}
-              className="hover:underline focus:outline-none"
-            >
+          <div className="flex pl-4 text-left font-medium">
+            <Link to={`/host/${name}`} className="hover:underline focus:outline-none">
               {name}
             </Link>
           </div>

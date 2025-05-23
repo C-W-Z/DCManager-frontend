@@ -163,6 +163,10 @@
     color: black !important;
   }
 
+  input::file-selector-button {
+    cursor: pointer;
+  }
+
   /* Modern table styling */
 
   .modern-table {

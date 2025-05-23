@@ -7,8 +7,10 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { EditServiceDialog } from "./edit-service";
 import { useUser } from "@/context/use-user";
-import { LoadingView } from "../../components/loading-view";
-import { FallbackView } from "../../components/fallback-view";
+import { LoadingView } from "../loading-view";
+import { FallbackView } from "../fallback-view";
+import { Button } from "../ui/button";
+import { Plus } from "lucide-react";
 
 export default function ServiceView() {
   const serviceName = useParams().serviceName as string;
@@ -55,6 +57,14 @@ export default function ServiceView() {
   const total_ip = service.total_ip_list.length;
   const available_ip = service.available_ip_list.length;
 
+  if (!service) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="text-xl font-bold">Service ID: {serviceId} not found :(</div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen w-full flex-col items-start justify-between px-20 pt-12">
       <div className="mb-4 flex flex-row items-center gap-2">
@@ -81,6 +91,12 @@ export default function ServiceView() {
           </p>
         </div>
         <div className="flex-1"></div>
+        <Button className="flex h-fit w-fit flex-row items-center justify-start gap-3 text-sm font-bold">
+          <Plus />
+          <Link to={`/add-hosts/${service.name}`} className="h-fit pr-2">
+            Bulk Add Hosts
+          </Link>
+        </Button>
         <EditServiceDialog service={service} />
       </div>
 
