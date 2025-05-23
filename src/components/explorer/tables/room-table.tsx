@@ -8,14 +8,15 @@ import { getDC } from "@/lib/api";
 import { AddRoomDialog } from "../dialogs/add-room-dialog";
 import { RoomSummary } from "../summary/room-summary";
 import { useParams, useOutletContext } from "react-router-dom";
+import { useUser } from "@/context/use-user";
 
 interface OutletContext {
   datacenter: SimpleDatacenter | null;
-  onSelect: (path: string) => void;
 }
 
 export default function RoomTable() {
-  const { datacenter, onSelect } = useOutletContext<OutletContext>();
+  const { user } = useUser();
+  const { datacenter } = useOutletContext<OutletContext>();
   const { dcId } = useParams<{ dcId: string }>();
   const [rooms, setRooms] = useState<SimpleRoom[]>([]);
   const [loading, setLoading] = useState(false);
@@ -71,10 +72,10 @@ export default function RoomTable() {
   };
 
   const columns = roomColumns({
-    onSelect: (room) => onSelect(`/explorer/room/${room.name}`),
     onUpdateSuccess,
     onDeleteSuccess,
     onMoveSuccess,
+    user: user || undefined,
   });
 
   return (
@@ -91,7 +92,7 @@ export default function RoomTable() {
           >
             {loading ? "Loading..." : "Refresh"}
           </button>
-          {datacenter && <AddRoomDialog currentDC={datacenter} />}
+          {user?.role === "admin" && datacenter && <AddRoomDialog currentDC={datacenter} />}
         </div>
       </div>
 

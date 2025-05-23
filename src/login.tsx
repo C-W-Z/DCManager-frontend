@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -24,9 +26,11 @@ import {
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useUser } from "./context/use-user";
+import { user_schema } from "./lib/type";
+import { getUserRole } from "./lib/api";
 
-const formSchema = z.object({
-  username: z.string(),
+const formSchema = user_schema.pick({ username: true }).extend({
+  password: z.string(),
 });
 
 export default function LoginPage() {
@@ -43,30 +47,24 @@ export default function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
 
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 300));
+    getUserRole(values.username)
+      .then((user) => {
+        login(user.username, user.role);
+        toast.success("Successfully logged in as " + user.username + " (" + user.role + ")");
 
-      // In a real app, you would call your authentication API here
-      // const response = await fetch("/api/login", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({
-      //     email: values.email,
-      //     password: values.password,
-      //   }),
-      // })
-
-      login(values.username, values.username === "admin" ? "admin" : "normal");
-
-      toast.success("Logged in successfully!");
-      navigate("/explorer");
-    } catch (error) {
-      toast.error("Something went wrong. Please try again.");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
+        if (user.role === "admin") {
+          navigate("/explorer");
+        } else {
+          navigate("/service");
+        }
+      })
+      .catch((e) => {
+        toast.error("Invalid username or password");
+        console.error(e);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   return (
@@ -92,6 +90,26 @@ export default function LoginPage() {
                         <Input
                           placeholder="admin"
                           type="text"
+                          // autoComplete="name"
+                          disabled={isLoading}
+                          {...field}
+                          required
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="password"
+                          type="password"
                           // autoComplete="name"
                           disabled={isLoading}
                           {...field}

@@ -1,13 +1,9 @@
+import { User } from "@/lib/type";
 import { createContext, useContext } from "react";
-
-export interface User {
-  username: string;
-  user_role: "admin" | "normal";
-}
 
 interface UserContextType {
   user: User | null;
-  login: (username: string, user_role: "admin" | "normal") => void;
+  login: (username: string, role: "admin" | "normal") => void;
   logout: () => void;
 }
 

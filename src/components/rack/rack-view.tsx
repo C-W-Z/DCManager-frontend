@@ -11,6 +11,7 @@ import Icon from "@/components/icon";
 import { DeleteConfirmation } from "../explorer/dialogs/delete-confirm";
 import { EditRackDialog } from "../explorer/dialogs/edit-rack";
 import { MoveItemDialog } from "../explorer/dialogs/move-item";
+import { LoadingView } from "../loading-view";
 
 const RackContext = createContext<{
   state: RackDroppable;
@@ -19,9 +20,11 @@ const RackContext = createContext<{
 
 export default function RackView() {
   const rackId = useParams().rackId as string;
+  const [loading, setLoading] = useState<boolean>(false);
   const [rack, setRack] = useState<Rack | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     getRack(rackId)
       .then((rack) => {
         setRack(rack);
@@ -31,6 +34,16 @@ export default function RackView() {
         setRack(null);
       });
   }, [rackId]);
+
+  useEffect(() => {
+      if (loading  && rack) {
+        setLoading(false);
+      }
+    }, [loading, rack]);
+
+    if (loading) {
+      return <LoadingView text={`Loading rack ${rackId}...`} />;
+    }
 
   return (
     <>

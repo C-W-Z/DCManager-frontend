@@ -20,30 +20,30 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
-import { simple_service_schema, SimpleDatacenter } from "@/lib/type";
+import { Service, simple_service_schema, SimpleDatacenter } from "@/lib/type";
 import { toast } from "sonner";
-import { addService, getAllDC } from "@/lib/api";
-import Icon from "@/components/icon";
-import { Plus, Trash2 } from "lucide-react";
+import { getAllDC, modifyService } from "@/lib/api";
+import { Edit, Plus, Trash2 } from "lucide-react";
 import { Label } from "../ui/label";
 import { DataCenterSelect } from "../select-datacenter";
-import { useUser } from "@/context/use-user";
 
 // Update form_schema to make allocated_subnet a string array
 const form_schema = z.object({
   name: simple_service_schema.shape.name,
   allocated_subnet: z.string().min(1, "IP Subnet is required").array(),
-  // .min(1, "At least one IP Subnet is required"),
 });
 
-type RackAllocation = { dc_name: string; n_racks: number };
+type RackAllocation = { dc_name: string; n_racks: number; isOriginal?: boolean; originalN_racks?: number };
 
-export function AddServiceDialog() {
-  const { user } = useUser();
+interface EditServiceDialogProps {
+  service: Service;
+  onUpdateSuccess?: () => void;
+}
 
+export function EditServiceDialog({ service, onUpdateSuccess }: EditServiceDialogProps) {
   const [open, setOpen] = useState(false);
   const [allocatedRacks, setAllocatedRacks] = useState<RackAllocation[]>([]);
-  const [allocatedSubnets, setAllocatedSubnets] = useState<string[]>([""]);
+  const [allocatedSubnets, setAllocatedSubnets] = useState<{ value: string; isOriginal: boolean }[]>([]);
   const [hasEmptyAllocatedRacks, setHasEmptyAllocatedRacks] = useState(false);
   const [hasEmptyAllocatedSubnets, setHasEmptyAllocatedSubnets] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -53,13 +53,35 @@ export function AddServiceDialog() {
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
     defaultValues: {
-      name: "",
-      allocated_subnet: [""],
+      name: service.name,
+      allocated_subnet: service.allocated_subnets || [""],
     },
   });
 
+  // Initialize state when dialog opens
   useEffect(() => {
     if (open) {
+      // Set allocated subnets with isOriginal flag
+      const subnets = (service.allocated_subnets || []).map((value) => ({
+        value,
+        isOriginal: true,
+      }));
+      setAllocatedSubnets(subnets.length > 0 ? subnets : [{ value: "", isOriginal: false }]);
+      form.setValue(
+        "allocated_subnet",
+        subnets.length > 0 ? subnets.map((s) => s.value) : [""],
+      );
+
+      // Convert allocated_racks record to RackAllocation array with original metadata
+      const racks = Object.entries(service.allocated_racks || {}).map(([dc_name, racks]) => ({
+        dc_name,
+        n_racks: racks.length,
+        isOriginal: true,
+        originalN_racks: racks.length,
+      }));
+      setAllocatedRacks(racks.length > 0 ? racks : [{ dc_name: "", n_racks: 1, isOriginal: false }]);
+
+      // Fetch data centers
       setLoading(true);
       getAllDC()
         .then((data) => {
@@ -72,16 +94,26 @@ export function AddServiceDialog() {
         .finally(() => {
           setLoading(false);
         });
+    } else {
+      // Reset state when dialog closes
+      form.reset({
+        name: service.name,
+        allocated_subnet: service.allocated_subnets || [""],
+      });
+      setAllocatedRacks([]);
+      setAllocatedSubnets([]);
+      setErrorMessage(null);
     }
-  }, [open]);
+  }, [open, service, form]);
 
+  // Validate allocated racks and subnets for empty fields
   useEffect(() => {
     const hasEmptyRacks = allocatedRacks.some(
-      (rack) => !rack.dc_name.trim() || rack.n_racks === 0,
+      (rack) => !rack.dc_name.trim() || rack.n_racks <= 0,
     );
     setHasEmptyAllocatedRacks(hasEmptyRacks);
 
-    const hasEmptySubnets = allocatedSubnets.some((subnet) => !subnet.trim());
+    const hasEmptySubnets = allocatedSubnets.some((subnet) => !subnet.value.trim());
     setHasEmptyAllocatedSubnets(hasEmptySubnets);
   }, [allocatedRacks, allocatedSubnets]);
 
@@ -95,7 +127,7 @@ export function AddServiceDialog() {
         i === index
           ? {
               ...rack,
-              [field]: field === "n_racks" ? parseInt(value) || 1 : value,
+              [field]: field === "n_racks" ? Math.max(rack.originalN_racks || 1, parseInt(value) || 1) : value,
             }
           : rack,
       ),
@@ -104,7 +136,7 @@ export function AddServiceDialog() {
   };
 
   const addAllocatedRacks = () => {
-    setAllocatedRacks((prev) => [...prev, { dc_name: "", n_racks: 1 }]);
+    setAllocatedRacks((prev) => [...prev, { dc_name: "", n_racks: 1, isOriginal: false }]);
     setErrorMessage(null);
   };
 
@@ -114,18 +146,20 @@ export function AddServiceDialog() {
   };
 
   const handleAllocatedSubnetChange = (index: number, value: string) => {
-    setAllocatedSubnets((prev) => prev.map((subnet, i) => (i === index ? value : subnet)));
+    setAllocatedSubnets((prev) =>
+      prev.map((subnet, i) => (i === index ? { ...subnet, value } : subnet)),
+    );
     setErrorMessage(null);
     // Update form value for validation
     form.setValue(
       "allocated_subnet",
-      allocatedSubnets.map((subnet, i) => (i === index ? value : subnet)),
+      allocatedSubnets.map((subnet, i) => (i === index ? value : subnet.value)),
     );
   };
 
   const addAllocatedSubnet = () => {
-    setAllocatedSubnets((prev) => [...prev, ""]);
-    form.setValue("allocated_subnet", [...allocatedSubnets, ""]);
+    setAllocatedSubnets((prev) => [...prev, { value: "", isOriginal: false }]);
+    form.setValue("allocated_subnet", [...allocatedSubnets.map((s) => s.value), ""]);
     setErrorMessage(null);
   };
 
@@ -133,14 +167,12 @@ export function AddServiceDialog() {
     setAllocatedSubnets((prev) => prev.filter((_, i) => i !== index));
     form.setValue(
       "allocated_subnet",
-      allocatedSubnets.filter((_, i) => i !== index),
+      allocatedSubnets.filter((_, i) => i !== index).map((s) => s.value),
     );
     setErrorMessage(null);
   };
 
   function onSubmit(values: z.infer<typeof form_schema>) {
-    if (!user) return
-
     setErrorMessage(null);
     const n_allocated_racks = allocatedRacks.reduce(
       (acc, rack) => {
@@ -154,28 +186,25 @@ export function AddServiceDialog() {
 
     setLoading(true);
 
-    console.log({
+    modifyService(service.name, {
       name: values.name,
       n_allocated_racks,
-      allocated_subnet: values.allocated_subnet,
-    });
-
-    addService({
-      name: values.name,
-      n_allocated_racks,
-      allocated_subnets: values.allocated_subnet,
-      username: user.username,
+      allocated_subnets: values.allocated_subnet.filter((subnet) => subnet.trim()),
     })
       .then(() => {
-        toast.success(`Service ${values.name} added successfully!`);
-        form.reset();
+        toast.success(`Service ${values.name} updated successfully!`);
+        form.reset({
+          name: service.name,
+          allocated_subnet: service.allocated_subnets || [""],
+        });
         setAllocatedRacks([]);
-        setAllocatedSubnets([""]);
+        setAllocatedSubnets([]);
         setOpen(false);
+        if (onUpdateSuccess) onUpdateSuccess();
       })
       .catch((error) => {
-        console.error("Error adding service:", error);
-        const message = error.message || "Failed to add service";
+        console.error("Error updating service:", error);
+        const message = error.message || "Failed to update service";
         setErrorMessage(message);
         toast.error(message);
       })
@@ -189,24 +218,18 @@ export function AddServiceDialog() {
       open={open}
       onOpenChange={(isOpen) => {
         setOpen(isOpen);
-        if (!isOpen) {
-          setErrorMessage(null);
-          form.reset();
-          setAllocatedRacks([]);
-          setAllocatedSubnets([""]);
-        }
       }}
       modal={false}
     >
       <DialogTrigger asChild>
         <Button className="flex h-fit w-fit flex-row items-center justify-start gap-3 text-sm font-bold">
-          <Icon id="add" className="size-4 fill-white" />
-          <p className="pr-2">New Service</p>
+          <Edit />
+          <p className="pr-2">Edit</p>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[400px] [&>button]:hidden">
         <DialogHeader>
-          <DialogTitle>Add New Service</DialogTitle>
+          <DialogTitle>Edit Service</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -260,13 +283,16 @@ export function AddServiceDialog() {
                                 <Input
                                   type="text"
                                   placeholder="192.168.1.0/24"
-                                  value={subnet}
+                                  value={subnet.value}
                                   onChange={(e) => {
-                                    handleAllocatedSubnetChange(index, e.target.value);
-                                    field.onChange(e.target.value);
+                                    if (!subnet.isOriginal) {
+                                      handleAllocatedSubnetChange(index, e.target.value);
+                                      field.onChange(e.target.value);
+                                    }
                                   }}
-                                  className={subnet.trim() ? "" : "border-red-300"}
-                                  disabled={loading}
+                                  className={subnet.value.trim() ? "" : "border-red-300"}
+                                  disabled={loading || subnet.isOriginal}
+                                  // readOnly={subnet.isOriginal}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -280,7 +306,7 @@ export function AddServiceDialog() {
                         size="icon"
                         onClick={() => removeAllocatedSubnet(index)}
                         className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600"
-                        disabled={loading}
+                        disabled={loading || subnet.isOriginal}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -320,10 +346,12 @@ export function AddServiceDialog() {
                         <DataCenterSelect
                           dataCenters={dataCenters}
                           value={rack.dc_name}
-                          onChange={(value) =>
-                            handleAllocatedRacksChange(index, "dc_name", value)
-                          }
-                          disabled={loading}
+                          onChange={(value) => {
+                            if (!rack.isOriginal) {
+                              handleAllocatedRacksChange(index, "dc_name", value);
+                            }
+                          }}
+                          disabled={loading || rack.isOriginal}
                           allocatedRacks={allocatedRacks}
                           index={index}
                         />
@@ -336,7 +364,7 @@ export function AddServiceDialog() {
                           type="number"
                           placeholder="Number of Racks"
                           value={rack.n_racks.toString()}
-                          min={1}
+                          min={rack.isOriginal ? rack.originalN_racks : 1}
                           onChange={(e) =>
                             handleAllocatedRacksChange(index, "n_racks", e.target.value)
                           }
@@ -350,7 +378,7 @@ export function AddServiceDialog() {
                         size="icon"
                         onClick={() => removeAllocatedRacks(index)}
                         className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600"
-                        disabled={loading}
+                        disabled={loading || rack.isOriginal}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -378,7 +406,7 @@ export function AddServiceDialog() {
                 type="submit"
                 disabled={loading || hasEmptyAllocatedRacks || hasEmptyAllocatedSubnets}
               >
-                {loading ? "Adding..." : "Add"}
+                {loading ? "Updating..." : "Update"}
               </Button>
             </DialogFooter>
           </form>

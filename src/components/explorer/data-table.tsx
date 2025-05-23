@@ -37,6 +37,7 @@ import { DataTablePagination } from "./data-table-pagination";
 import { Move, Trash2 } from "lucide-react";
 import { DeleteConfirmation, DeleteType } from "./dialogs/delete-confirm";
 import { MoveItemDialog } from "./dialogs/move-item";
+import { useUser } from "@/context/use-user";
 
 interface WithID {
   name: string;
@@ -65,6 +66,7 @@ export function DataTable<TData extends WithID, TValue>({
   onDeleteSuccess,
   type,
 }: DataTableProps<TData, TValue>) {
+  const { user } = useUser();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -143,20 +145,23 @@ export function DataTable<TData extends WithID, TValue>({
             disabled={loading}
           />
 
-          {type !== "datacenter" && type !== "host" && selectedRowCount > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1"
-              onClick={onMoveSelected}
-              disabled={loading}
-            >
-              <Move className="h-4 w-4" />
-              Move Selected ({selectedRowCount})
-            </Button>
-          )}
+          {user?.role === "admin" &&
+            type !== "datacenter" &&
+            type !== "host" &&
+            selectedRowCount > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1"
+                onClick={onMoveSelected}
+                disabled={loading}
+              >
+                <Move className="h-4 w-4" />
+                Move Selected ({selectedRowCount})
+              </Button>
+            )}
 
-          {selectedRowCount > 0 && (
+          {user?.role === "admin" && selectedRowCount > 0 && (
             <Button
               variant="destructive"
               size="sm"
@@ -275,7 +280,7 @@ export function DataTable<TData extends WithID, TValue>({
 
       <DataTablePagination table={table} />
 
-      {type !== "datacenter" && (
+      {user?.role === "admin" && type !== "datacenter" && (
         <MoveItemDialog
           type={type}
           items={itemsToMove as unknown as (SimpleRoom | SimpleRack | Host)[]}
@@ -283,11 +288,13 @@ export function DataTable<TData extends WithID, TValue>({
         />
       )}
 
-      <DeleteConfirmation
-        ids={multipleIdsToDelete}
-        type={type}
-        onSuccess={handleDeleteSuccess}
-      />
+      {user?.role === "admin" && (
+        <DeleteConfirmation
+          ids={multipleIdsToDelete}
+          type={type}
+          onSuccess={handleDeleteSuccess}
+        />
+      )}
     </div>
   );
 }
