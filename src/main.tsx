@@ -17,7 +17,7 @@ import RackTable from "@/components/explorer/tables/rack-table";
 import HostTable from "./components/explorer/tables/host-table";
 import { UserProvider } from "./context/user-context";
 import LoginPage from "./login";
-import AddHosts from "./components/add-hosts";
+import AddHosts from "./view/service/bulk-add-host-view";
 
 createRoot(document.getElementById("root")!).render(
   <UserProvider>

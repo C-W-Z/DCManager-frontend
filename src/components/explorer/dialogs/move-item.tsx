@@ -271,7 +271,8 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
   // 检查是否可以移动
   const canMove = () => {
     if (items.length === 0) return false;
-    if (type === "room") return !!selectedDC && selectedDC !== (items[0] as SimpleRoom).dc_name;
+    if (type === "room")
+      return !!selectedDC && selectedDC !== (items[0] as SimpleRoom).dc_name;
     if (type === "rack")
       return !!selectedRoom && selectedRoom !== (items[0] as SimpleRack).room_name;
     if (type === "host")

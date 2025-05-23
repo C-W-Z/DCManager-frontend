@@ -50,7 +50,7 @@ export default function ServiceBoard() {
       <div className="flex flex-row items-start justify-between">
         <div className="mb-4 flex flex-row items-center gap-2">
           <Icon id="service" className="size-8" />
-          <div className="text-2xl font-bold">Your Services</div>
+          <div className="text-2xl font-bold">服務管理</div>
         </div>
         <div>
           <div className="flex flex-row justify-end gap-4">

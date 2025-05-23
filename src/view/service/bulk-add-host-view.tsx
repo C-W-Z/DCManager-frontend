@@ -4,7 +4,7 @@ import { Service, simple_rack_schema } from "@/lib/type";
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
 import { z } from "zod";
-import { LoadingView } from "./loading-view";
+import { LoadingView } from "../../components/loading-view";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -37,7 +37,7 @@ export const rackWithDC_schema = simple_rack_schema.extend({
 });
 export type RackWithDC = z.infer<typeof rackWithDC_schema>;
 
-export default function AddHosts() {
+export default function BulkAddHostView() {
   const serviceName = useParams().serviceId as string;
 
   const [racks, setRacks] = useState<RackWithDC[]>([]);
@@ -253,7 +253,9 @@ export default function AddHosts() {
 
   return (
     <div className="m-12">
-      <h1 className="mb-4 text-2xl font-bold">Bulk Host Addition for Service: {serviceName}</h1>
+      <h1 className="mb-4 text-2xl font-bold">
+        Bulk Host Addition for Service: {serviceName}
+      </h1>
       <div className="w-full">
         {error && (
           <Alert variant="destructive" className="mb-4">

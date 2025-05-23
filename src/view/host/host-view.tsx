@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import Icon from "@/components/icon";
 import { useParams, useNavigate } from "react-router-dom";
 import { DeleteConfirmation } from "@/components/explorer/dialogs/delete-confirm";
-import { EditHostDialog } from "./edit-host";
+import { EditHostDialog } from "./edit-host-dialog";
 import {
   RackDroppable,
   RackDnDReducer,
@@ -14,10 +14,10 @@ import {
   createInitialState,
 } from "@/components/rack-dnd/rack-dnd-reducer";
 import { RackDnD } from "@/components/rack-dnd/rack-dnd";
-import { MoveItemDialog } from "@/components/explorer/dialogs/move-item";
 import { LoadingView } from "@/components/loading-view";
-import { useUser } from "@/context/use-user";
 import { FallbackView } from "@/components/fallback-view";
+import { useUser } from "@/context/use-user";
+import { MoveHostDialog } from "./move-host-dialog";
 
 export default function HostView() {
   const hostName = useParams().hostName as string;
@@ -101,11 +101,8 @@ function Wrapper({
     setHost({ ...host, pos: newPos });
   }
 
-  function onMoveSuccess(data: { rack_name: string | null }) {
-    if (data.rack_name) {
-      setHost({ ...host, rack_name: data.rack_name });
-      navigate(`/rack/${data.rack_name}`);
-    }
+  function onMoveSuccess(rack_name: string) {
+    navigate(`/rack/${rack_name}`);
   }
 
   return (
@@ -121,7 +118,7 @@ function Wrapper({
             <DataFlexRow label="Datacenter" data={host.dc_name} />
             <DataFlexRow label="Room" data={host.room_name} />
             <DataFlexRow label="Rack" data={host.rack_name} link={`/rack/${host.rack_name}`} />
-            <DataFlexRow label="Position" data={`${host.pos}`} />
+            <DataFlexRow label="機櫃內位置" data={`${host.pos}`} />
             <Separator />
             <DataFlexRow
               label="運行服務"
@@ -171,10 +168,10 @@ function Wrapper({
             className="flex h-fit w-full flex-row items-center justify-start gap-3 self-start text-sm font-bold"
           >
             <Icon id="move" className="size-4 fill-white" />
-            <p className="pr-2">Move Host To Other Rack</p>
+            <p className="pr-2">移動主機至其他機櫃</p>
           </Button>
           <RackDnD context={HostContext} hostId={host.name} onMoveUpdate={onMoveUpdate} />
-          <div className="text-sm text-gray-500">Drag the host to move in rack.</div>
+          <div className="text-sm text-gray-500">拖動主機來改變機櫃內位置</div>
         </div>
       </div>
 
@@ -182,7 +179,7 @@ function Wrapper({
         host={editHost}
         onUpdateSuccess={(updatedHost) => setHost({ ...host, ...updatedHost })}
       />
-      <MoveItemDialog type="host" items={moveHost} onSuccess={onMoveSuccess} />
+      <MoveHostDialog items={moveHost} onSuccess={onMoveSuccess} />
       <DeleteConfirmation
         ids={deleteIds}
         type="host"

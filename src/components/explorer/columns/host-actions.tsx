@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EditHostDialog } from "@/view//host/edit-host";
+import { EditHostDialog } from "@/view/host/edit-host-dialog";
 import { DeleteConfirmation } from "../dialogs/delete-confirm";
 import { Row } from "@tanstack/react-table";
 import type { Host } from "@/lib/type";

@@ -7,9 +7,9 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { EditServiceDialog } from "./edit-service";
 import { useUser } from "@/context/use-user";
-import { LoadingView } from "../loading-view";
-import { FallbackView } from "../fallback-view";
-import { Button } from "../ui/button";
+import { LoadingView } from "@/components/loading-view";
+import { FallbackView } from "@/components/fallback-view";
+import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
 export default function ServiceView() {
@@ -56,14 +56,6 @@ export default function ServiceView() {
 
   const total_ip = service.total_ip_list.length;
   const available_ip = service.available_ip_list.length;
-
-  if (!service) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <div className="text-xl font-bold">Service ID: {serviceId} not found :(</div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex h-screen w-full flex-col items-start justify-between px-20 pt-12">
