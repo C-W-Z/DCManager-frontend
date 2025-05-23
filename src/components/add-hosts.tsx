@@ -188,13 +188,13 @@ export default function AddHosts() {
     setSuccess(null);
 
     try {
-      for (let i = 0; i < previewData.length; i++) {
-        const row = previewData[i];
+      let updatedPreviewData = [...previewData]; // Create a local copy to track updates
+
+      for (let i = 0; i < updatedPreviewData.length; i++) {
+        const row = updatedPreviewData[i];
         if (row.status !== "Pending") continue; // Skip already processed rows
 
-        // setPreviewData((prev) =>
-        //   prev.map((r, index) => (index === i ? { ...r, status: "Pending" } : r)),
-        // );
+        // console.log("Processing row", i, row);
 
         try {
           const rack = racks.find(
@@ -216,43 +216,34 @@ export default function AddHosts() {
             pos: parseInt(row.position),
           });
 
-          setPreviewData((prev) =>
-            prev.map((r, index) => (index === i ? { ...r, status: "Added" } : r)),
+          // Update the local copy
+          updatedPreviewData = updatedPreviewData.map((r, index) =>
+            index === i ? { ...r, status: "Added" as const } : r,
           );
+          setPreviewData(updatedPreviewData);
+          // console.log("Added row", i, updatedPreviewData[i]);
         } catch (err) {
-          setPreviewData((prev) =>
-            prev.map((r, index) =>
-              index === i ? { ...r, status: "Failed", error: (err as Error).message } : r,
-            ),
+          // Update the local copy on error
+          updatedPreviewData = updatedPreviewData.map((r, index) =>
+            index === i
+              ? { ...r, status: "Failed" as const, error: (err as Error).message }
+              : r,
           );
+          setPreviewData(updatedPreviewData);
+          // console.log("Failed row", i, updatedPreviewData[i]);
         }
       }
 
-      let attempts = 0;
-      const maxAttempts = 3;
-      const interval = setInterval(async () => {
-        if (previewData.every((row) => row.status !== "Pending")) {
-          const allSuccessful = previewData.every((row) => row.status === "Added");
-          console.log("check all success", previewData)
-          if (allSuccessful) {
-            setSuccess("All hosts added successfully");
-            setIsPreviewVisible(false);
-            setPreviewData([]);
-          } else {
-            setError("Some hosts failed to add. Please review the preview.");
-          }
+      const allSuccessful = updatedPreviewData.every((row) => row.status === "Added");
+      if (allSuccessful) {
+        setSuccess("All hosts added successfully");
+        setIsPreviewVisible(false);
+        setPreviewData([]);
+      } else {
+        setError("Some hosts failed to add. Please review the preview.");
+      }
 
-          await refreshRacks();
-          clearInterval(interval);
-        } else if (attempts >= maxAttempts) {
-          console.log("max attempts", previewData)
-          setError("Some hosts failed to add. Please review the preview.");
-          await refreshRacks();
-          clearInterval(interval);
-        }
-        attempts++;
-      }, 100);
-      return () => clearInterval(interval);
+      await refreshRacks();
     } catch (err) {
       setError("Failed to process hosts: " + (err as Error).message);
     } finally {
@@ -262,7 +253,7 @@ export default function AddHosts() {
 
   return (
     <div className="m-12">
-      <h1 className="mb-4 text-2xl font-bold">Bulk Host Addition for Service {serviceName}</h1>
+      <h1 className="mb-4 text-2xl font-bold">Bulk Host Addition for Service: {serviceName}</h1>
       <div className="w-full">
         {error && (
           <Alert variant="destructive" className="mb-4">
