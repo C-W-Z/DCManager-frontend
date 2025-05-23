@@ -39,7 +39,7 @@ const form_schema = z.object({
 type RackAllocation = { dc_name: string; n_racks: number };
 
 export function AddServiceDialog() {
-  const { user } = useUser();
+  const { user, loadAccessableService } = useUser();
 
   const [open, setOpen] = useState(false);
   const [allocatedRacks, setAllocatedRacks] = useState<RackAllocation[]>([]);
@@ -172,6 +172,7 @@ export function AddServiceDialog() {
         setAllocatedRacks([]);
         setAllocatedSubnets([""]);
         setOpen(false);
+        loadAccessableService();
       })
       .catch((error) => {
         console.error("Error adding service:", error);

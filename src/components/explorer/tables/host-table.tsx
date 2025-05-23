@@ -3,27 +3,25 @@
 import { DataTable } from "@/components/explorer/data-table";
 import { hostColumns } from "@/components/explorer/columns/host-columns";
 import type { Host } from "@/lib/type";
-import { getAllHost, getUserService } from "@/lib/api";
+import { getAllHost } from "@/lib/api";
 import { useEffect, useState, useCallback } from "react";
 import { useUser } from "@/context/use-user";
 import Icon from "@/components/icon";
 
 export default function HostTable() {
-  const { user } = useUser();
+  const { user, accessableService } = useUser();
   const [host, setHost] = useState<Host[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const loadDataCenters = useCallback(() => {
+  const loadHosts = useCallback(() => {
     setLoading(true);
     getAllHost()
       .then((hosts) => {
         if (user?.role === "normal") {
-          return getUserService(user.username).then((serviceList) => {
-            const updatedHost = hosts.filter((h) =>
-              serviceList.some((s) => s.name === h.service_name),
-            );
-            setHost(updatedHost);
-          });
+          const updatedHost = hosts.filter((h) =>
+            accessableService.some((s) => s == h.service_name),
+          );
+          setHost(updatedHost);
         } else {
           setHost(hosts);
         }
@@ -35,11 +33,11 @@ export default function HostTable() {
       .finally(() => {
         setLoading(false);
       });
-  }, [user?.role, user?.username]);
+  }, [accessableService, user?.role]);
 
   useEffect(() => {
-    loadDataCenters();
-  }, [loadDataCenters]);
+    loadHosts();
+  }, [loadHosts]);
 
   const onUpdateSuccess = (updatedDC: Host) => {
     if (updatedDC) {
@@ -63,7 +61,7 @@ export default function HostTable() {
   };
 
   const handleRefresh = () => {
-    loadDataCenters();
+    loadHosts();
   };
 
   const columns = hostColumns({

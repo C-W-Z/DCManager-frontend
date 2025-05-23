@@ -30,7 +30,7 @@ export default function ServiceBoard() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [setAccessableService]);
 
   useEffect(() => {
     if (!user) return;

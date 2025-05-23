@@ -1,6 +1,7 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode, useCallback } from "react";
 import { UserContext } from "./use-user";
 import { User } from "@/lib/type";
+import { getUserService } from "@/lib/api";
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -32,6 +33,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     });
     localStorage.setItem("username", JSON.stringify(username));
     localStorage.setItem("role", JSON.stringify(role));
+    loadAccessableService();
   };
 
   const logout = () => {
@@ -41,14 +43,32 @@ export function UserProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("accessableService");
   };
 
-  const setAccessableService = (services: string[]) => {
+  const setAccessableService = useCallback((services: string[]) => {
     _setAccessableService(services);
     localStorage.setItem("accessableService", JSON.stringify(services));
-  };
+  }, []);
+
+  const loadAccessableService = useCallback(() => {
+    if (!user) return;
+    getUserService(user.username)
+      .then((serviceList) => {
+        setAccessableService(serviceList.map((service) => service.name));
+      })
+      .catch((error) => {
+        console.error("Error fetching all service data:", error);
+      });
+  }, [setAccessableService, user]);
 
   return (
     <UserContext.Provider
-      value={{ user, accessableService, setAccessableService, login, logout }}
+      value={{
+        user,
+        accessableService,
+        setAccessableService,
+        loadAccessableService,
+        login,
+        logout,
+      }}
     >
       {children}
     </UserContext.Provider>
