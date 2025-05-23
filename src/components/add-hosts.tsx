@@ -5,6 +5,19 @@ import { saveAs } from "file-saver";
 import Papa from "papaparse";
 import { z } from "zod";
 import { LoadingView } from "./loading-view";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { useParams } from "react-router-dom";
 
 interface CsvRow {
@@ -141,7 +154,7 @@ export default function AddHosts() {
             });
           }
           setSuccess("Hosts added successfully");
-          await refreshRacks(); // Reuse the refresh function
+          await refreshRacks();
         } catch (err) {
           setError("Failed to add hosts: " + (err as Error).message);
         } finally {
@@ -156,55 +169,71 @@ export default function AddHosts() {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="mb-4 text-2xl font-bold">Bulk Host Addition for {serviceName}</h1>
+    <div className="m-12">
+      <h1 className="mb-4 text-2xl font-bold">Bulk Host Addition for Service {serviceName}</h1>
+      <div className="w-full">
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        {success && (
+          <Alert variant="default" className="mb-4 border-green-500">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <AlertTitle>Success</AlertTitle>
+            <AlertDescription>{success}</AlertDescription>
+          </Alert>
+        )}
 
-      {error && <div className="mb-4 text-red-500">{error}</div>}
-      {success && <div className="mb-4 text-green-500">{success}</div>}
+        <div className="mb-6 flex gap-4">
+          <Button
+            onClick={downloadTemplate}
+            disabled={loading || racks.length === 0}
+            className="bg-primary hover:bg-primary/90"
+          >
+            Download CSV Template
+          </Button>
+          <div className="self-center">
+            Upload CSV:
+          </div>
+          <div>
+            <Input
+              type="file"
+              accept=".csv"
+              onChange={handleFileUpload}
+              disabled={loading}
+              className="hover:cursor-pointer"
+            />
+          </div>
+        </div>
 
-      <div className="mb-4">
-        <button
-          onClick={downloadTemplate}
-          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:bg-blue-300"
-          disabled={loading || racks.length === 0}
-        >
-          Download CSV Template
-        </button>
-        <input
-          type="file"
-          accept=".csv"
-          onChange={handleFileUpload}
-          className="ml-4"
-          disabled={loading}
-        />
+        {loading ? (
+          <LoadingView text="Loading..." />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Datacenter</TableHead>
+                <TableHead>Room</TableHead>
+                <TableHead>Rack</TableHead>
+                <TableHead>Available Positions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {racks.map((rack) => (
+                <TableRow key={rack.name}>
+                  <TableCell>{rack.dc_name}</TableCell>
+                  <TableCell>{rack.room_name}</TableCell>
+                  <TableCell>{rack.name}</TableCell>
+                  <TableCell>{(availablePositions[rack.name] || []).join(", ")}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
-
-      {loading ? (
-        <LoadingView text="Loading..."/>
-      ) : (
-        <table className="w-full border-collapse border">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2">Datacenter</th>
-              <th className="border p-2">Room</th>
-              <th className="border p-2">Rack</th>
-              <th className="border p-2">Available Positions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {racks.map((rack) => (
-              <tr key={rack.name}>
-                <td className="border p-2">{rack.dc_name}</td>
-                <td className="border p-2">{rack.room_name}</td>
-                <td className="border p-2">{rack.name}</td>
-                <td className="border p-2">
-                  {(availablePositions[rack.name] || []).join(", ")}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
     </div>
   );
 }

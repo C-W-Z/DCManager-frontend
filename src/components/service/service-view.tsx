@@ -51,61 +51,61 @@ export default function ServiceView() {
   const total_ip = service.total_ip_list.length;
   const available_ip = service.available_ip_list.length;
 
-  return (
-    <>
-      {service ? (
-        <div className="flex h-screen w-full flex-col items-start justify-between px-20 pt-12">
-          <div className="mb-4 flex flex-row items-center gap-2">
-            <Icon id="service" className="size-8" />
-            <div className="text-2xl font-bold">{service.name}</div>
-          </div>
-          <div className="mb-8 flex w-full flex-row items-center gap-8 p-2">
-            <div>
-              <label className="text-sm text-gray-500">已上架機器數量</label>
-              <p>{service.hosts.length}</p>
-            </div>
-            <div>
-              <label className="text-sm text-gray-500">已使用 IP 數量</label>
-              <p className={cn(available_ip <= 2 ? "text-red-500" : "")}>
-                {total_ip - available_ip} / {total_ip}
-              </p>
-            </div>
-            <div>
-              <label className="text-sm text-gray-500">已分配網段</label>
-              <p>
-                {service.allocated_subnets.length > 0
-                  ? service.allocated_subnets.join(", ")
-                  : "無"}
-              </p>
-            </div>
-            <div className="flex-1"></div>
-            <EditServiceDialog service={service} />
-          </div>
+  if (!service) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="text-xl font-bold">Service ID: {serviceId} not found :(</div>
+      </div>
+    );
+  }
 
-          <div className="grid w-full grid-cols-[1fr_2fr_2fr_2fr] gap-4">
-            <div className="translate-x-2 text-sm text-gray-500">Datacenter</div>
-            <div className="translate-x-2 text-sm text-gray-500">Rack</div>
-            <div className="text-sm text-gray-500">Host</div>
-            <div className="text-sm text-gray-500">IP</div>
-          </div>
-          <Separator />
-          <div className="mb-4 flex h-full w-full flex-col items-start justify-start gap-2 overflow-y-scroll">
-            {Object.entries(service.allocated_racks).map(([dc_name, racks]) => (
-              <DCBlock
-                key={dc_name}
-                dc_name={dc_name}
-                racks={racks}
-                hosts={service.hosts.filter((host) => host.dc_name === dc_name)}
-              />
-            ))}
-          </div>
+  return (
+    <div className="flex h-screen w-full flex-col items-start justify-between px-20 pt-12">
+      <div className="mb-4 flex flex-row items-center gap-2">
+        <Icon id="service" className="size-8" />
+        <div className="text-2xl font-bold">{service.name}</div>
+      </div>
+      <div className="mb-8 flex w-full flex-row items-center gap-8 p-2">
+        <div>
+          <label className="text-sm text-gray-500">已上架機器數量</label>
+          <p>{service.hosts.length}</p>
         </div>
-      ) : (
-        <div className="flex h-screen w-full items-center justify-center">
-          <div className="text-xl font-bold">Service ID: {serviceId} not found :(</div>
+        <div>
+          <label className="text-sm text-gray-500">已使用 IP 數量</label>
+          <p className={cn(available_ip <= 2 ? "text-red-500" : "")}>
+            {total_ip - available_ip} / {total_ip}
+          </p>
         </div>
-      )}
-    </>
+        <div>
+          <label className="text-sm text-gray-500">已分配網段</label>
+          <p>
+            {service.allocated_subnets.length > 0
+              ? service.allocated_subnets.join(", ")
+              : "無"}
+          </p>
+        </div>
+        <div className="flex-1"></div>
+        <EditServiceDialog service={service} />
+      </div>
+
+      <div className="grid w-full grid-cols-[1fr_2fr_2fr_2fr] gap-4">
+        <div className="translate-x-2 text-sm text-gray-500">Datacenter</div>
+        <div className="translate-x-2 text-sm text-gray-500">Rack</div>
+        <div className="text-sm text-gray-500">Host</div>
+        <div className="text-sm text-gray-500">IP</div>
+      </div>
+      <Separator />
+      <div className="mb-4 flex h-full w-full flex-col items-start justify-start gap-2 overflow-y-scroll">
+        {Object.entries(service.allocated_racks).map(([dc_name, racks]) => (
+          <DCBlock
+            key={dc_name}
+            dc_name={dc_name}
+            racks={racks}
+            hosts={service.hosts.filter((host) => host.dc_name === dc_name)}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
