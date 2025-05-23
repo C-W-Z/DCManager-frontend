@@ -1,5 +1,6 @@
 # DCManager-frontend
-## Run Local
+## How to run
+### Run Local
 to run locally (without docker), you need to install the dependency first
 ```
 cd DCManager-frontend/
@@ -11,8 +12,15 @@ then
 npm run dev
 ```
 
-## Use Frontend Mock Data
+### Use Mock Data
 set `.env` to
 ```
 API_MODE=mock
 ```
+
+## Convention
+`lib/`: 定義型別、API、幫手函式
+`view/`: 畫面
+`components/`: 可重複利用的 React Components
+`components/ui/`: Shadcn 元件
+`hooks/`: 自定義 react hooks

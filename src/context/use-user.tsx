@@ -3,6 +3,8 @@ import { createContext, useContext } from "react";
 
 interface UserContextType {
   user: User | null;
+  accessableService: string[];
+  setAccessableService: (services: string[]) => void;
   login: (username: string, role: "admin" | "normal") => void;
   logout: () => void;
 }

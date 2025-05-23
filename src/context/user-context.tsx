@@ -4,17 +4,24 @@ import { User } from "@/lib/type";
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [accessableService, _setAccessableService] = useState<string[]>([]);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
     const storedRole = localStorage.getItem("role");
-    if (storedUsername && storedRole) {
+    const storedAccessableService = localStorage.getItem("accessableService");
+
+    if (storedUsername && storedRole && storedAccessableService) {
+      console.log("Found UserProvider: ", storedUsername, storedRole, storedAccessableService);
+
       setUser({
         username: JSON.parse(storedUsername),
         role: JSON.parse(storedRole),
       });
+      _setAccessableService(JSON.parse(storedAccessableService));
     } else {
       setUser(null);
+      _setAccessableService([]);
     }
   }, []);
 
@@ -31,9 +38,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setUser(null);
     localStorage.removeItem("username");
     localStorage.removeItem("role");
+    localStorage.removeItem("accessableService");
+  };
+
+  const setAccessableService = (services: string[]) => {
+    _setAccessableService(services);
+    localStorage.setItem("accessableService", JSON.stringify(services));
   };
 
   return (
-    <UserContext.Provider value={{ user, login, logout }}>{children}</UserContext.Provider>
+    <UserContext.Provider
+      value={{ user, accessableService, setAccessableService, login, logout }}
+    >
+      {children}
+    </UserContext.Provider>
   );
 }

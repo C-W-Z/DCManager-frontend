@@ -92,10 +92,6 @@ export default function HostDraggable({
 
     if (state.dragging?.name === host.name) {
       if (state.dragging.valid) {
-        toast.success(
-          `Host ${host.name} successfully moved to position ${state.dragging.nextPos}`,
-        );
-
         const newPos = state.dragging.nextPos;
 
         modifyHost(host.name, {

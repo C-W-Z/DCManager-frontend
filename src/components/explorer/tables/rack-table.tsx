@@ -92,7 +92,9 @@ export default function RackTable() {
           >
             {loading ? "Loading..." : "Refresh"}
           </button>
-          {user?.role === "admin" && datacenter && room && <AddRackDialog currentDC={datacenter} currentRoom={room} />}
+          {user?.role === "admin" && datacenter && room && (
+            <AddRackDialog currentDC={datacenter} currentRoom={room} />
+          )}
         </div>
       </div>
 

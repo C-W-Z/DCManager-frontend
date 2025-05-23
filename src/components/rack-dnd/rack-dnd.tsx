@@ -7,7 +7,7 @@ import { RackContextType } from "@/components/rack-dnd/rack-dnd-reducer";
 import { useContextSafe } from "@/lib/utils";
 import { HostComponent } from "./host-component";
 
-export default function RackDnD({
+export function RackDnD({
   context,
   hostId,
   onMoveUpdate,

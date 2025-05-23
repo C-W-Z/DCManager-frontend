@@ -8,12 +8,13 @@ import { LoadingButton } from "@/components/loading-button";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import Icon from "@/components/icon";
-import { LoadingView } from "../loading-view";
+import { LoadingView } from "@/components/loading-view";
+import { FallbackView } from "@/components/fallback-view";
 
 export default function ServiceBoard() {
   const [services, setServices] = useState<SimpleService[]>([]);
   const [loading, setLoading] = useState(false);
-  const { user } = useUser();
+  const { user, setAccessableService } = useUser();
 
   const LoadService = useCallback((username: string) => {
     setLoading(true);
@@ -21,6 +22,7 @@ export default function ServiceBoard() {
     getUserService(username)
       .then((serviceList) => {
         setServices(serviceList);
+        setAccessableService(serviceList.map((service) => service.name));
       })
       .catch((error) => {
         console.error("Error fetching all service data:", error);
@@ -36,7 +38,7 @@ export default function ServiceBoard() {
   }, [LoadService, user]);
 
   if (!user) {
-    return <div className="text-lg font-semibold">Please log in to view services.</div>;
+    return <FallbackView text={"請登入以瀏覽此頁面。"} />;
   }
 
   if (loading) {
@@ -45,15 +47,19 @@ export default function ServiceBoard() {
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-12">
-      <div className="mb-4 flex flex-row items-center gap-2">
-        <Icon id="service" className="size-8" />
-        <div className="text-2xl font-bold">Your Services</div>
-      </div>
-      <div className="flex flex-row justify-end gap-4">
-        <LoadingButton isLoading={loading} onClick={() => LoadService(user.username)}>
-          Refresh
-        </LoadingButton>
-        <AddServiceDialog />
+      <div className="flex flex-row items-start justify-between">
+        <div className="mb-4 flex flex-row items-center gap-2">
+          <Icon id="service" className="size-8" />
+          <div className="text-2xl font-bold">Your Services</div>
+        </div>
+        <div>
+          <div className="flex flex-row justify-end gap-4">
+            <LoadingButton isLoading={loading} onClick={() => LoadService(user.username)}>
+              Refresh
+            </LoadingButton>
+            <AddServiceDialog />
+          </div>
+        </div>
       </div>
       {services.length === 0 ? (
         <div>

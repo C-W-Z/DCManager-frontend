@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EditHostDialog } from "@/components/host/edit-host";
+import { EditHostDialog } from "@/view//host/edit-host";
 import { DeleteConfirmation } from "../dialogs/delete-confirm";
 import { Row } from "@tanstack/react-table";
 import type { Host } from "@/lib/type";
@@ -79,10 +79,7 @@ export function HostRowActions({
             <Move className="mr-2 h-4 w-4" /> Move
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="text-red-600"
-            onClick={() => handleDelete(host)}
-          >
+          <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(host)}>
             <Trash2 className="mr-2 h-4 w-4" /> DELETE
           </DropdownMenuItem>
         </DropdownMenuContent>

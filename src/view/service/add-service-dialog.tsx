@@ -25,8 +25,8 @@ import { toast } from "sonner";
 import { addService, getAllDC } from "@/lib/api";
 import Icon from "@/components/icon";
 import { Plus, Trash2 } from "lucide-react";
-import { Label } from "../ui/label";
-import { DataCenterSelect } from "../select-datacenter";
+import { Label } from "../../components/ui/label";
+import { DataCenterSelect } from "../../components/select-datacenter";
 import { useUser } from "@/context/use-user";
 
 // Update form_schema to make allocated_subnet a string array
@@ -139,7 +139,7 @@ export function AddServiceDialog() {
   };
 
   function onSubmit(values: z.infer<typeof form_schema>) {
-    if (!user) return
+    if (!user) return;
 
     setErrorMessage(null);
     const n_allocated_racks = allocatedRacks.reduce(

@@ -24,8 +24,8 @@ import { Service, simple_service_schema, SimpleDatacenter } from "@/lib/type";
 import { toast } from "sonner";
 import { getAllDC, modifyService } from "@/lib/api";
 import { Edit, Plus, Trash2 } from "lucide-react";
-import { Label } from "../ui/label";
-import { DataCenterSelect } from "../select-datacenter";
+import { Label } from "../../components/ui/label";
+import { DataCenterSelect } from "../../components/select-datacenter";
 
 // Update form_schema to make allocated_subnet a string array
 const form_schema = z.object({
@@ -33,7 +33,12 @@ const form_schema = z.object({
   allocated_subnet: z.string().min(1, "IP Subnet is required").array(),
 });
 
-type RackAllocation = { dc_name: string; n_racks: number; isOriginal?: boolean; originalN_racks?: number };
+type RackAllocation = {
+  dc_name: string;
+  n_racks: number;
+  isOriginal?: boolean;
+  originalN_racks?: number;
+};
 
 interface EditServiceDialogProps {
   service: Service;
@@ -43,7 +48,9 @@ interface EditServiceDialogProps {
 export function EditServiceDialog({ service, onUpdateSuccess }: EditServiceDialogProps) {
   const [open, setOpen] = useState(false);
   const [allocatedRacks, setAllocatedRacks] = useState<RackAllocation[]>([]);
-  const [allocatedSubnets, setAllocatedSubnets] = useState<{ value: string; isOriginal: boolean }[]>([]);
+  const [allocatedSubnets, setAllocatedSubnets] = useState<
+    { value: string; isOriginal: boolean }[]
+  >([]);
   const [hasEmptyAllocatedRacks, setHasEmptyAllocatedRacks] = useState(false);
   const [hasEmptyAllocatedSubnets, setHasEmptyAllocatedSubnets] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -79,7 +86,9 @@ export function EditServiceDialog({ service, onUpdateSuccess }: EditServiceDialo
         isOriginal: true,
         originalN_racks: racks.length,
       }));
-      setAllocatedRacks(racks.length > 0 ? racks : [{ dc_name: "", n_racks: 1, isOriginal: false }]);
+      setAllocatedRacks(
+        racks.length > 0 ? racks : [{ dc_name: "", n_racks: 1, isOriginal: false }],
+      );
 
       // Fetch data centers
       setLoading(true);
@@ -127,7 +136,10 @@ export function EditServiceDialog({ service, onUpdateSuccess }: EditServiceDialo
         i === index
           ? {
               ...rack,
-              [field]: field === "n_racks" ? Math.max(rack.originalN_racks || 1, parseInt(value) || 1) : value,
+              [field]:
+                field === "n_racks"
+                  ? Math.max(rack.originalN_racks || 1, parseInt(value) || 1)
+                  : value,
             }
           : rack,
       ),

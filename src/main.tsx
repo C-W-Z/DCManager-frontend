@@ -7,10 +7,10 @@ import "./global.css";
 // import Home from "./home";
 import Explorer from "@/components/explorer/explorer";
 import Layout from "./layout";
-import HostView from "./components/host/host-view";
-import RackView from "./components/rack/rack-view";
-import ServiceBoard from "./components/service/service-board";
-import ServiceView from "./components/service/service-view";
+import HostView from "@/view/host/host-view";
+import RackView from "@/view/rack/rack-view";
+import ServiceBoard from "./view/service/service-board";
+import ServiceView from "./view/service/service-view";
 import DataCenterTable from "@/components/explorer/tables/datacenter-table";
 import RoomTable from "@/components/explorer/tables/room-table";
 import RackTable from "@/components/explorer/tables/rack-table";
@@ -46,7 +46,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
         <Route
-          path="/rack/:rackId"
+          path="/rack/:rackName"
           element={
             <Layout>
               <RackView />
@@ -54,7 +54,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
         <Route
-          path="/host/:hostId"
+          path="/host/:hostName"
           element={
             <Layout>
               <HostView />
@@ -70,7 +70,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
         <Route
-          path="/service/:serviceId"
+          path="/service/:serviceName"
           element={
             <Layout>
               <ServiceView />

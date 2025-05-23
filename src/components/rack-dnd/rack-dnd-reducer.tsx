@@ -23,6 +23,27 @@ export type RackContextType = React.Context<{
   dispatch: React.ActionDispatch<[action: Action]>;
 } | null>;
 
+export function createInitialState(rack: Rack): RackDroppable {
+  const spaces = Array.from({ length: rack.height }, () => "space");
+
+  rack.hosts.forEach((host) => {
+    for (let i = 0; i < host.height; i++) {
+      spaces[host.pos - 1 + i] = host.name;
+    }
+  });
+
+  console.log("initial state", {
+    rack,
+    spaces,
+  });
+
+  return {
+    rack,
+    spaces,
+    dragging: undefined,
+  } as RackDroppable;
+}
+
 export function RackDnDReducer(state: RackDroppable, action: Action) {
   function clearHostFromSpaces(host: Host, spaces: string[]) {
     const newSpace = [...spaces];

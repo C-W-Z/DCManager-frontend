@@ -12,7 +12,6 @@ import {
 } from "@/components/explorer/summary/datacenter-summary";
 import { useUser } from "@/context/use-user";
 
-
 export default function DataCenterTable() {
   const { user } = useUser();
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);

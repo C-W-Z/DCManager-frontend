@@ -10,13 +10,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Edit, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { host_schema, Host } from "@/lib/type";
 import { modifyHost } from "@/lib/api";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface EditHostDialogProps {
   host: Host | null;
@@ -99,7 +106,7 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+        <form onSubmit={handleSubmit} className="space-y-6 pt-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -112,31 +119,31 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="height">Height (U)</Label>
-            <Input
-              id="height"
-              name="height"
-              type="number"
-              value={formData.height}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
             <Select
-              onValueChange={(value) => {
-                setFormData((prev) => ({ ...prev, status: value as Host["status"] }));
-              }}
+              onValueChange={(value) => setFormData({ ...formData, height: parseInt(value) })}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select status" />
+                <SelectValue placeholder="Select a height" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="running">Running</SelectItem>
-                <SelectItem value="idle">Idle</SelectItem>
-                <SelectItem value="stopped">Stopped</SelectItem>
+                {["1U", "2U", "3U", "4U"].map((height) => (
+                  <SelectItem key={height} value={height}>
+                    {height}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="flex flex-row gap-4 space-y-2">
+            <Label htmlFor="running">Stop Running?</Label>
+            <Checkbox
+              id="running"
+              name="running"
+              checked={!formData.running}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, running: checked ? false : true })
+              }
+            />
           </div>
 
           <DialogFooter>

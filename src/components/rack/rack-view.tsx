@@ -3,7 +3,7 @@ import { getRack } from "@/lib/api";
 import { Rack } from "@/lib/type";
 import RackDnD from "@/components/rack-dnd/rack-dnd";
 import { RackDnDReducer, RackDroppable, Action } from "@/components/rack-dnd/rack-dnd-reducer";
-import { InfoCard, Separator, CardColumn } from "@/components/infocard";
+import { InfoCard, Separator, CardColumn } from "@/components/components";
 import { AddHostDialog } from "@/components/rack/add-host-dialog";
 import { Button } from "@/components/ui/button";
 import { useParams } from "react-router-dom";
@@ -36,14 +36,14 @@ export default function RackView() {
   }, [rackId]);
 
   useEffect(() => {
-      if (loading  && rack) {
-        setLoading(false);
-      }
-    }, [loading, rack]);
-
-    if (loading) {
-      return <LoadingView text={`Loading rack ${rackId}...`} />;
+    if (loading && rack) {
+      setLoading(false);
     }
+  }, [loading, rack]);
+
+  if (loading) {
+    return <LoadingView text={`Loading rack ${rackId}...`} />;
+  }
 
   return (
     <>

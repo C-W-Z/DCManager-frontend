@@ -1,16 +1,11 @@
-import { JSX } from "react";
 import { Link } from "react-router-dom";
 import Icon from "@/components/icon";
-
-export function InfoCard({ children }: { children: JSX.Element }) {
-  return <div className="flex h-fit w-md flex-col gap-4">{children}</div>;
-}
 
 export const Separator = () => {
   return <div className="my-2 h-[2px] w-full bg-gray-200" />;
 };
 
-export const CardColumn = ({
+export const DataFlexRow = ({
   label,
   data,
   link,
