@@ -54,7 +54,7 @@ export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
       setRacks([]);
       setLoadingRack(false);
     }
-  }, []);
+  }, [accessableService]);
 
   const initParentRacks = useCallback(() => {
     const parentRacks: Set<string> = new Set();
@@ -74,7 +74,7 @@ export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
     } else {
       setIsOpen(false);
     }
-  }, [items]);
+  }, [LoadRack, initParentRacks, items]);
 
   const handleSelectRack = (rack_name: string) => {
     setSelectedRack(rack_name);
@@ -216,6 +216,9 @@ export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
         </div>
 
         <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
           <Button
             type="submit"
             onClick={handleMove}

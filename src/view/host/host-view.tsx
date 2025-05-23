@@ -26,23 +26,6 @@ export default function HostView() {
   const [host, setHost] = useState<Host | null>(null);
   const { user, accessableService } = useUser();
 
-  const LoadHost = useCallback((hostName: string) => {
-    setLoading(true);
-
-    getHost(hostName)
-      .then((host) => {
-        setHost(host);
-        LoadRack(host.rack_name);
-      })
-      .catch((error) => {
-        console.error("Error fetching rack data:", error);
-        setHost(null);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
   const LoadRack = useCallback((rackName: string) => {
     getRack(rackName)
       .then((rack) => {
@@ -53,6 +36,26 @@ export default function HostView() {
         setRack(null);
       });
   }, []);
+
+  const LoadHost = useCallback(
+    (hostName: string) => {
+      setLoading(true);
+
+      getHost(hostName)
+        .then((host) => {
+          setHost(host);
+          LoadRack(host.rack_name);
+        })
+        .catch((error) => {
+          console.error("Error fetching rack data:", error);
+          setHost(null);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    },
+    [LoadRack],
+  );
 
   useEffect(() => {
     LoadHost(hostName);
