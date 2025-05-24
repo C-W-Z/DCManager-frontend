@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { MoveRight, Home, Move, MoveLeft } from "lucide-react";
-import type {
+import {
   SimpleDatacenter,
   Host,
   SimpleRack,
@@ -208,30 +208,16 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
 
   const getPromises = () => {
     if (type === "room" && selectedDC)
-      return items.map((item) =>
-        modifyRoom(item.name, { dc_name: selectedDC }).catch((e: APIError) => {
-          console.error(e);
-          toast.error(e.error);
-        }),
-      );
+      return items.map((item) => modifyRoom(item.name, { dc_name: selectedDC }));
     if (type === "rack" && selectedRoom)
-      return items.map((item) =>
-        modifyRack(item.name, { room_name: selectedRoom }).catch((e: APIError) => {
-          console.error(e);
-          toast.error(e.error);
-        }),
-      );
+      return items.map((item) => modifyRack(item.name, { room_name: selectedRoom }));
     if (type === "host" && selectedRack)
       return items.map((item) => {
         if (selectedRackPos !== null)
-          modifyHost(item.name, { rack_name: selectedRack, pos: selectedRackPos }).catch(
-            (e: APIError) => {
-              console.error(e);
-              toast.error(e.error);
-            },
-          );
+          modifyHost(item.name, { rack_name: selectedRack, pos: selectedRackPos });
+        return Promise.resolve();
       });
-    return items.map(() => Promise.resolve(false));
+    return items.map(() => Promise.resolve());
   };
 
   // 处理移动确认
@@ -241,15 +227,8 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
     try {
       const movePromises = getPromises();
       const results = await Promise.all(movePromises);
-      const allSuccessful = results.every((result) => result === true || result === undefined);
+      const allSuccessful = results.every((result) => result === undefined || !(result instanceof APIError));
 
-      // 关闭对话框并通知成功
-      setIsOpen(false);
-      const names =
-        items.length > 1
-          ? `${items.length} ${getTypeName()}s`
-          : `${getTypeName()} ${items[0].name}`;
-      toast.success(names + " has successfully move to " + getSelectedDestinationName());
       if (allSuccessful) {
         if (onSuccess)
           onSuccess({
@@ -257,9 +236,21 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
             room_name: selectedRoom,
             rack_name: selectedRack,
           });
-      } else console.error("Some move operations failed");
-    } catch (error) {
-      console.error(`Error moving ${type}:`, error);
+
+        // 关闭对话框并通知成功
+        setIsOpen(false);
+        const names =
+          items.length > 1
+            ? `${items.length} ${getTypeName()}s`
+            : `${getTypeName()} ${items[0].name}`;
+        toast.success(names + " has successfully move to " + getSelectedDestinationName());
+      } else {
+        console.error("Some moving operations failed");
+        toast.error("Some moving operations failed");
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error((e as APIError).error);
     } finally {
       setLoading(false);
     }
