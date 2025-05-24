@@ -12,14 +12,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const storedRole = localStorage.getItem("role");
     const storedAccessableService = localStorage.getItem("accessableService");
 
-    if (storedUsername && storedRole && storedAccessableService) {
-      console.log("Found UserProvider: ", storedUsername, storedRole, storedAccessableService);
+    if (storedUsername && storedRole) {
+      console.log("Found UserProvider: ", storedUsername, storedRole);
 
       setUser({
         username: JSON.parse(storedUsername),
         role: JSON.parse(storedRole),
       });
-      _setAccessableService(JSON.parse(storedAccessableService));
+      if (storedAccessableService) _setAccessableService(JSON.parse(storedAccessableService));
     } else {
       setUser(null);
       _setAccessableService([]);
@@ -33,7 +33,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     });
     localStorage.setItem("username", JSON.stringify(username));
     localStorage.setItem("role", JSON.stringify(role));
-    loadAccessableService();
+
+    if (role === "normal") loadAccessableService(username);
   };
 
   const logout = () => {
@@ -48,16 +49,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("accessableService", JSON.stringify(services));
   }, []);
 
-  const loadAccessableService = useCallback(() => {
-    if (!user || user.role === "admin") return;
-    getUserService(user.username)
-      .then((serviceList) => {
-        setAccessableService(serviceList.map((service) => service.name));
-      })
-      .catch((error) => {
-        console.error("Error fetching all service data:", error);
-      });
-  }, [setAccessableService, user]);
+  const loadAccessableService = useCallback(
+    (username: string) => {
+      getUserService(username)
+        .then((serviceList) => {
+          setAccessableService(serviceList.map((service) => service.name));
+        })
+        .catch((error) => {
+          console.error("Error fetching all service data:", error);
+        });
+    },
+    [setAccessableService],
+  );
 
   return (
     <UserContext.Provider

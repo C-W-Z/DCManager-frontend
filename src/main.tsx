@@ -4,21 +4,20 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import "./global.css";
 
-// import Home from "./home";
-import Explorer from "@/components/explorer/explorer";
-import Layout from "./layout";
-import HostView from "@/view/host/host-view";
-import RackView from "@/view/rack/rack-view";
-import ServiceBoard from "./view/service/service-board";
-import ServiceView from "./view/service/service-view";
-import DataCenterTable from "@/components/explorer/tables/datacenter-table";
-import RoomTable from "@/components/explorer/tables/room-table";
-import RackTable from "@/components/explorer/tables/rack-table";
-import HostTable from "./components/explorer/tables/host-table";
 import { UserProvider } from "./context/user-context";
-import LoginPage from "@/view/login";
-import BulkAddHostView from "@/view/bulk-add-host-view";
-import RegisterPage from "@/view/register";
+import Layout from "./layout";
+import { OverviewPage } from "@/pages/overview-page";
+import DataCenterTable from "@/components/overview/tables/datacenter-table";
+import RoomTable from "@/components/overview/tables/room-table";
+import RackTable from "@/components/overview/tables/rack-table";
+import { RackPage } from "@/pages/rack-page";
+import { HostTablePage } from "./pages/host-table-page";
+import { HostPage } from "@/pages/host-page";
+import { ServiceBoardPage } from "./pages/service-board-page";
+import { ServicePage } from "./pages/service-page";
+import { LoginPage } from "@/pages/login-page";
+import { RegisterPage } from "@/pages/register-page";
+import { BulkAddHostPage } from "@/pages/bulk-add-host-page";
 
 createRoot(document.getElementById("root")!).render(
   <UserProvider>
@@ -27,22 +26,22 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route
-          path="/explorer"
+          path="/overview"
           element={
             <Layout>
-              <Explorer />
+              <OverviewPage />
             </Layout>
           }
         >
           <Route index element={<DataCenterTable />} />
-          <Route path="dc/:dcId" element={<RoomTable />} />
-          <Route path="room/:roomId" element={<RackTable />} />
+          <Route path="dc/:dcName" element={<RoomTable />} />
+          <Route path="room/:roomName" element={<RackTable />} />
         </Route>
         <Route
-          path="/bulk-add-host/:serviceId"
+          path="/rack/:rackName"
           element={
             <Layout>
-              <BulkAddHostView />
+              <RackPage />
             </Layout>
           }
         />
@@ -50,17 +49,7 @@ createRoot(document.getElementById("root")!).render(
           path="/host"
           element={
             <Layout>
-              <div className="flex h-full flex-1 flex-col overflow-auto px-12 pt-12">
-                <HostTable />
-              </div>
-            </Layout>
-          }
-        />
-        <Route
-          path="/rack/:rackName"
-          element={
-            <Layout>
-              <RackView />
+              <HostTablePage />
             </Layout>
           }
         />
@@ -68,7 +57,7 @@ createRoot(document.getElementById("root")!).render(
           path="/host/:hostName"
           element={
             <Layout>
-              <HostView />
+              <HostPage />
             </Layout>
           }
         />
@@ -76,7 +65,7 @@ createRoot(document.getElementById("root")!).render(
           path="/service"
           element={
             <Layout>
-              <ServiceBoard />
+              <ServiceBoardPage />
             </Layout>
           }
         />
@@ -84,7 +73,15 @@ createRoot(document.getElementById("root")!).render(
           path="/service/:serviceName"
           element={
             <Layout>
-              <ServiceView />
+              <ServicePage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/bulk-add-host/:serviceId"
+          element={
+            <Layout>
+              <BulkAddHostPage />
             </Layout>
           }
         />

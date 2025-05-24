@@ -2,7 +2,6 @@ import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Link, useResolvedPath } from "react-router-dom";
 import Icon from "@/components/icon";
-import { LogOut } from "lucide-react";
 import { useUser } from "@/context/use-user";
 
 export default function Sidebar() {
@@ -36,19 +35,12 @@ export default function Sidebar() {
           {collapsed ? <Icon id="sidebar-close" /> : <Icon id="sidebar-open" />}
         </button>
       </div>
-      {/* <SidebarItem
-        iconId="home"
-        label="Home"
-        collapsed={collapsed}
-        href="/"
-        active={currentPath === "/"}
-      /> */}
       <SidebarItem
-        iconId="explorer"
-        label="Explorer"
+        iconId="overview"
+        label="物件總覽"
         collapsed={collapsed}
-        href="/explorer"
-        active={currentPath === "/explorer"}
+        href="/overview"
+        active={currentPath === "/overview"}
       />
       {/* <SidebarItem
         iconId="rack"
@@ -59,28 +51,27 @@ export default function Sidebar() {
       /> */}
       <SidebarItem
         iconId="host"
-        label="Hosts"
+        label="主機管理"
         collapsed={collapsed}
         href="/host"
         active={currentPath === "/host"}
       />
       <SidebarItem
         iconId="service"
-        label="Services"
+        label="服務管理"
         collapsed={collapsed}
         href="/service"
         active={currentPath === "/service"}
       />
       <div className="flex-1"></div>
       <SidebarItem
+        iconId="logout"
         label="Logout"
         collapsed={collapsed}
         href="/"
         active={currentPath === "/"}
         onClick={logout}
-      >
-        <LogOut />
-      </SidebarItem>
+      />
       {/* <SidebarItem iconId="settings" label="Setting" collapsed={collapsed} /> */}
     </div>
   );

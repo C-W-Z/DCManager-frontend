@@ -23,6 +23,7 @@ export async function addDC(
       rooms: [],
     } as t.Datacenter;
     MockData.data_centers.push(newDC);
+    console.log("addDC mock data:", newDC);
     return newDC;
   } else {
     const response = await fetch(`${baseUrl}/dc/`, {
@@ -43,6 +44,7 @@ export async function getAllDC(): Promise<t.SimpleDatacenter[]> {
   if (mode === "mock") {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
+    console.log("getAllDC mock data:", MockData.data_centers);
     return MockData.data_centers as t.SimpleDatacenter[];
   } else {
     const response = await fetch(`${baseUrl}/dc/all`);
@@ -59,8 +61,10 @@ export async function getDC(dc_name: string): Promise<t.Datacenter> {
 
     const dc = MockData.data_centers.find((dc) => dc.name === dc_name);
     if (!dc) {
+      console.log("getDC mock data: Datacenter not found");
       return Promise.reject(new Error("Datacenter not found"));
     }
+    console.log("getDC mock data:", dc);
     return dc as t.Datacenter;
   } else {
     const response = await fetch(`${baseUrl}/dc/${dc_name}`);
@@ -80,9 +84,11 @@ export async function modifyDC(
 
     const dc = MockData.data_centers.find((dc) => dc.name === dc_name);
     if (!dc) {
+      console.log("modifyDC mock data: Datacenter not found");
       return Promise.reject(new Error("Datacenter not found"));
     }
     Object.assign(dc, body);
+    console.log("modifyDC mock data:", dc);
     return dc as t.Datacenter;
   } else {
     const response = await fetch(`${baseUrl}/dc/${dc_name}`, {
@@ -105,9 +111,11 @@ export async function deleteDC(dc_name: string): Promise<void> {
 
     const index = MockData.data_centers.findIndex((dc) => dc.name === dc_name);
     if (index === -1) {
+      console.log("deleteDC mock data: Datacenter not found");
       return Promise.reject(new Error("Datacenter not found"));
     }
     MockData.data_centers.splice(index, 1);
+    console.log("deleteDC mock data: Datacenter deleted", dc_name);
     return Promise.resolve();
   } else {
     const response = await fetch(`${baseUrl}/dc/${dc_name}`, {
@@ -134,6 +142,7 @@ export async function addRoom(
       racks: [],
     } as t.Room;
     MockData.rooms.push(newRoom);
+    console.log("addRoom mock data:", newRoom);
     return newRoom;
   } else {
     const response = await fetch(`${baseUrl}/room/`, {
@@ -156,8 +165,10 @@ export async function getRoom(room_name: string): Promise<t.Room> {
 
     const room = MockData.rooms.find((room) => room.name === room_name);
     if (!room) {
+      console.log("getRoom mock data: Room not found");
       return Promise.reject(new Error("Room not found"));
     }
+    console.log("getRoom mock data:", room);
     return room as t.Room;
   } else {
     const response = await fetch(`${baseUrl}/room/${room_name}`);
@@ -177,9 +188,11 @@ export async function modifyRoom(
 
     const room = MockData.rooms.find((room) => room.name === room_name);
     if (!room) {
+      console.log("modifyRoom mock data: Room not found");
       return Promise.reject(new Error("Room not found"));
     }
     Object.assign(room, body);
+    console.log("modifyRoom mock data:", room);
     return room as t.Room;
   } else {
     const response = await fetch(`${baseUrl}/room/${room_name}`, {
@@ -205,6 +218,7 @@ export async function deleteRoom(room_name: string): Promise<void> {
       return Promise.reject(new Error("Room not found"));
     }
     MockData.rooms.splice(index, 1);
+    console.log("deleteRoom mock data: Room deleted", room_name);
     return Promise.resolve();
   } else {
     const response = await fetch(`${baseUrl}/room/${room_name}`, {
@@ -226,6 +240,7 @@ export async function addRack(
 
     const room = MockData.rooms.find((room) => room.name === body.room_name);
     if (!room) {
+      console.log("addRack mock data: Room not found");
       return Promise.reject(new Error("Room not found"));
     }
     const newRack = {
@@ -237,6 +252,7 @@ export async function addRack(
       dc_name: room.dc_name,
     } as t.Rack;
     MockData.racks.push(newRack);
+    console.log("addRack mock data:", newRack);
     return newRack;
   } else {
     const response = await fetch(`${baseUrl}/rack/`, {
@@ -259,8 +275,10 @@ export async function getRack(rack_name: string): Promise<t.Rack> {
 
     const rack = MockData.racks.find((rack) => rack.name === rack_name);
     if (!rack) {
+      console.log("getRack mock data: Rack not found");
       return Promise.reject(new Error("Rack not found"));
     }
+    console.log("getRack mock data:", rack);
     return rack as t.Rack;
   } else {
     const response = await fetch(`${baseUrl}/rack/${rack_name}`);
@@ -283,6 +301,7 @@ export async function modifyRack(
       return Promise.reject(new Error("Rack not found"));
     }
     Object.assign(rack, body);
+    console.log("modifyRack mock data:", rack);
     return rack as t.Rack;
   } else {
     const response = await fetch(`${baseUrl}/rack/${rack_name}`, {
@@ -305,9 +324,11 @@ export async function deleteRack(rack_name: string): Promise<void> {
 
     const index = MockData.racks.findIndex((rack) => rack.name === rack_name);
     if (index === -1) {
+      console.log("deleteRack mock data: Rack not found");
       return Promise.reject(new Error("Rack not found"));
     }
     MockData.racks.splice(index, 1);
+    console.log("deleteRack mock data: Rack deleted", rack_name);
     return Promise.resolve();
   } else {
     const response = await fetch(`${baseUrl}/rack/${rack_name}`, {
@@ -329,10 +350,12 @@ export async function addHost(
 
     const rack = MockData.racks.find((rack) => rack.name === body.rack_name);
     if (!rack) {
+      console.log("addHost mock data: Rack not found");
       return Promise.reject(new Error("Rack not found"));
     }
     const room = MockData.rooms.find((room) => room.name === rack.room_name);
     if (!room) {
+      console.log("addHost mock data: Room not found");
       return Promise.reject(new Error("Room not found"));
     }
 
@@ -345,6 +368,7 @@ export async function addHost(
       room_name: rack.room_name,
     } as t.Host;
     MockData.hosts.push(newHost);
+    console.log("addHost mock data:", newHost);
     return newHost;
   } else {
     const response = await fetch(`${baseUrl}/host/`, {
@@ -365,6 +389,7 @@ export async function getAllHost(): Promise<t.Host[]> {
   if (mode === "mock") {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
+    console.log("getAllHost mock data:", MockData.hosts);
     return MockData.hosts as t.Host[];
   } else {
     const response = await fetch(`${baseUrl}/host/all`);
@@ -381,8 +406,10 @@ export async function getHost(host_name: string): Promise<t.Host> {
 
     const host = MockData.hosts.find((host) => host.name === host_name);
     if (!host) {
+      console.log("getHost mock data: Host not found");
       return Promise.reject(new Error("Host not found"));
     }
+    console.log("getHost mock data:", host);
     return host as t.Host;
   } else {
     const response = await fetch(`${baseUrl}/host/${host_name}`);
@@ -402,9 +429,11 @@ export async function modifyHost(
 
     const host = MockData.hosts.find((host) => host.name === host_name);
     if (!host) {
+      console.log("modifyHost mock data: Host not found");
       return Promise.reject(new Error("Host not found"));
     }
     Object.assign(host, body);
+    console.log("modifyHost mock data:", host);
     return host as t.Host;
   } else {
     const response = await fetch(`${baseUrl}/host/${host_name}`, {
@@ -430,6 +459,7 @@ export async function deleteHost(host_name: string): Promise<void> {
       return Promise.reject(new Error("Host not found"));
     }
     MockData.hosts.splice(index, 1);
+    console.log("deleteHost mock data: Host deleted", host_name);
     return Promise.resolve();
   }
   const response = await fetch(`${baseUrl}/host/${host_name}`, {
@@ -462,6 +492,7 @@ export async function addService(
       available_ip_list: [],
     } as t.Service;
     MockData.services.push(newService);
+    console.log("addService mock data:", newService);
     return newService;
   } else {
     const response = await fetch(`${baseUrl}/service/`, {
@@ -482,6 +513,7 @@ export async function getAllService(): Promise<t.SimpleService[]> {
   if (mode === "mock") {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
+    console.log("getAllService mock data:", MockData.services);
     return MockData.services.map(
       (service) =>
         ({
@@ -513,6 +545,10 @@ export async function getUserService(username: string): Promise<t.SimpleService[
   if (mode === "mock") {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
+    console.log(
+      "getUserService mock data:",
+      MockData.services.filter((service) => service.username === username),
+    );
     return MockData.services
       .filter((service) => service.username === username)
       .map(
@@ -548,8 +584,10 @@ export async function getService(service_name: string): Promise<t.Service> {
 
     const service = MockData.services.find((service) => service.name === service_name);
     if (!service) {
+      console.log("getService mock data: Service not found");
       return Promise.reject(new Error("Service not found"));
     }
+    console.log("getService mock data:", service);
     return service as t.Service;
   } else {
     const response = await fetch(`${baseUrl}/service/${service_name}`);
@@ -571,8 +609,10 @@ export async function modifyService(
     // 這裡沒有做任何修改
     const service = MockData.services.find((service) => service.name === service_name);
     if (!service) {
+      console.log("modifyService mock data: Service not found");
       return Promise.reject(new Error("Service not found"));
     }
+    console.log("modifyService mock data:", service);
     return service as t.Service;
   } else {
     const response = await fetch(`${baseUrl}/service/${service_name}`, {
@@ -620,6 +660,7 @@ export async function addUser(body: Pick<t.User, "username" | "role">): Promise<
     } as t.User;
     MockData.users.push(newUser);
 
+    console.log("addUser mock data:", newUser);
     return newUser;
   } else {
     // TODO: 這裡的 Endpoint 還沒決定
@@ -643,8 +684,10 @@ export async function getUserRole(username: string): Promise<t.User> {
 
     const user = MockData.users.find((user) => user.username === username);
     if (!user) {
+      console.log("getUserRole mock data: User not found");
       return Promise.reject(new Error("User not found"));
     }
+    console.log("getUserRole mock data:", user);
     return user as t.User;
   } else {
     // TODO: 這裡的 Endpoint 還沒決定
