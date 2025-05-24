@@ -114,3 +114,8 @@ export type MockDataJson = {
   services: Service[];
   users: UserPassword[];
 };
+
+export type APIError = {
+  error: string;
+  code: number;
+}
