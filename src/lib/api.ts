@@ -611,19 +611,18 @@ export async function deleteService(service_name: string): Promise<void> {
 }
 
 /* User */
-export async function addUser(body: Pick<t.User, "username" | "role">): Promise<t.User> {
+export async function addUser(body: t.UserPassword): Promise<t.User> {
   if (mode === "mock") {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const newUser = {
       ...body,
-    } as t.User;
+    } as t.UserPassword;
     MockData.users.push(newUser);
 
     return newUser;
   } else {
-    // TODO: 這裡的 Endpoint 還沒決定
-    const response = await fetch(`${baseUrl}/user/`, {
+    const response = await fetch(`${baseUrl}/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -631,27 +630,40 @@ export async function addUser(body: Pick<t.User, "username" | "role">): Promise<
       body: JSON.stringify(body),
     });
     if (!response.ok) {
-      return Promise.reject(new Error("Failed to add user"));
+      const data = await response.json();
+      return Promise.reject(new Error(data.error));
     }
     return response.json();
   }
 }
 
-export async function getUserRole(username: string): Promise<t.User> {
+export async function userLogin(body: Pick<t.UserPassword, "username" | "password">): Promise<t.User> {
   if (mode === "mock") {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    const user = MockData.users.find((user) => user.username === username);
+    const user = MockData.users.find((user) => user.username === body.username);
     if (!user) {
       return Promise.reject(new Error("User not found"));
     }
+    if (user.password !== body.password) {
+      return Promise.reject(new Error("Invalid username or password"));
+    }
     return user as t.User;
   } else {
-    // TODO: 這裡的 Endpoint 還沒決定
-    const response = await fetch(`${baseUrl}/user/${username}`);
+    const response = await fetch(`${baseUrl}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
     if (!response.ok) {
-      return Promise.reject(new Error("User not found"));
+      const data = await response.json();
+      return Promise.reject(new Error(data.error));
     }
-    return response.json();
+    const data = await response.json();
+    if (data.role !== "admin")
+      data.role = "normal"
+    return Promise.resolve(data as t.User);
   }
 }

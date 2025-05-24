@@ -101,11 +101,16 @@ export const user_schema = z.object({
   role: z.enum(["admin", "normal"]),
 });
 
+export type UserPassword = z.infer<typeof user_password_schema>;
+export const user_password_schema = user_schema.extend({
+  password: z.string(),
+})
+
 export type MockDataJson = {
   data_centers: Datacenter[];
   rooms: Room[];
   racks: Rack[];
   hosts: Host[];
   services: Service[];
-  users: User[];
+  users: UserPassword[];
 };
