@@ -661,9 +661,6 @@ export async function userLogin(body: Pick<t.UserPassword, "username" | "passwor
       const data = await response.json();
       return Promise.reject(new Error(data.error));
     }
-    const data = await response.json();
-    if (data.role !== "admin")
-      data.role = "normal"
-    return Promise.resolve(data as t.User);
+    return response.json();
   }
 }
