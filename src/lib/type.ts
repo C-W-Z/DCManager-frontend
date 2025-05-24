@@ -104,7 +104,7 @@ export const user_schema = z.object({
 export type UserPassword = z.infer<typeof user_password_schema>;
 export const user_password_schema = user_schema.extend({
   password: z.string(),
-})
+});
 
 export type MockDataJson = {
   data_centers: Datacenter[];
@@ -115,7 +115,19 @@ export type MockDataJson = {
   users: UserPassword[];
 };
 
-export type APIError = {
+interface APIError {
   error: string;
-  code: number;
+  code?: number;
 }
+
+class APIErrorImpl implements APIError {
+  code?: number;
+  error: string;
+
+  constructor(error: string, code?: number) {
+    this.code = code;
+    this.error = error;
+  }
+}
+
+export { APIErrorImpl as APIError };

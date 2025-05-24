@@ -34,8 +34,8 @@ export async function addDC(
     body: JSON.stringify(body),
   });
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -49,8 +49,8 @@ export async function getAllDC(): Promise<t.SimpleDatacenter[]> {
   }
   const response = await fetch(`${baseUrl}/dc/all`);
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -62,15 +62,15 @@ export async function getDC(dc_name: string): Promise<t.Datacenter> {
     const dc = MockData.data_centers.find((dc) => dc.name === dc_name);
     if (!dc) {
       console.log("getDC mock data: Datacenter not found");
-      return Promise.reject(new Error("Datacenter not found"));
+      return Promise.reject(new t.APIError("Datacenter not found"));
     }
     console.log("getDC mock data:", dc);
     return dc as t.Datacenter;
   }
   const response = await fetch(`${baseUrl}/dc/${dc_name}`);
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -85,7 +85,7 @@ export async function modifyDC(
     const dc = MockData.data_centers.find((dc) => dc.name === dc_name);
     if (!dc) {
       console.log("modifyDC mock data: Datacenter not found");
-      return Promise.reject(new Error("Datacenter not found"));
+      return Promise.reject(new t.APIError("Datacenter not found"));
     }
     Object.assign(dc, body);
     console.log("modifyDC mock data:", dc);
@@ -99,8 +99,8 @@ export async function modifyDC(
     body: JSON.stringify(body),
   });
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -112,7 +112,7 @@ export async function deleteDC(dc_name: string): Promise<void> {
     const index = MockData.data_centers.findIndex((dc) => dc.name === dc_name);
     if (index === -1) {
       console.log("deleteDC mock data: Datacenter not found");
-      return Promise.reject(new Error("Datacenter not found"));
+      return Promise.reject(new t.APIError("Datacenter not found"));
     }
     MockData.data_centers.splice(index, 1);
     console.log("deleteDC mock data: Datacenter deleted", dc_name);
@@ -122,8 +122,8 @@ export async function deleteDC(dc_name: string): Promise<void> {
     method: "DELETE",
   });
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return Promise.resolve();
 }
@@ -153,8 +153,8 @@ export async function addRoom(
     body: JSON.stringify(body),
   });
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -166,15 +166,15 @@ export async function getRoom(room_name: string): Promise<t.Room> {
     const room = MockData.rooms.find((room) => room.name === room_name);
     if (!room) {
       console.log("getRoom mock data: Room not found");
-      return Promise.reject(new Error("Room not found"));
+      return Promise.reject(new t.APIError("Room not found"));
     }
     console.log("getRoom mock data:", room);
     return room as t.Room;
   }
   const response = await fetch(`${baseUrl}/room/${room_name}`);
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -189,7 +189,7 @@ export async function modifyRoom(
     const room = MockData.rooms.find((room) => room.name === room_name);
     if (!room) {
       console.log("modifyRoom mock data: Room not found");
-      return Promise.reject(new Error("Room not found"));
+      return Promise.reject(new t.APIError("Room not found"));
     }
     Object.assign(room, body);
     console.log("modifyRoom mock data:", room);
@@ -203,8 +203,8 @@ export async function modifyRoom(
     body: JSON.stringify(body),
   });
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -215,7 +215,7 @@ export async function deleteRoom(room_name: string): Promise<void> {
 
     const index = MockData.rooms.findIndex((room) => room.name === room_name);
     if (index === -1) {
-      return Promise.reject(new Error("Room not found"));
+      return Promise.reject(new t.APIError("Room not found"));
     }
     MockData.rooms.splice(index, 1);
     console.log("deleteRoom mock data: Room deleted", room_name);
@@ -225,8 +225,8 @@ export async function deleteRoom(room_name: string): Promise<void> {
     method: "DELETE",
   });
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return Promise.resolve();
 }
@@ -241,7 +241,7 @@ export async function addRack(
     const room = MockData.rooms.find((room) => room.name === body.room_name);
     if (!room) {
       console.log("addRack mock data: Room not found");
-      return Promise.reject(new Error("Room not found"));
+      return Promise.reject(new t.APIError("Room not found"));
     }
     const newRack = {
       ...body,
@@ -263,8 +263,8 @@ export async function addRack(
     body: JSON.stringify(body),
   });
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -276,15 +276,15 @@ export async function getRack(rack_name: string): Promise<t.Rack> {
     const rack = MockData.racks.find((rack) => rack.name === rack_name);
     if (!rack) {
       console.log("getRack mock data: Rack not found");
-      return Promise.reject(new Error("Rack not found"));
+      return Promise.reject(new t.APIError("Rack not found"));
     }
     console.log("getRack mock data:", rack);
     return rack as t.Rack;
   }
   const response = await fetch(`${baseUrl}/rack/${rack_name}`);
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -298,7 +298,7 @@ export async function modifyRack(
 
     const rack = MockData.racks.find((rack) => rack.name === rack_name);
     if (!rack) {
-      return Promise.reject(new Error("Rack not found"));
+      return Promise.reject(new t.APIError("Rack not found"));
     }
     Object.assign(rack, body);
     console.log("modifyRack mock data:", rack);
@@ -312,8 +312,8 @@ export async function modifyRack(
     body: JSON.stringify(body),
   });
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -325,7 +325,7 @@ export async function deleteRack(rack_name: string): Promise<void> {
     const index = MockData.racks.findIndex((rack) => rack.name === rack_name);
     if (index === -1) {
       console.log("deleteRack mock data: Rack not found");
-      return Promise.reject(new Error("Rack not found"));
+      return Promise.reject(new t.APIError("Rack not found"));
     }
     MockData.racks.splice(index, 1);
     console.log("deleteRack mock data: Rack deleted", rack_name);
@@ -335,8 +335,8 @@ export async function deleteRack(rack_name: string): Promise<void> {
     method: "DELETE",
   });
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return Promise.resolve();
 }
@@ -351,12 +351,12 @@ export async function addHost(
     const rack = MockData.racks.find((rack) => rack.name === body.rack_name);
     if (!rack) {
       console.log("addHost mock data: Rack not found");
-      return Promise.reject(new Error("Rack not found"));
+      return Promise.reject(new t.APIError("Rack not found"));
     }
     const room = MockData.rooms.find((room) => room.name === rack.room_name);
     if (!room) {
       console.log("addHost mock data: Room not found");
-      return Promise.reject(new Error("Room not found"));
+      return Promise.reject(new t.APIError("Room not found"));
     }
 
     const newHost = {
@@ -379,8 +379,8 @@ export async function addHost(
     body: JSON.stringify(body),
   });
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -394,8 +394,8 @@ export async function getAllHost(): Promise<t.Host[]> {
   }
   const response = await fetch(`${baseUrl}/host/all`);
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -407,15 +407,15 @@ export async function getHost(host_name: string): Promise<t.Host> {
     const host = MockData.hosts.find((host) => host.name === host_name);
     if (!host) {
       console.log("getHost mock data: Host not found");
-      return Promise.reject(new Error("Host not found"));
+      return Promise.reject(new t.APIError("Host not found"));
     }
     console.log("getHost mock data:", host);
     return host as t.Host;
   }
   const response = await fetch(`${baseUrl}/host/${host_name}`);
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -430,7 +430,7 @@ export async function modifyHost(
     const host = MockData.hosts.find((host) => host.name === host_name);
     if (!host) {
       console.log("modifyHost mock data: Host not found");
-      return Promise.reject(new Error("Host not found"));
+      return Promise.reject(new t.APIError("Host not found"));
     }
     Object.assign(host, body);
     console.log("modifyHost mock data:", host);
@@ -444,8 +444,8 @@ export async function modifyHost(
     body: JSON.stringify(body),
   });
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -456,7 +456,7 @@ export async function deleteHost(host_name: string): Promise<void> {
 
     const index = MockData.hosts.findIndex((host) => host.name === host_name);
     if (index === -1) {
-      return Promise.reject(new Error("Host not found"));
+      return Promise.reject(new t.APIError("Host not found"));
     }
     MockData.hosts.splice(index, 1);
     console.log("deleteHost mock data: Host deleted", host_name);
@@ -466,8 +466,8 @@ export async function deleteHost(host_name: string): Promise<void> {
     method: "DELETE",
   });
   if (!response.ok) {
-    const data: t.APIError = await response.json();
-    return Promise.reject(data);
+    const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
   }
   return Promise.resolve();
 }
@@ -504,8 +504,8 @@ export async function addService(
       body: JSON.stringify(body),
     });
     if (!response.ok) {
-      const data: t.APIError = await response.json();
-      return Promise.reject(data);
+      const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
     }
     return response.json();
   }
@@ -537,8 +537,8 @@ export async function getAllService(): Promise<t.SimpleService[]> {
   } else {
     const response = await fetch(`${baseUrl}/service/all`);
     if (!response.ok) {
-      const data: t.APIError = await response.json();
-      return Promise.reject(data);
+      const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
     }
     return response.json();
   }
@@ -575,8 +575,8 @@ export async function getUserService(username: string): Promise<t.SimpleService[
   } else {
     const response = await fetch(`${baseUrl}/service/user/${username}`);
     if (!response.ok) {
-      const data: t.APIError = await response.json();
-      return Promise.reject(data);
+      const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
     }
     return response.json();
   }
@@ -589,15 +589,15 @@ export async function getService(service_name: string): Promise<t.Service> {
     const service = MockData.services.find((service) => service.name === service_name);
     if (!service) {
       console.log("getService mock data: Service not found");
-      return Promise.reject(new Error("Service not found"));
+      return Promise.reject(new t.APIError("Service not found"));
     }
     console.log("getService mock data:", service);
     return service as t.Service;
   } else {
     const response = await fetch(`${baseUrl}/service/${service_name}`);
     if (!response.ok) {
-      const data: t.APIError = await response.json();
-      return Promise.reject(data);
+      const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
     }
     return response.json();
   }
@@ -615,7 +615,7 @@ export async function modifyService(
     const service = MockData.services.find((service) => service.name === service_name);
     if (!service) {
       console.log("modifyService mock data: Service not found");
-      return Promise.reject(new Error("Service not found"));
+      return Promise.reject(new t.APIError("Service not found"));
     }
     console.log("modifyService mock data:", service);
     return service as t.Service;
@@ -628,8 +628,8 @@ export async function modifyService(
       body: JSON.stringify(body),
     });
     if (!response.ok) {
-      const data: t.APIError = await response.json();
-      return Promise.reject(data);
+      const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
     }
     return response.json();
   }
@@ -641,7 +641,7 @@ export async function deleteService(service_name: string): Promise<void> {
 
     const index = MockData.services.findIndex((service) => service.name === service_name);
     if (index === -1) {
-      return Promise.reject(new Error("Service not found"));
+      return Promise.reject(new t.APIError("Service not found"));
     }
     MockData.services.splice(index, 1);
     return Promise.resolve();
@@ -650,8 +650,8 @@ export async function deleteService(service_name: string): Promise<void> {
       method: "DELETE",
     });
     if (!response.ok) {
-      const data: t.APIError = await response.json();
-      return Promise.reject(data);
+      const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
     }
     return Promise.resolve();
   }
@@ -678,8 +678,8 @@ export async function addUser(body: t.UserPassword): Promise<t.User> {
       body: JSON.stringify(body),
     });
     if (!response.ok) {
-      const data: t.APIError = await response.json();
-      return Promise.reject(data);
+      const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
     }
     return response.json();
   }
@@ -694,10 +694,10 @@ export async function userLogin(
     const user = MockData.users.find((user) => user.username === body.username);
     if (!user) {
       console.log("getUserRole mock data: User not found");
-      return Promise.reject(new Error("User not found"));
+      return Promise.reject(new t.APIError("User not found"));
     }
     if (user.password !== body.password) {
-      return Promise.reject(new Error("Invalid username or password"));
+      return Promise.reject(new t.APIError("Invalid username or password"));
     }
     return user as t.User;
   } else {
@@ -709,8 +709,8 @@ export async function userLogin(
       body: JSON.stringify(body),
     });
     if (!response.ok) {
-      const data: t.APIError = await response.json();
-      return Promise.reject(data);
+      const data = await response.json();
+      return Promise.reject(new t.APIError(data.error, response.status));
     }
     return response.json();
   }

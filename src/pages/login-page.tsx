@@ -26,7 +26,7 @@ import {
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useUser } from "@/context/use-user";
-import { user_schema } from "@/lib/type";
+import { APIError, user_schema } from "@/lib/type";
 import { userLogin } from "@/lib/api";
 
 const formSchema = user_schema.pick({ username: true }).extend({
@@ -61,8 +61,8 @@ export function LoginPage() {
           navigate("/service");
         }
       })
-      .catch((e) => {
-        toast.error((e as Error).message);
+      .catch((e: APIError) => {
+        toast.error(e.error);
         console.error(e);
       })
       .finally(() => {
