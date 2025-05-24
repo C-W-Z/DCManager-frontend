@@ -242,8 +242,8 @@ export function BulkAddHostPage() {
       const allSuccessful = updatedPreviewData.every((row) => row.status === "Added");
       if (allSuccessful) {
         setSuccess("All hosts added successfully");
-        setIsPreviewVisible(false);
-        setPreviewData([]);
+        // setIsPreviewVisible(false);
+        // setPreviewData([]);
       } else {
         setError("Some hosts failed to add. Please review the preview.");
       }
