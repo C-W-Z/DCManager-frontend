@@ -227,7 +227,7 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
     try {
       const movePromises = getPromises();
       const results = await Promise.all(movePromises);
-      const allSuccessful = results.every((result) => result === undefined || !(result instanceof APIError));
+      const allSuccessful = results.every((result) => result === undefined);
 
       if (allSuccessful) {
         if (onSuccess)

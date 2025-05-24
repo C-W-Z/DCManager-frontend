@@ -78,7 +78,7 @@ export async function getDC(dc_name: string): Promise<t.Datacenter> {
 export async function modifyDC(
   dc_name: string,
   body: Partial<Pick<t.Datacenter, "name" | "height">>,
-): Promise<t.Datacenter> {
+): Promise<void> {
   if (mode === "mock") {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -89,7 +89,7 @@ export async function modifyDC(
     }
     Object.assign(dc, body);
     console.log("modifyDC mock data:", dc);
-    return dc as t.Datacenter;
+    return;
   }
   const response = await fetch(`${baseUrl}/dc/${dc_name}`, {
     method: "PUT",
@@ -102,7 +102,7 @@ export async function modifyDC(
     const data = await response.json();
     return Promise.reject(new t.APIError(data.error, response.status));
   }
-  return response.json();
+  return;
 }
 
 export async function deleteDC(dc_name: string): Promise<void> {
@@ -182,7 +182,7 @@ export async function getRoom(room_name: string): Promise<t.Room> {
 export async function modifyRoom(
   room_name: string,
   body: Partial<Pick<t.Room, "name" | "height" | "dc_name">>,
-): Promise<t.Room> {
+): Promise<void> {
   if (mode === "mock") {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -193,7 +193,7 @@ export async function modifyRoom(
     }
     Object.assign(room, body);
     console.log("modifyRoom mock data:", room);
-    return room as t.Room;
+    return;
   }
   const response = await fetch(`${baseUrl}/room/${room_name}`, {
     method: "PUT",
@@ -206,7 +206,7 @@ export async function modifyRoom(
     const data = await response.json();
     return Promise.reject(new t.APIError(data.error, response.status));
   }
-  return response.json();
+  return;
 }
 
 export async function deleteRoom(room_name: string): Promise<void> {
@@ -292,7 +292,7 @@ export async function getRack(rack_name: string): Promise<t.Rack> {
 export async function modifyRack(
   rack_name: string,
   body: Partial<Pick<t.Rack, "name" | "height" | "room_name" | "service_name">>,
-): Promise<t.Rack> {
+): Promise<void> {
   if (mode === "mock") {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -302,7 +302,7 @@ export async function modifyRack(
     }
     Object.assign(rack, body);
     console.log("modifyRack mock data:", rack);
-    return rack as t.Rack;
+    return;
   }
   const response = await fetch(`${baseUrl}/rack/${rack_name}`, {
     method: "PUT",
@@ -315,7 +315,7 @@ export async function modifyRack(
     const data = await response.json();
     return Promise.reject(new t.APIError(data.error, response.status));
   }
-  return response.json();
+  return;
 }
 
 export async function deleteRack(rack_name: string): Promise<void> {
@@ -423,7 +423,7 @@ export async function getHost(host_name: string): Promise<t.Host> {
 export async function modifyHost(
   host_name: string,
   body: Partial<Pick<t.Host, "name" | "height" | "running" | "rack_name" | "pos">>,
-): Promise<t.Host> {
+): Promise<void> {
   if (mode === "mock") {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -434,7 +434,7 @@ export async function modifyHost(
     }
     Object.assign(host, body);
     console.log("modifyHost mock data:", host);
-    return host as t.Host;
+    return;
   }
   const response = await fetch(`${baseUrl}/host/${host_name}`, {
     method: "PUT",
@@ -447,7 +447,7 @@ export async function modifyHost(
     const data = await response.json();
     return Promise.reject(new t.APIError(data.error, response.status));
   }
-  return response.json();
+  return;
 }
 
 export async function deleteHost(host_name: string): Promise<void> {
@@ -607,7 +607,7 @@ export async function getService(service_name: string): Promise<t.Service> {
 export async function modifyService(
   service_name: string,
   body: Partial<Pick<t.SimpleService, "name" | "n_allocated_racks" | "allocated_subnets">>,
-): Promise<t.Service> {
+): Promise<void> {
   if (mode === "mock") {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -618,7 +618,7 @@ export async function modifyService(
       return Promise.reject(new t.APIError("Service not found"));
     }
     console.log("modifyService mock data:", service);
-    return service as t.Service;
+    return;
   } else {
     const response = await fetch(`${baseUrl}/service/${service_name}`, {
       method: "PUT",
@@ -631,7 +631,7 @@ export async function modifyService(
       const data = await response.json();
       return Promise.reject(new t.APIError(data.error, response.status));
     }
-    return response.json();
+    return;
   }
 }
 
