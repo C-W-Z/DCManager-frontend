@@ -21,13 +21,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-import { datacenter_schema } from "@/lib/type";
+import { Datacenter, datacenter_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addDC } from "@/lib/api";
 import { MAX_HEIGHT } from "@/lib/constant";
 import Icon from "@/components/icon";
 
-export function AddDatacenterDialog() {
+export function AddDatacenterDialog({
+  onSuccess,
+}: {
+  onSuccess?: (newDatacenter: Datacenter) => void;
+}) {
   const [open, setOpen] = useState(false);
 
   const form_schema = datacenter_schema
@@ -48,13 +52,14 @@ export function AddDatacenterDialog() {
       name: values.name,
       height: values.height,
     })
-      .then(() => {
+      .then((newDatacenter) => {
         setOpen(false);
+        toast.success(`Datacenter ${values.name} added successfully`);
         form.reset();
-        toast.success(`Data center ${values.name} added successfully`);
+        onSuccess?.(newDatacenter);
       })
       .catch((error) => {
-        toast.error(`Failed to add data center: ${error.message}`);
+        toast.error(`Failed to add datacenter: ${error.message}`);
       });
   }
 

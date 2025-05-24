@@ -20,7 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
-import { simple_service_schema, SimpleDatacenter } from "@/lib/type";
+import { Service, simple_service_schema, SimpleDatacenter } from "@/lib/type";
 import { toast } from "sonner";
 import { addService, getAllDC } from "@/lib/api";
 import Icon from "@/components/icon";
@@ -38,7 +38,11 @@ const form_schema = z.object({
 
 type RackAllocation = { dc_name: string; n_racks: number };
 
-export function AddServiceDialog() {
+export function AddServiceDialog({
+  onSuccess,
+}: {
+  onSuccess?: (newService: Service) => void;
+}) {
   const { user, loadAccessableService } = useUser();
 
   const [open, setOpen] = useState(false);
@@ -166,19 +170,17 @@ export function AddServiceDialog() {
       allocated_subnets: values.allocated_subnet,
       username: user.username,
     })
-      .then(() => {
+      .then((newService) => {
+        setOpen(false);
         toast.success(`Service ${values.name} added successfully!`);
-        form.reset();
         setAllocatedRacks([]);
         setAllocatedSubnets([""]);
-        setOpen(false);
+        form.reset();
         loadAccessableService(user.username);
+        onSuccess?.(newService);
       })
       .catch((error) => {
-        console.error("Error adding service:", error);
-        const message = error.message || "Failed to add service";
-        setErrorMessage(message);
-        toast.error(message);
+        toast.error(`Failed to add service: ${error.message}`);
       })
       .finally(() => {
         setLoading(false);

@@ -28,7 +28,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-import { Rack, host_schema } from "@/lib/type";
+import { Host, Rack, host_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addHost } from "@/lib/api";
 import Icon from "@/components/icon";
@@ -37,7 +37,13 @@ import { useContextSafe } from "@/lib/utils";
 
 const form_schema = host_schema.pick({ name: true, height: true });
 
-export function AddHostDialog({ context }: { context: RackContextType }) {
+export function AddHostDialog({
+  context,
+  onSuccess,
+}: {
+  context: RackContextType;
+  onSuccess?: (newHost: Host) => void;
+}) {
   const { state, dispatch } = useContextSafe(context);
 
   const [open, setOpen] = useState(false);
@@ -63,13 +69,14 @@ export function AddHostDialog({ context }: { context: RackContextType }) {
     })
       .then((newHost) => {
         dispatch({ type: "ADD_HOST", payload: { host: newHost } });
+        setOpen(false);
         toast.success(`Host  ${values.name} added successfully!`);
+        form.reset();
+        onSuccess?.(newHost);
       })
       .catch((error) => {
-        console.error("Error adding host:", error);
-        toast.error("Failed to add host");
+        toast.error(`Failed to add host: ${error.message}`);
       });
-    setOpen(false);
   }
 
   return (

@@ -21,16 +21,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-import { room_schema, SimpleDatacenter } from "@/lib/type";
+import { Room, room_schema, SimpleDatacenter } from "@/lib/type";
 import { toast } from "sonner";
 import { addRoom } from "@/lib/api";
 import Icon from "@/components/icon";
 
-interface AddRoomDialogProps {
+export function AddRoomDialog({
+  currentDC,
+  onSuccess,
+}: {
   currentDC: SimpleDatacenter;
-}
-
-export function AddRoomDialog({ currentDC }: AddRoomDialogProps) {
+  onSuccess?: (newRoom: Room) => void;
+}) {
   const [open, setOpen] = useState(false);
 
   const form_schema = room_schema
@@ -52,10 +54,11 @@ export function AddRoomDialog({ currentDC }: AddRoomDialogProps) {
       height: values.height,
       dc_name: currentDC.name,
     })
-      .then(() => {
+      .then((newRoom) => {
         setOpen(false);
-        form.reset();
         toast.success(`Room ${values.name} added successfully`);
+        form.reset();
+        onSuccess?.(newRoom);
       })
       .catch((error) => {
         toast.error(`Failed to add room: ${error.message}`);

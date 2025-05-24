@@ -23,19 +23,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-import { rack_schema, type SimpleRoom } from "@/lib/type";
+import { Rack, rack_schema, SimpleRoom } from "@/lib/type";
 import { toast } from "sonner";
 import { addRack } from "@/lib/api";
 import { Plus } from "lucide-react";
 
-interface AddRackDialogProps {
+export function AddRackDialog({
+  currentRoom,
+  onSuccess,
+}: {
   currentRoom: SimpleRoom;
-  onSuccess?: () => void;
-}
-
-// TODO: Can not set service when create?
-
-export function AddRackDialog({ currentRoom, onSuccess }: AddRackDialogProps) {
+  onSuccess?: (newRack: Rack) => void;
+}) {
   const [open, setOpen] = useState(false);
 
   const form_schema = rack_schema
@@ -61,11 +60,11 @@ export function AddRackDialog({ currentRoom, onSuccess }: AddRackDialogProps) {
       height: values.height,
       room_name: currentRoom.name,
     })
-      .then(() => {
+      .then((newRack) => {
         setOpen(false);
-        form.reset();
         toast.success(`Rack ${values.name} added successfully`);
-        if (onSuccess) onSuccess();
+        form.reset();
+        onSuccess?.(newRack);
       })
       .catch((error) => {
         toast.error(`Failed to add rack: ${error.message}`);
