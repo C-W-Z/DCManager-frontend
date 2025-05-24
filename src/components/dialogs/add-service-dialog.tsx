@@ -66,9 +66,9 @@ export function AddServiceDialog() {
         .then((data) => {
           setDataCenters(data);
         })
-        .catch((error) => {
-          console.error("Failed to fetch data centers:", error);
-          toast.error("Failed to load data centers");
+        .catch((e: APIError) => {
+          console.error(e);
+          toast.error(e.error);
         })
         .finally(() => {
           setLoading(false);

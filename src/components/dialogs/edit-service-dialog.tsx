@@ -26,7 +26,7 @@ import { getAllDC, modifyService } from "@/lib/api";
 import { Edit, Plus, Trash2 } from "lucide-react";
 import { Label } from "../ui/label";
 import { DataCenterSelect } from "../select-datacenter";
-import { AlertError } from "@/components/alert-error-success"
+import { AlertError } from "@/components/alert-error-success";
 
 // Update form_schema to make allocated_subnet a string array
 const form_schema = z.object({
@@ -97,9 +97,9 @@ export function EditServiceDialog({ service, onUpdateSuccess }: EditServiceDialo
         .then((data) => {
           setDataCenters(data);
         })
-        .catch((error) => {
-          console.error("Failed to fetch data centers:", error);
-          toast.error("Failed to load data centers");
+        .catch((e: APIError) => {
+          console.error(e);
+          toast.error(e.error);
         })
         .finally(() => {
           setLoading(false);

@@ -209,7 +209,7 @@ export function BulkAddHostPage() {
           );
 
           if (!rack) {
-            throw new Error(
+            throw new APIError(
               `Invalid rack or position, rack: ${row.rack_name}, position: ${row.position}`,
             );
           }
@@ -231,7 +231,7 @@ export function BulkAddHostPage() {
           // Update the local copy on error
           updatedPreviewData = updatedPreviewData.map((r, index) =>
             index === i
-              ? { ...r, status: "Failed" as const, error: (err as Error).message }
+              ? { ...r, status: "Failed" as const, error: (err as APIError).error }
               : r,
           );
           setPreviewData(updatedPreviewData);
@@ -250,7 +250,7 @@ export function BulkAddHostPage() {
 
       await refreshRacks();
     } catch (err) {
-      setError("Failed to process hosts: " + (err as Error).message);
+      setError("Failed to process hosts: " + (err as APIError).error);
     } finally {
       setLoading(false);
     }
@@ -263,7 +263,7 @@ export function BulkAddHostPage() {
         {error && <AlertError message={error} />}
         {success && <AlertSuccess message={success} />}
 
-        <div className="mb-6 flex items-center gap-4">
+        <div className="my-6 flex items-center gap-4">
           <Button
             onClick={downloadTemplate}
             disabled={loading || racks.length === 0}

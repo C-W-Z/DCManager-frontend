@@ -21,7 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-import { room_schema, SimpleDatacenter } from "@/lib/type";
+import { APIError, room_schema, SimpleDatacenter } from "@/lib/type";
 import { toast } from "sonner";
 import { addRoom } from "@/lib/api";
 import Icon from "@/components/icon";
@@ -57,8 +57,9 @@ export function AddRoomDialog({ currentDC }: AddRoomDialogProps) {
         form.reset();
         toast.success(`Room ${values.name} added successfully`);
       })
-      .catch((error) => {
-        toast.error(`Failed to add room: ${error.message}`);
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
       });
   }
 

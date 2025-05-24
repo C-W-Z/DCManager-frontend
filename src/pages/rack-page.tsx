@@ -1,6 +1,6 @@
 import { useEffect, useState, useReducer, useCallback, createContext } from "react";
 import { getRack } from "@/lib/api";
-import { Rack } from "@/lib/type";
+import { APIError, Rack } from "@/lib/type";
 import { RackDnD } from "@/components/rack-dnd/rack-dnd";
 import {
   RackDroppable,
@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { DeleteConfirmation } from "@/components/dialogs/delete-confirm";
 import { EditRackDialog } from "@/components/dialogs/edit-rack-dialog";
 import { MoveItemDialog } from "@/components/dialogs/move-item";
+import { toast } from "sonner";
 
 export function RackPage() {
   const rackName = useParams().rackName as string;
@@ -33,8 +34,9 @@ export function RackPage() {
       .then((rack) => {
         setRack(rack);
       })
-      .catch((error) => {
-        console.error("Error fetching rack data:", error);
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
         setRack(null);
       })
       .finally(() => {

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { deleteDC, deleteRoom, deleteRack, deleteHost } from "@/lib/api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import { APIError } from "@/lib/type";
 
 export type DeleteType = "datacenter" | "room" | "rack" | "host";
 
@@ -51,16 +52,20 @@ export function DeleteConfirmation({
       const results = await Promise.all(deletePromises);
 
       // 检查是否所有删除操作都成功
-      const allSuccessful = results.every((result) => result === true || result === undefined);
+      const allSuccessful = results.every((result) => result === undefined);
 
       // 如果所有删除都成功，通知父组件
       if (allSuccessful) {
-        const names = itemCount > 1 ? `${itemCount} ${typeName}s` : `${itemName || ""}`
+        const names = itemCount > 1 ? `${itemCount} ${typeName}s` : `${itemName || ""}`;
         toast.success(`Delete ${names} successfully`);
         if (onSuccess) onSuccess(ids);
-      } else console.error("Some delete operations failed");
+      } else {
+        console.error("Some delete operations failed");
+        toast.error("Some delete operations failed");
+      }
     } catch (error) {
       console.error(`Error deleting ${type}:`, error);
+      toast.error((error as APIError).error);
     } finally {
       setLoading(false);
       setIsOpen(false);
@@ -80,7 +85,7 @@ export function DeleteConfirmation({
         return deleteHost;
       default:
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        return (_id: string) => Promise.resolve(false);
+        return (_id: string) => Promise.resolve();
     }
   };
 

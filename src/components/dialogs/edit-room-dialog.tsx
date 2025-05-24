@@ -13,11 +13,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Edit } from "lucide-react";
-import type { SimpleRoom } from "@/lib/type";
+import { Edit } from "lucide-react";
+import type { APIError, SimpleRoom } from "@/lib/type";
 import { modifyRoom } from "@/lib/api";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import { AlertError } from "../alert-error-success";
 
 interface EditRoomDialogProps {
   room: SimpleRoom | null;
@@ -68,9 +68,10 @@ export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
         if (onUpdateSuccess) onUpdateSuccess(updatedRoom);
         setOpen(false);
       })
-      .catch((error) => {
-        console.error("Error updating room:", error);
-        setError("Failed to edit Room.");
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
+        setError(e.error);
       });
   };
 
@@ -83,12 +84,7 @@ export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-          {error && (
-            <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+          {error && <AlertError message={error} />}
 
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>

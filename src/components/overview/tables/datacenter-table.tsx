@@ -2,13 +2,14 @@
 
 import { DataTable } from "@/components/overview/data-table";
 import { dataCenterColumns } from "@/components/overview/columns/datacenter-columns";
-import type { SimpleDatacenter } from "@/lib/type";
+import type { APIError, SimpleDatacenter } from "@/lib/type";
 import { getAllDC } from "@/lib/api";
 import { useEffect, useState, useCallback } from "react";
 import { AddDatacenterDialog } from "@/components/dialogs/add-datacenter-dialog";
 import { useUser } from "@/context/use-user";
 import { Summary } from "@/components/overview/summary";
 import { RefreshButton } from "@/components/refresh-button";
+import { toast } from "sonner";
 
 type dcSummary = {
   dc: number;
@@ -52,8 +53,9 @@ export default function DataCenterTable() {
         setDataCenters(dcs);
         calculateTotalCounts(dcs);
       })
-      .catch((error) => {
-        console.error("Error fetching all dc data:", error);
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
         setDataCenters([]);
       })
       .finally(() => {

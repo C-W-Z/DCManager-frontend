@@ -91,8 +91,9 @@ export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
         setNewPos(newPos);
         setLoadingPos(false);
       })
-      .catch((error) => {
-        console.error("Error fetching rack data:", error);
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
         setNewPos(null);
         setLoadingPos(false);
       });
@@ -143,9 +144,12 @@ export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
       setLoadingMoveRequest(true);
 
       for (const item of items) {
-        await modifyHost(item.name, {
+        modifyHost(item.name, {
           rack_name: selectedRack,
           pos: newPos[item.name],
+        }).catch((e: APIError) => {
+          console.error(e);
+          toast.error(e.error);
         });
       }
 

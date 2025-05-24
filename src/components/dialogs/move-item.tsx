@@ -11,7 +11,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { MoveRight, Home, Move, MoveLeft } from "lucide-react";
-import type { SimpleDatacenter, Host, SimpleRack, SimpleRoom, Rack } from "@/lib/type";
+import type {
+  SimpleDatacenter,
+  Host,
+  SimpleRack,
+  SimpleRoom,
+  Rack,
+  APIError,
+} from "@/lib/type";
 import {
   getAllDC,
   getDC,
@@ -55,40 +62,37 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
 
   const loadRacksByRoomId = useCallback(async (room_name: string) => {
     setLoadingDestinations(true);
-    try {
-      const room = await getRoom(room_name);
-      setRacks(room.racks);
-    } catch (error) {
-      console.error("Error loading racks:", error);
-    } finally {
-      setLoadingDestinations(false);
-    }
+    getRoom(room_name)
+      .then((room) => setRacks(room.racks))
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
+      })
+      .finally(() => setLoadingDestinations(false));
   }, []);
 
   // 加载指定数据中心的房间
   const loadRoomsByDCId = useCallback(async (dc_name: string) => {
     setLoadingDestinations(true);
-    try {
-      const dc = await getDC(dc_name);
-      setRooms(dc.rooms);
-    } catch (error) {
-      console.error("Error loading rooms:", error);
-    } finally {
-      setLoadingDestinations(false);
-    }
+    getDC(dc_name)
+      .then((dc) => setRooms(dc.rooms))
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
+      })
+      .finally(() => setLoadingDestinations(false));
   }, []);
 
   // 加载所有数据中心
   const loadDataCenters = useCallback(async () => {
     setLoadingDestinations(true);
-    try {
-      const dcs = await getAllDC();
-      setDataCenters(dcs);
-    } catch (error) {
-      console.error("Error loading data centers:", error);
-    } finally {
-      setLoadingDestinations(false);
-    }
+    getAllDC()
+      .then((dcs) => setDataCenters(dcs))
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
+      })
+      .finally(() => setLoadingDestinations(false));
   }, []);
 
   const loadParentLevel = useCallback(async () => {
@@ -100,36 +104,40 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
         break;
       }
       case "rack": {
-        try {
-          const room = await getRoom((items[0] as SimpleRack).room_name);
-          if (room.name !== (items[0] as SimpleRack).room_name)
-            console.error("room.name !== item.room_name");
-          loadRoomsByDCId(room.dc_name);
-          setParentDCId(room.dc_name);
-          setSelectedDC(room.dc_name);
-          setParentRoomId(room.name);
-          setSelectedRoom(room.name);
-        } catch (error) {
-          console.error("Error loading rooms:", error);
-        }
+        getRoom((items[0] as SimpleRack).room_name)
+          .then((room) => {
+            if (room.name !== (items[0] as SimpleRack).room_name)
+              console.error("room.name !== item.room_name");
+            loadRoomsByDCId(room.dc_name);
+            setParentDCId(room.dc_name);
+            setSelectedDC(room.dc_name);
+            setParentRoomId(room.name);
+            setSelectedRoom(room.name);
+          })
+          .catch((e: APIError) => {
+            console.error(e);
+            toast.error(e.error);
+          });
         break;
       }
       case "host": {
-        try {
-          const rack = await getRack((items[0] as Host).rack_name);
-          if (rack.name !== (items[0] as Host).rack_name)
-            console.error("rack.name !== item.rack_name");
-          loadRoomsByDCId(rack.dc_name);
-          setParentDCId(rack.dc_name);
-          setSelectedDC(rack.dc_name);
-          loadRacksByRoomId(rack.room_name);
-          setParentRoomId(rack.room_name);
-          setSelectedRoom(rack.room_name);
-          setParentRackId(rack.name);
-          setSelectedRack(rack.name);
-        } catch (error) {
-          console.error("Error loading racks:", error);
-        }
+        getRack((items[0] as Host).rack_name)
+          .then((rack) => {
+            if (rack.name !== (items[0] as Host).rack_name)
+              console.error("rack.name !== item.rack_name");
+            loadRoomsByDCId(rack.dc_name);
+            setParentDCId(rack.dc_name);
+            setSelectedDC(rack.dc_name);
+            loadRacksByRoomId(rack.room_name);
+            setParentRoomId(rack.room_name);
+            setSelectedRoom(rack.room_name);
+            setParentRackId(rack.name);
+            setSelectedRack(rack.name);
+          })
+          .catch((e: APIError) => {
+            console.error(e);
+            toast.error(e.error);
+          });
         break;
       }
       default:
@@ -200,13 +208,28 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
 
   const getPromises = () => {
     if (type === "room" && selectedDC)
-      return items.map((item) => modifyRoom(item.name, { dc_name: selectedDC }));
+      return items.map((item) =>
+        modifyRoom(item.name, { dc_name: selectedDC }).catch((e: APIError) => {
+          console.error(e);
+          toast.error(e.error);
+        }),
+      );
     if (type === "rack" && selectedRoom)
-      return items.map((item) => modifyRack(item.name, { room_name: selectedRoom }));
+      return items.map((item) =>
+        modifyRack(item.name, { room_name: selectedRoom }).catch((e: APIError) => {
+          console.error(e);
+          toast.error(e.error);
+        }),
+      );
     if (type === "host" && selectedRack)
       return items.map((item) => {
         if (selectedRackPos !== null)
-          modifyHost(item.name, { rack_name: selectedRack, pos: selectedRackPos });
+          modifyHost(item.name, { rack_name: selectedRack, pos: selectedRackPos }).catch(
+            (e: APIError) => {
+              console.error(e);
+              toast.error(e.error);
+            },
+          );
       });
     return items.map(() => Promise.resolve(false));
   };

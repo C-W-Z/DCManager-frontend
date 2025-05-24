@@ -12,7 +12,7 @@ export function AlertError({message}: {message: string}) {
 
 export function AlertSuccess({message}: {message: string}) {
   return (
-    <Alert variant="default" className="border-green-500 bg-green-500 text-green-800">
+    <Alert variant="default" className="border-green-500 bg-green-100">
       <AlertCircle className="h-4 w-4" />
       <AlertDescription>{message}</AlertDescription>
     </Alert>
