@@ -18,12 +18,14 @@ import HostTable from "./components/explorer/tables/host-table";
 import { UserProvider } from "./context/user-context";
 import LoginPage from "@/view/login";
 import BulkAddHostView from "@/view/bulk-add-host-view";
+import RegisterPage from "@/view/register";
 
 createRoot(document.getElementById("root")!).render(
   <UserProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route
           path="/explorer"
           element={

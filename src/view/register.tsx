@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -25,41 +25,42 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { useUser } from "@/context/use-user";
 import { user_schema } from "@/lib/type";
-import { getUserRole } from "@/lib/api";
+import { addUser } from "@/lib/api";
+import {
+  Select,
+  SelectItem,
+  SelectTrigger,
+  SelectContent,
+  SelectValue,
+} from "@/components/ui/select";
 
-const formSchema = user_schema.pick({ username: true }).extend({
+const formSchema = user_schema.extend({
   password: z.string(),
 });
 
-export default function LoginPage() {
-  const { login } = useUser();
-
+export default function RegisterPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { username: "" },
+    defaultValues: { username: "", password: "" },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
 
-    getUserRole(values.username)
-      .then((user) => {
-        login(user.username, user.role);
-        toast.success("Successfully logged in as " + user.username + " (" + user.role + ")");
-
-        if (user.role === "admin") {
-          navigate("/explorer");
-        } else {
-          navigate("/service");
-        }
+    addUser({
+      username: values.username,
+      role: values.role,
+    })
+      .then(() => {
+        toast.success("Successfully register! You can now log in.");
+        navigate("/");
       })
       .catch((e) => {
-        toast.error("Invalid username or password");
+        toast.error("Registration failed.");
         console.error(e);
       })
       .finally(() => {
@@ -72,9 +73,9 @@ export default function LoginPage() {
       <div className="mx-auto flex items-center justify-center">
         <Card className="w-[350px]">
           <CardHeader className="mb-2">
-            <CardTitle className="flex justify-center text-xl">Login</CardTitle>
+            <CardTitle className="flex justify-center text-xl">Register</CardTitle>
             <CardDescription className="flex justify-center">
-              Login to Data Center Manager
+              Register a account to access DCManager.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -88,9 +89,8 @@ export default function LoginPage() {
                       <FormLabel>Username</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="admin"
+                          placeholder="leezhang103"
                           type="text"
-                          // autoComplete="name"
                           disabled={isLoading}
                           {...field}
                           required
@@ -108,13 +108,33 @@ export default function LoginPage() {
                       <FormLabel>Password</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="password"
+                          placeholder="gHy7!@#daw2"
                           type="password"
-                          // autoComplete="name"
                           disabled={isLoading}
                           {...field}
                           required
                         />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Role</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={(value) => field.onChange(value)}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="normal">Normal User</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -125,18 +145,12 @@ export default function LoginPage() {
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Logging in...
+                        Registering ...
                       </>
                     ) : (
-                      "Login"
+                      "Register"
                     )}
                   </Button>
-                  <Link
-                    to="/register"
-                    className="ml-4 text-sm font-bold text-blue-600 hover:underline"
-                  >
-                    Don't have an account?
-                  </Link>
                 </CardFooter>
               </form>
             </Form>
