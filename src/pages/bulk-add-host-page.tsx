@@ -236,6 +236,7 @@ export function BulkAddHostPage() {
           );
           setPreviewData(updatedPreviewData);
           // console.log("Failed row", i, updatedPreviewData[i]);
+          break; // early stop if error occur
         }
       }
 
