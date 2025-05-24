@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { user_schema } from "@/lib/type";
+import { APIError, user_schema } from "@/lib/type";
 import { addUser } from "@/lib/api";
 import {
   Select,
@@ -60,8 +60,8 @@ export function RegisterPage() {
         toast.success("Successfully register! You can now log in.");
         navigate("/");
       })
-      .catch((e) => {
-        toast.error((e as Error).message);
+      .catch((e: APIError) => {
+        toast.error(e.error);
         console.error(e);
       })
       .finally(() => {

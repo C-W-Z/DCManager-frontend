@@ -129,8 +129,8 @@ function ServiceCard({
         </div>
         <div>
           <label className="text-sm text-gray-500">已分配機櫃</label>
-          {Object.entries(service.n_allocated_racks).map(([dc_name, n_racks]) => (
-            <p>
+          {Object.entries(service.n_allocated_racks).map(([dc_name, n_racks], index) => (
+            <p key={index}>
               {dc_name} ({n_racks})
             </p>
           ))}
