@@ -35,7 +35,7 @@ export async function addDC(
   });
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -50,7 +50,7 @@ export async function getAllDC(): Promise<t.SimpleDatacenter[]> {
   const response = await fetch(`${baseUrl}/dc/all`);
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -100,7 +100,7 @@ export async function modifyDC(
   });
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -123,7 +123,7 @@ export async function deleteDC(dc_name: string): Promise<void> {
   });
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return Promise.resolve();
 }
@@ -154,7 +154,7 @@ export async function addRoom(
   });
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -174,7 +174,7 @@ export async function getRoom(room_name: string): Promise<t.Room> {
   const response = await fetch(`${baseUrl}/room/${room_name}`);
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -204,7 +204,7 @@ export async function modifyRoom(
   });
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -226,7 +226,7 @@ export async function deleteRoom(room_name: string): Promise<void> {
   });
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return Promise.resolve();
 }
@@ -264,7 +264,7 @@ export async function addRack(
   });
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -284,7 +284,7 @@ export async function getRack(rack_name: string): Promise<t.Rack> {
   const response = await fetch(`${baseUrl}/rack/${rack_name}`);
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -313,7 +313,7 @@ export async function modifyRack(
   });
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -336,7 +336,7 @@ export async function deleteRack(rack_name: string): Promise<void> {
   });
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return Promise.resolve();
 }
@@ -380,7 +380,7 @@ export async function addHost(
   });
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -395,7 +395,7 @@ export async function getAllHost(): Promise<t.Host[]> {
   const response = await fetch(`${baseUrl}/host/all`);
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -415,7 +415,7 @@ export async function getHost(host_name: string): Promise<t.Host> {
   const response = await fetch(`${baseUrl}/host/${host_name}`);
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -445,7 +445,7 @@ export async function modifyHost(
   });
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return response.json();
 }
@@ -467,7 +467,7 @@ export async function deleteHost(host_name: string): Promise<void> {
   });
   if (!response.ok) {
     const data = await response.json();
-      return Promise.reject(new t.APIError(data.error, response.status));
+    return Promise.reject(new t.APIError(data.error, response.status));
   }
   return Promise.resolve();
 }
