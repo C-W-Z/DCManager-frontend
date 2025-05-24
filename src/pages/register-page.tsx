@@ -53,6 +53,7 @@ export function RegisterPage() {
 
     addUser({
       username: values.username,
+      password: values.password,
       role: values.role,
     })
       .then(() => {
@@ -60,7 +61,7 @@ export function RegisterPage() {
         navigate("/");
       })
       .catch((e) => {
-        toast.error("Registration failed.");
+        toast.error((e as Error).message);
         console.error(e);
       })
       .finally(() => {

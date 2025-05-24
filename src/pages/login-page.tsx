@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useUser } from "@/context/use-user";
 import { user_schema } from "@/lib/type";
-import { getUserRole } from "@/lib/api";
+import { userLogin } from "@/lib/api";
 
 const formSchema = user_schema.pick({ username: true }).extend({
   password: z.string(),
@@ -47,7 +47,10 @@ export function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
 
-    getUserRole(values.username)
+    userLogin({
+      username: values.username,
+      password: values.password,
+    })
       .then((user) => {
         login(user.username, user.role);
         toast.success("Successfully logged in as " + user.username + " (" + user.role + ")");
@@ -59,7 +62,7 @@ export function LoginPage() {
         }
       })
       .catch((e) => {
-        toast.error("Invalid username or password");
+        toast.error((e as Error).message);
         console.error(e);
       })
       .finally(() => {
