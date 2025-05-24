@@ -1,6 +1,6 @@
 import { useEffect, useState, useReducer, useCallback, createContext } from "react";
 import { getHost, getRack } from "@/lib/api";
-import { Host, Rack } from "@/lib/type";
+import { APIError, Host, Rack } from "@/lib/type";
 import { Separator, DataFlexRow } from "@/components/components";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/icon";
@@ -18,6 +18,7 @@ import { LoadingView } from "@/components/loading-view";
 import { FallbackView } from "@/components/fallback-view";
 import { useUser } from "@/context/use-user";
 import { MoveHostDialog } from "../components/dialogs/move-host-dialog";
+import { toast } from "sonner";
 
 export function HostPage() {
   const hostName = useParams().hostName as string;
@@ -31,8 +32,9 @@ export function HostPage() {
       .then((rack) => {
         setRack(rack);
       })
-      .catch((error) => {
-        console.error("Error fetching rack data:", error);
+     .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
         setRack(null);
       });
   }, []);
@@ -46,8 +48,9 @@ export function HostPage() {
           setHost(host);
           LoadRack(host.rack_name);
         })
-        .catch((error) => {
-          console.error("Error fetching rack data:", error);
+        .catch((e: APIError) => {
+          console.error(e);
+          toast.error(e.error);
           setHost(null);
         })
         .finally(() => {

@@ -23,7 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-import { Rack, rack_schema, SimpleRoom } from "@/lib/type";
+import { APIError, Rack, rack_schema, type SimpleRoom } from "@/lib/type";
 import { toast } from "sonner";
 import { addRack } from "@/lib/api";
 import { Plus } from "lucide-react";
@@ -66,8 +66,9 @@ export function AddRackDialog({
         form.reset();
         onSuccess?.(newRack);
       })
-      .catch((error) => {
-        toast.error(`Failed to add rack: ${error.message}`);
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
       });
   }
 

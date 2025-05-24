@@ -2,12 +2,13 @@
 
 import { DataTable } from "@/components/overview/data-table";
 import { hostColumns } from "@/components/overview/columns/host-columns";
-import type { Host } from "@/lib/type";
+import type { APIError, Host } from "@/lib/type";
 import { getAllHost } from "@/lib/api";
 import { useEffect, useState, useCallback } from "react";
 import { useUser } from "@/context/use-user";
 import Icon from "@/components/icon";
 import { RefreshButton } from "@/components/refresh-button";
+import { toast } from "sonner";
 
 export function HostTablePage() {
   const { user, accessableService } = useUser();
@@ -27,8 +28,9 @@ export function HostTablePage() {
           setHost(hosts);
         }
       })
-      .catch((error) => {
-        console.error("Error loading data:", error);
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
         setHost([]);
       })
       .finally(() => {

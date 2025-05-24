@@ -21,7 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-import { Datacenter, datacenter_schema } from "@/lib/type";
+import { APIError, Datacenter, datacenter_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addDC } from "@/lib/api";
 import { MAX_HEIGHT } from "@/lib/constant";
@@ -58,8 +58,9 @@ export function AddDatacenterDialog({
         form.reset();
         onSuccess?.(newDatacenter);
       })
-      .catch((error) => {
-        toast.error(`Failed to add datacenter: ${error.message}`);
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
       });
   }
 

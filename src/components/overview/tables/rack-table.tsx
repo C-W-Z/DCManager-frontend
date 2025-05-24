@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { DataTable } from "@/components/overview/data-table";
 import { rackColumns } from "@/components/overview/columns/rack-columns";
-import type { SimpleRoom, SimpleRack } from "@/lib/type";
+import type { SimpleRoom, SimpleRack, APIError } from "@/lib/type";
 import { getRoom } from "@/lib/api";
 import { AddRackDialog } from "@/components/dialogs/add-rack-dialog";
 import { useParams } from "react-router-dom";
 import { useUser } from "@/context/use-user";
 import { Summary } from "../summary";
 import { RefreshButton } from "@/components/refresh-button";
+import { toast } from "sonner";
 
 export default function RackTable() {
   const { user } = useUser();
@@ -23,8 +24,9 @@ export default function RackTable() {
         setRoom(room);
         setRacks(room.racks);
       })
-      .catch((error) => {
-        console.error("Error fetching room data:", error);
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
         setRoom(null);
         setRacks([]);
       })

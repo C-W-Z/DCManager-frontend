@@ -1,7 +1,8 @@
 import { useState, useEffect, type ReactNode, useCallback } from "react";
 import { UserContext } from "./use-user";
-import { User } from "@/lib/type";
+import { APIError, User } from "@/lib/type";
 import { getUserService } from "@/lib/api";
+import { toast } from "sonner";
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -55,8 +56,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
         .then((serviceList) => {
           setAccessableService(serviceList.map((service) => service.name));
         })
-        .catch((error) => {
-          console.error("Error fetching all service data:", error);
+        .catch((e: APIError) => {
+          console.error(e);
+          toast.error(e.error);
         });
     },
     [setAccessableService],

@@ -11,9 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Edit, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { host_schema, Host } from "@/lib/type";
+import { Edit } from "lucide-react";
+import { host_schema, Host, APIError } from "@/lib/type";
 import { modifyHost } from "@/lib/api";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -24,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AlertError } from "../alert-error-success";
 
 interface EditHostDialogProps {
   host: Host | null;
@@ -36,8 +36,6 @@ const form_schema = host_schema.pick({
   height: true,
   running: true,
 });
-
-// TODO: fix status -> running
 
 export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
   const [open, setOpen] = useState(false);
@@ -84,9 +82,10 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
         setOpen(false);
         toast.success(`Host ${formData.name} edited successfully`);
       })
-      .catch((error) => {
-        console.error("Error updating rack:", error);
-        setError("Failed to edit Rack.");
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
+        setError(e.error);
       });
   };
 
@@ -99,12 +98,7 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
           </DialogTitle>
         </DialogHeader>
 
-        {error && (
-          <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+        {error && <AlertError message={error} />}
 
         <form onSubmit={handleSubmit} className="space-y-6 pt-4">
           <div className="space-y-2">

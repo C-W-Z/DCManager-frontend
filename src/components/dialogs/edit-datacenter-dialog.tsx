@@ -13,11 +13,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Edit, AlertCircle } from "lucide-react";
-import type { Datacenter, SimpleDatacenter } from "@/lib/type";
+import { Edit } from "lucide-react";
+import type { APIError, Datacenter, SimpleDatacenter } from "@/lib/type";
 import { getDC, modifyDC } from "@/lib/api";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import { AlertError } from "../alert-error-success";
 
 interface EditDatacenterDialogProps {
   datacenter: SimpleDatacenter | null;
@@ -50,13 +50,14 @@ export function EditDatacenterDialog({
           height: dc.height.toString(),
         });
       })
-      .catch((error) => {
-        console.error("Error fetching datacenter data:", error);
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
         setFormData({
           name: datacenter.name,
           height: datacenter.height.toString(),
         });
-        setError("Unable to retrieve data center details, please try again later.");
+        setError(e.error);
       })
       .finally(() => {
         setLoading(false);
@@ -91,9 +92,10 @@ export function EditDatacenterDialog({
         if (onUpdateSuccess) onUpdateSuccess(updatedDC);
         setOpen(false);
       })
-      .catch((error) => {
-        console.error("Error updating datacenter:", error);
-        setError("Failed to edit Datacenter.");
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
+        setError(e.error);
       })
       .finally(() => {
         setLoading(false);
@@ -114,12 +116,7 @@ export function EditDatacenterDialog({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-            {error && (
-              <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+            {error && <AlertError message={error} />}
 
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>

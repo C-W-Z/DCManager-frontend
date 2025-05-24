@@ -28,7 +28,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-import { Host, Rack, host_schema } from "@/lib/type";
+import { APIError, Host, Rack, host_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addHost } from "@/lib/api";
 import Icon from "@/components/icon";
@@ -74,8 +74,9 @@ export function AddHostDialog({
         form.reset();
         onSuccess?.(newHost);
       })
-      .catch((error) => {
-        toast.error(`Failed to add host: ${error.message}`);
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
       });
   }
 

@@ -25,9 +25,10 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { createPortal } from "react-dom";
-import type { SimpleRack, SimpleService } from "@/lib/type";
+import type { APIError, SimpleRack, SimpleService } from "@/lib/type";
 import { modifyRack, getAllService } from "@/lib/api";
 import { toast } from "sonner";
+import { AlertError } from "../alert-error-success";
 
 interface EditRackDialogProps {
   rack: SimpleRack | null;
@@ -58,9 +59,9 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
         .then((data) => {
           setServices(data);
         })
-        .catch((error) => {
-          console.error("Failed to fetch services:", error);
-          toast.error("Failed to load services");
+        .catch((e: APIError) => {
+          console.error(e);
+          toast.error(e.error);
         })
         .finally(() => {
           setLoading(false);
@@ -113,9 +114,10 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
         if (onUpdateSuccess) onUpdateSuccess(updatedRack);
         setOpen(false);
       })
-      .catch((error) => {
-        console.error("Error updating rack:", error);
-        setError("Failed to edit Rack.");
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
+        setError(e.error);
       });
   };
 
@@ -206,7 +208,9 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            formData.service_name === service.name ? "opacity-100" : "opacity-0",
+                            formData.service_name === service.name
+                              ? "opacity-100"
+                              : "opacity-0",
                           )}
                         />
                         {service.name}
@@ -242,12 +246,7 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
           </Alert>
         )}
 
-        {error && (
-          <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+        {error && <AlertError message={error} />}
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">

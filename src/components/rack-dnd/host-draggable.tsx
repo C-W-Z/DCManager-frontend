@@ -1,4 +1,4 @@
-import { Host } from "@/lib/type";
+import { APIError, Host } from "@/lib/type";
 import { motion, PanInfo, useMotionValue, useMotionValueEvent } from "motion/react";
 import { height2Px, pos2translateY, HOST_HEIGHT, RACK_GAP } from "@/lib/constant";
 import { cn } from "@/lib/utils";
@@ -102,8 +102,9 @@ export default function HostDraggable({
             toast.success(`Host ${host.name} moved successfully!`);
             onUpdate?.(newPos);
           })
-          .catch((error) => {
-            toast.error(`Failed to move host ${host.name}: ${error.message}`);
+          .catch((e: APIError) => {
+            console.error(e);
+            toast.error(e.error);
           });
       } else {
         toast.warning(`Host cannot be moved here`);

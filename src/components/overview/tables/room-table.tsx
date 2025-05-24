@@ -3,13 +3,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { DataTable } from "../data-table";
 import { roomColumns } from "../columns/room-columns";
-import type { SimpleDatacenter, SimpleRoom } from "@/lib/type";
+import type { APIError, SimpleDatacenter, SimpleRoom } from "@/lib/type";
 import { getDC } from "@/lib/api";
 import { AddRoomDialog } from "../../dialogs/add-room-dialog";
 import { useParams } from "react-router-dom";
 import { useUser } from "@/context/use-user";
 import { Summary } from "../summary";
 import { RefreshButton } from "@/components/refresh-button";
+import { toast } from "sonner";
 
 export default function RoomTable() {
   const { user } = useUser();
@@ -25,8 +26,9 @@ export default function RoomTable() {
         setDC(dc);
         setRooms(dc.rooms);
       })
-      .catch((error) => {
-        console.error("Error fetching rooms data from datacenter:", error);
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
         setDC(null);
         setRooms([]);
       })

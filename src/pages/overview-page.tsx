@@ -6,6 +6,8 @@ import Breadcrumb from "../components/overview/breadcrumb";
 import { useUser } from "@/context/use-user";
 import { FallbackView } from "@/components/fallback-view";
 import { getRoom } from "@/lib/api";
+import { APIError } from "@/lib/type";
+import { toast } from "sonner";
 
 export type ViewLevel = "datacenter-table" | "room-table" | "rack-table";
 
@@ -25,8 +27,9 @@ export function OverviewPage() {
         .then((room) => {
           setCurrentDCName(room.dc_name);
         })
-        .catch((error) => {
-          console.error("Error fetching room data:", error);
+        .catch((e: APIError) => {
+          console.error(e);
+          toast.error(e.error);
           setCurrentDCName(null);
         });
     } else if (dcName) {

@@ -1,5 +1,5 @@
 import { getService } from "@/lib/api";
-import { Service, SimpleRack, Host } from "@/lib/type";
+import { Service, SimpleRack, Host, APIError } from "@/lib/type";
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import Icon from "@/components/icon";
@@ -11,6 +11,7 @@ import { LoadingView } from "@/components/loading-view";
 import { FallbackView } from "@/components/fallback-view";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 export function ServicePage() {
   const serviceName = useParams().serviceName as string;
@@ -25,8 +26,9 @@ export function ServicePage() {
       .then((service) => {
         setService(service);
       })
-      .catch((error) => {
-        console.error("Error fetching service data:", error);
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
         setService(null);
       })
       .finally(() => {
