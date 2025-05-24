@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { MoveRight } from "lucide-react";
-import type { Host, SimpleRack, Rack } from "@/lib/type";
+import type { Host, SimpleRack, Rack, APIError } from "@/lib/type";
 import { modifyHost, getService, getRack } from "@/lib/api";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -40,11 +40,16 @@ export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
 
       const all: SimpleRack[] = [];
       for (const serviceName of accessableService) {
-        const service = await getService(serviceName);
-
-        Object.values(service.allocated_racks).forEach((racks) => {
-          all.push(...racks);
-        });
+        getService(serviceName)
+          .then((service) => {
+            Object.values(service.allocated_racks).forEach((racks) => {
+              all.push(...racks);
+            });
+          })
+          .catch((e: APIError) => {
+            console.error(e);
+            toast.error(e.error);
+          });
       }
 
       setRacks(all);

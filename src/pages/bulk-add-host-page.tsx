@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { getService, addHost } from "@/lib/api";
-import { Service, simple_rack_schema } from "@/lib/type";
+import { APIError, simple_rack_schema } from "@/lib/type";
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
 import { z } from "zod";
@@ -15,9 +15,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle2, Clock } from "lucide-react";
 import { useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { AlertError, AlertSuccess } from "@/components/alert-error-success";
 
 interface CsvRow {
   rack_name: string;
@@ -51,37 +52,41 @@ export function BulkAddHostPage() {
   // Reusable function to refresh racks and positions
   const refreshRacks = useCallback(async () => {
     setLoading(true);
-    try {
-      const service: Service = await getService(serviceName);
-      const allRacks: Array<RackWithDC> = [];
-      const positions: Record<string, number[]> = {};
+    getService(serviceName)
+      .then((service) => {
+        const allRacks: Array<RackWithDC> = [];
+        const positions: Record<string, number[]> = {};
 
-      // Aggregate racks from all datacenters
-      Object.entries(service.allocated_racks).forEach(([dc_name, rackList]) => {
-        allRacks.push(
-          ...rackList.map((r) => ({
-            ...r,
-            dc_name: dc_name,
-          })),
-        );
-      });
+        // Aggregate racks from all datacenters
+        Object.entries(service.allocated_racks).forEach(([dc_name, rackList]) => {
+          allRacks.push(
+            ...rackList.map((r) => ({
+              ...r,
+              dc_name: dc_name,
+            })),
+          );
+        });
 
-      // Calculate available positions for each rack
-      allRacks.forEach((rack) => {
-        const occupiedPositions = service.hosts
-          .filter((host) => host.rack_name === rack.name)
-          .flatMap((host) => Array.from({ length: host.height }, (_, i) => host.pos + i));
-        const allPositions = Array.from({ length: rack.capacity }, (_, i) => i + 1);
-        positions[rack.name] = allPositions.filter((pos) => !occupiedPositions.includes(pos));
-      });
+        // Calculate available positions for each rack
+        allRacks.forEach((rack) => {
+          const occupiedPositions = service.hosts
+            .filter((host) => host.rack_name === rack.name)
+            .flatMap((host) => Array.from({ length: host.height }, (_, i) => host.pos + i));
+          const allPositions = Array.from({ length: rack.capacity }, (_, i) => i + 1);
+          positions[rack.name] = allPositions.filter(
+            (pos) => !occupiedPositions.includes(pos),
+          );
+        });
 
-      setRacks(allRacks);
-      setAvailablePositions(positions);
-    } catch (error) {
-      setError(`Failed to fetch service racks: ${error}`);
-    } finally {
-      setLoading(false);
-    }
+        setRacks(allRacks);
+        setAvailablePositions(positions);
+      })
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
+        setError(e.error);
+      })
+      .finally(() => setLoading(false));
   }, [serviceName]);
 
   // Fetch service racks on mount
@@ -255,20 +260,8 @@ export function BulkAddHostPage() {
     <div className="m-12">
       <h1 className="mb-4 text-2xl font-bold">批量新增主機至服務: {serviceName}</h1>
       <div className="w-full">
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        {success && (
-          <Alert variant="default" className="mb-4 border-green-500">
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
-            <AlertTitle>Success</AlertTitle>
-            <AlertDescription>{success}</AlertDescription>
-          </Alert>
-        )}
+        {error && <AlertError message={error} />}
+        {success && <AlertSuccess message={success} />}
 
         <div className="mb-6 flex items-center gap-4">
           <Button

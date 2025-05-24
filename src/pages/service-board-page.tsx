@@ -1,4 +1,4 @@
-import { SimpleService } from "@/lib/type";
+import { APIError, SimpleService } from "@/lib/type";
 import { getAllService, getUserService } from "@/lib/api";
 import { useEffect, useState, useCallback } from "react";
 import { AddServiceDialog } from "../components/dialogs/add-service-dialog";
@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import Icon from "@/components/icon";
 import { LoadingView } from "@/components/loading-view";
 import { FallbackView } from "@/components/fallback-view";
+import { toast } from "sonner";
 
 export function ServiceBoardPage() {
   const [services, setServices] = useState<SimpleService[]>([]);
@@ -27,8 +28,9 @@ export function ServiceBoardPage() {
           setServices(serviceList);
           setAccessableService(serviceList.map((service) => service.name));
         })
-        .catch((error) => {
-          console.error("Error fetching all service data:", error);
+        .catch((e: APIError) => {
+          console.error(e);
+          toast.error(e.error)
         })
         .finally(() => {
           setLoading(false);
@@ -39,8 +41,9 @@ export function ServiceBoardPage() {
           setServices(serviceList);
           setAccessableService(serviceList.map((service) => service.name));
         })
-        .catch((error) => {
-          console.error("Error fetching all service data:", error);
+        .catch((e: APIError) => {
+          console.error(e);
+          toast.error(e.error)
         })
         .finally(() => {
           setLoading(false);

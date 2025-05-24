@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { createPortal } from "react-dom";
-import type { SimpleRack, SimpleService } from "@/lib/type";
+import type { APIError, SimpleRack, SimpleService } from "@/lib/type";
 import { modifyRack, getAllService } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -58,9 +58,9 @@ export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
         .then((data) => {
           setServices(data);
         })
-        .catch((error) => {
-          console.error("Failed to fetch services:", error);
-          toast.error("Failed to load services");
+        .catch((e: APIError) => {
+          console.error(e);
+          toast.error(e.error)
         })
         .finally(() => {
           setLoading(false);

@@ -26,7 +26,7 @@ import { getAllDC, modifyService } from "@/lib/api";
 import { Edit, Plus, Trash2 } from "lucide-react";
 import { Label } from "../ui/label";
 import { DataCenterSelect } from "../select-datacenter";
-import ErrorAlert from "../error-alert";
+import { AlertError } from "@/components/alert-error-success"
 
 // Update form_schema to make allocated_subnet a string array
 const form_schema = z.object({
@@ -132,7 +132,6 @@ export function EditServiceDialog({ service, onUpdateSuccess }: EditServiceDialo
     if (hasEmptySubnets) {
       setErrorMessage("Please fill in all IP Subnets or delete the blanks");
     }
-
   }, [allocatedRacks, allocatedSubnets]);
 
   const handleAllocatedRacksChange = (
@@ -251,7 +250,7 @@ export function EditServiceDialog({ service, onUpdateSuccess }: EditServiceDialo
         <DialogHeader>
           <DialogTitle>Edit Service</DialogTitle>
         </DialogHeader>
-        {errorMessage && <ErrorAlert error={errorMessage} />}
+        {errorMessage && <AlertError message={errorMessage} />}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField

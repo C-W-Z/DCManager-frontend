@@ -20,7 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
-import { simple_service_schema, SimpleDatacenter } from "@/lib/type";
+import { APIError, simple_service_schema, SimpleDatacenter } from "@/lib/type";
 import { toast } from "sonner";
 import { addService, getAllDC } from "@/lib/api";
 import Icon from "@/components/icon";
@@ -28,6 +28,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Label } from "../ui/label";
 import { DataCenterSelect } from "../select-datacenter";
 import { useUser } from "@/context/use-user";
+import { AlertError } from "../alert-error-success";
 
 // Update form_schema to make allocated_subnet a string array
 const form_schema = z.object({
@@ -80,9 +81,15 @@ export function AddServiceDialog() {
       (rack) => !rack.dc_name.trim() || rack.n_racks === 0,
     );
     setHasEmptyAllocatedRacks(hasEmptyRacks);
+    if (hasEmptyRacks) {
+      setErrorMessage("Please choose all DC names or delete the blanks");
+    }
 
     const hasEmptySubnets = allocatedSubnets.some((subnet) => !subnet.trim());
     setHasEmptyAllocatedSubnets(hasEmptySubnets);
+    if (hasEmptySubnets) {
+      setErrorMessage("Please fill in all IP Subnets or delete the blanks");
+    }
   }, [allocatedRacks, allocatedSubnets]);
 
   const handleAllocatedRacksChange = (
@@ -174,11 +181,10 @@ export function AddServiceDialog() {
         setOpen(false);
         loadAccessableService(user.username);
       })
-      .catch((error) => {
-        console.error("Error adding service:", error);
-        const message = error.message || "Failed to add service";
-        setErrorMessage(message);
-        toast.error(message);
+      .catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
+        setErrorMessage(e.error);
       })
       .finally(() => {
         setLoading(false);
@@ -209,6 +215,7 @@ export function AddServiceDialog() {
         <DialogHeader>
           <DialogTitle>Add New Service</DialogTitle>
         </DialogHeader>
+        {errorMessage && <AlertError message={errorMessage} />}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
@@ -289,11 +296,6 @@ export function AddServiceDialog() {
                   ))}
                 </div>
               )}
-              {hasEmptyAllocatedSubnets && (
-                <p className="text-sm text-red-500">
-                  Please fill in all IP Subnets or delete the blanks
-                </p>
-              )}
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -359,12 +361,6 @@ export function AddServiceDialog() {
                   ))}
                 </div>
               )}
-              {hasEmptyAllocatedRacks && (
-                <p className="text-sm text-red-500">
-                  Please choose all DC names or delete the blanks
-                </p>
-              )}
-              {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
             </div>
             <DialogFooter>
               <Button
