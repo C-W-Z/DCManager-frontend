@@ -177,7 +177,7 @@ export function DataTable<TData extends WithID, TValue>({
 
         <DropdownMenu open={isColumnMenuOpen} onOpenChange={setIsColumnMenuOpen}>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" disabled={loading}>
+            <Button variant="outline" disabled={loading} size="sm">
               Columns
             </Button>
           </DropdownMenuTrigger>
@@ -213,7 +213,7 @@ export function DataTable<TData extends WithID, TValue>({
         </DropdownMenu>
       </div>
 
-      <div className="my-4 h-fit w-full overflow-y-hidden rounded-sm border bg-white">
+      <div className="my-4 h-fit w-full overflow-y-hidden rounded-sm border border-gray-200 bg-white">
         {loading ? (
           <div className="flex h-60 w-full flex-col items-center justify-center gap-2 bg-gray-50">
             <div className="size-6 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
@@ -221,7 +221,7 @@ export function DataTable<TData extends WithID, TValue>({
           </div>
         ) : (
           <Table>
-            <TableHeader className="sticky top-0 z-10 bg-neutral-200">
+            <TableHeader className="sticky top-0 z-10 border-b-2 bg-gray-50">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
@@ -236,10 +236,14 @@ export function DataTable<TData extends WithID, TValue>({
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody className="**:data-[slot=table-cell]:first:w-8">
+            <TableBody className="**:data-[slot=table-cell]:first:w-10">
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="border-b border-b-gray-200 hover:bg-gray-100"
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}

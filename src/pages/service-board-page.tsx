@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { AddServiceDialog } from "../components/dialogs/add-service-dialog";
 import { useUser } from "@/context/use-user";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LoadingButton } from "@/components/loading-button";
+import { RefreshButton } from "@/components/refresh-button";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import Icon from "@/components/icon";
@@ -69,9 +69,7 @@ export function ServiceBoardPage() {
         </div>
         <div>
           <div className="flex flex-row justify-end gap-4">
-            <LoadingButton isLoading={loading} onClick={() => LoadService()}>
-              Refresh
-            </LoadingButton>
+            <RefreshButton isLoading={loading} onClick={() => LoadService()} />
             <AddServiceDialog />
           </div>
         </div>

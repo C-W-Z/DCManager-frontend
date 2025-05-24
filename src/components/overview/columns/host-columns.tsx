@@ -1,13 +1,13 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { Host } from "@/lib/type";
 import { Link } from "react-router-dom";
 import { HostRowActions } from "./host-actions";
 import { cn } from "@/lib/utils";
+import Icon from "@/components/icon";
 
 interface HostColumnsProps {
   onUpdateSuccess: (host: Host) => void;
@@ -58,7 +58,7 @@ export function hostColumns({
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Status
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <Icon id="swap" className="size-4 fill-zinc-600" />
           </Button>
         );
       },
@@ -86,7 +86,7 @@ export function hostColumns({
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Host Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <Icon id="swap" className="size-4 fill-zinc-600" />
           </Button>
         );
       },
@@ -110,7 +110,7 @@ export function hostColumns({
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Service
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <Icon id="swap" className="size-4 fill-zinc-600" />
           </Button>
         );
       },
@@ -128,7 +128,7 @@ export function hostColumns({
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Height
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <Icon id="swap" className="size-4 fill-zinc-600" />
           </Button>
         );
       },
@@ -146,7 +146,7 @@ export function hostColumns({
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             IP
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <Icon id="swap" className="size-4 fill-zinc-600" />
           </Button>
         );
       },

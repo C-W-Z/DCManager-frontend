@@ -7,6 +7,7 @@ import { getAllHost } from "@/lib/api";
 import { useEffect, useState, useCallback } from "react";
 import { useUser } from "@/context/use-user";
 import Icon from "@/components/icon";
+import { RefreshButton } from "@/components/refresh-button";
 
 export function HostTablePage() {
   const { user, accessableService } = useUser();
@@ -57,10 +58,6 @@ export function HostTablePage() {
   }) => {
     // Handle the move success logic here
     console.log("Move success:", data);
-    handleRefresh();
-  };
-
-  const handleRefresh = () => {
     loadHosts();
   };
 
@@ -71,22 +68,14 @@ export function HostTablePage() {
   });
 
   return (
-    <div>
+    <div className="flex h-full w-full flex-col gap-4 p-12">
       <div className="flex items-start justify-between">
         <div className="mb-4 flex flex-row items-center gap-2">
           <Icon id="host" className="size-8" />
           <div className="text-2xl font-bold">Hosts</div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handleRefresh}
-            className="rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
-            disabled={loading}
-          >
-            {loading ? "Loading..." : "Refresh"}
-          </button>
-        </div>
+        <RefreshButton isLoading={loading} onClick={() => loadHosts()} />
       </div>
 
       <DataTable

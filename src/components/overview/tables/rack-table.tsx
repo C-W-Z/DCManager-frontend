@@ -7,6 +7,7 @@ import { AddRackDialog } from "@/components/dialogs/add-rack-dialog";
 import { useParams } from "react-router-dom";
 import { useUser } from "@/context/use-user";
 import { Summary } from "../summary";
+import { RefreshButton } from "@/components/refresh-button";
 
 export default function RackTable() {
   const { user } = useUser();
@@ -90,13 +91,7 @@ export default function RackTable() {
         <h1 className="text-2xl font-bold">Racks</h1>
 
         <div className="flex items-center gap-4">
-          <button
-            onClick={handleRefresh}
-            className="rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
-            disabled={loading}
-          >
-            {loading ? "Loading..." : "Refresh"}
-          </button>
+          <RefreshButton isLoading={loading} onClick={() => handleRefresh()} />
           {room && <AddRackDialog currentRoom={room} />}
         </div>
       </div>

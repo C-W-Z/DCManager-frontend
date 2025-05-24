@@ -1,12 +1,12 @@
 "use client";
 
 import type { Column, ColumnDef, Row } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { SimpleRoom, User } from "@/lib/type";
 import { RoomRowActions } from "./room-actions";
 import { Link } from "react-router-dom";
+import Icon from "@/components/icon";
 
 interface RoomColumnsProps {
   onUpdateSuccess: (dc: SimpleRoom) => void;
@@ -29,7 +29,7 @@ function getCommonColumns(): ColumnDef<SimpleRoom>[] {
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Room Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <Icon id="swap" className="size-4 fill-zinc-600" />
         </Button>
       ),
       cell: ({ row }) => {
@@ -54,7 +54,7 @@ function getCommonColumns(): ColumnDef<SimpleRoom>[] {
             .replace("n_", "")
             .replace("_", " ")
             .replace(/^\w/, (c) => c.toUpperCase())}
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <Icon id="swap" className="size-4 fill-zinc-600" />
         </Button>
       ),
       cell: ({ row }: { row: Row<SimpleRoom> }) => {

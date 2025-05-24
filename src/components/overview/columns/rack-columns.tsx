@@ -1,12 +1,12 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { SimpleRack, User } from "@/lib/type";
 import { Link } from "react-router-dom";
 import { RackRowActions } from "./rack-actions";
+import Icon from "@/components/icon";
 
 interface RackColumnsProps {
   onUpdateSuccess: (dc: SimpleRack) => void;
@@ -30,7 +30,7 @@ function getCommonColumns(): ColumnDef<SimpleRack>[] {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Rack Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <Icon id="swap" className="size-4 fill-zinc-600" />
           </Button>
         );
       },
@@ -54,7 +54,7 @@ function getCommonColumns(): ColumnDef<SimpleRack>[] {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Service
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <Icon id="swap" className="size-4 fill-zinc-600" />
           </Button>
         );
       },
@@ -73,7 +73,7 @@ function getCommonColumns(): ColumnDef<SimpleRack>[] {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Usage/Capacity
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <Icon id="swap" className="size-4 fill-zinc-600" />
           </Button>
         );
       },
@@ -96,7 +96,7 @@ function getCommonColumns(): ColumnDef<SimpleRack>[] {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Hosts
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <Icon id="swap" className="size-4 fill-zinc-600" />
           </Button>
         );
       },

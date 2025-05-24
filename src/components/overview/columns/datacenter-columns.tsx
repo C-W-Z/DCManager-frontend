@@ -1,12 +1,12 @@
 "use client";
 
 import type { Column, ColumnDef, Row } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { SimpleDatacenter, User } from "@/lib/type";
 import { DatacenterRowActions } from "./datacenter-actions";
 import { Link } from "react-router-dom";
+import Icon from "@/components/icon";
 
 interface DataCenterColumnsProps {
   onUpdateSuccess: (dc: SimpleDatacenter) => void;
@@ -24,7 +24,7 @@ function getCommonColumns(): ColumnDef<SimpleDatacenter>[] {
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           DC Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <Icon id="swap" className="size-4 fill-zinc-600" />
         </Button>
       ),
       cell: ({ row }) => {
@@ -49,7 +49,7 @@ function getCommonColumns(): ColumnDef<SimpleDatacenter>[] {
             .replace("n_", "")
             .replace("_", " ")
             .replace(/^\w/, (c) => c.toUpperCase())}
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <Icon id="swap" className="size-4 fill-zinc-600" />
         </Button>
       ),
       cell: ({ row }: { row: Row<SimpleDatacenter> }) => {
