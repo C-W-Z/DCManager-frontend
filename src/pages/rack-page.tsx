@@ -59,14 +59,14 @@ export function RackPage() {
   }
 
   if (user.role === "admin") {
-    return <AdminWrapper rack={rack} setRack={setRack} />;
+    return <AdminWrapper rack={rack} setRack={setRack} LoadRack={LoadRack} />;
   }
 
   if (!accessableService.includes(rack.service_name)) {
     return <FallbackView text={`你沒有權限瀏覽 ${rack.name}`} />;
   }
 
-  return <UserWrapper rack={rack} />;
+  return <UserWrapper rack={rack} LoadRack={LoadRack} />;
 }
 
 const RackContext = createContext<{
@@ -74,7 +74,7 @@ const RackContext = createContext<{
   dispatch: React.ActionDispatch<[action: Action]>;
 } | null>(null);
 
-function UserWrapper({ rack }: { rack: Rack }) {
+function UserWrapper({ rack, LoadRack }: { rack: Rack; LoadRack: (_: string) => void }) {
   const [state, dispatch] = useReducer(RackDnDReducer, rack, createInitialState);
 
   return (
@@ -103,7 +103,7 @@ function UserWrapper({ rack }: { rack: Rack }) {
           </div>
         </div>
         <div className="flex flex-col items-center justify-start gap-2">
-          <AddHostDialog context={RackContext} />
+          <AddHostDialog context={RackContext} onSuccess={() => LoadRack(rack.name)} />
           <RackDnD context={RackContext} />
           <div className="text-sm text-gray-500">Click the host to manage host.</div>
         </div>
@@ -112,7 +112,15 @@ function UserWrapper({ rack }: { rack: Rack }) {
   );
 }
 
-function AdminWrapper({ rack, setRack }: { rack: Rack; setRack: (_: Rack | null) => void }) {
+function AdminWrapper({
+  rack,
+  setRack,
+  LoadRack,
+}: {
+  rack: Rack;
+  setRack: (_: Rack | null) => void;
+  LoadRack: (_: string) => void;
+}) {
   const [state, dispatch] = useReducer(RackDnDReducer, rack, createInitialState);
   const [deleteIds, setDeleteIds] = useState<string[]>([]);
   const [editRack, setEditRack] = useState<Rack | null>(null);
@@ -181,7 +189,7 @@ function AdminWrapper({ rack, setRack }: { rack: Rack; setRack: (_: Rack | null)
           </div>
         </div>
         <div className="flex flex-col items-center justify-start gap-2">
-          <AddHostDialog context={RackContext} />
+          <AddHostDialog context={RackContext} onSuccess={() => LoadRack(rack.name)} />
           <RackDnD context={RackContext} />
           <div className="text-sm text-gray-500">Click the host to manage host.</div>
         </div>

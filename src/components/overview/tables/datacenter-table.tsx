@@ -79,10 +79,6 @@ export default function DataCenterTable() {
     calculateTotalCounts(updatedDCs);
   };
 
-  const handleRefresh = () => {
-    loadDataCenters();
-  };
-
   const columns = dataCenterColumns({
     onUpdateSuccess,
     onDeleteSuccess,
@@ -105,8 +101,10 @@ export default function DataCenterTable() {
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Data Centers</h1>
         <div className="flex items-center gap-4">
-          <RefreshButton isLoading={loading} onClick={() => handleRefresh()} />
-          {user?.role === "admin" && <AddDatacenterDialog />}
+          <RefreshButton isLoading={loading} onClick={() => loadDataCenters()} />
+          {user?.role === "admin" && (
+            <AddDatacenterDialog onSuccess={() => loadDataCenters()} />
+          )}
         </div>
       </div>
 

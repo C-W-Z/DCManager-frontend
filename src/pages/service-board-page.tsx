@@ -70,7 +70,7 @@ export function ServiceBoardPage() {
         <div>
           <div className="flex flex-row justify-end gap-4">
             <RefreshButton isLoading={loading} onClick={() => LoadService()} />
-            <AddServiceDialog />
+            <AddServiceDialog onSuccess={() => LoadService()} />
           </div>
         </div>
       </div>
