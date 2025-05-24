@@ -146,6 +146,10 @@ export function AddHostDialog({
 }
 
 function isHostFit(hostHeight: number, rack: Rack) {
+  if (rack.hosts.length === 0) {
+    return rack.height - hostHeight + 1;
+  }
+
   const sortedHosts = [...rack.hosts].sort((a, b) => a.pos - b.pos);
   let currentTop = rack.height;
 
