@@ -1,7 +1,5 @@
 "use client";
 
-import type React from "react";
-
 import { useState, useEffect } from "react";
 import {
   Dialog,
@@ -12,68 +10,117 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Edit } from "lucide-react";
-import type { APIError, SimpleRoom } from "@/lib/type";
-import { modifyRoom } from "@/lib/api";
+import { APIError, SimpleRoom, Room, room_schema } from "@/lib/type";
+import { getDC, getRoom, modifyRoom } from "@/lib/api";
 import { toast } from "sonner";
-import { AlertError } from "../alert-error-success";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
-interface EditRoomDialogProps {
-  room: SimpleRoom | null;
+export function EditRoomDialog({
+  room,
+  onUpdateSuccess,
+}: {
+  room: SimpleRoom;
   onUpdateSuccess?: (updatedRoom: SimpleRoom) => void;
-}
-
-export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
+}) {
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    height: "",
+  const [constraints, setConstraints] = useState<{ min: number; max: number }>({
+    min: 42,
+    max: 60,
   });
+
+  const form_schema = room_schema
+    .pick({
+      name: true,
+      height: true,
+    })
+    .extend({
+      height: z.coerce.number().int(),
+    });
+
+  const form = useForm<z.infer<typeof form_schema>>({
+    resolver: zodResolver(form_schema),
+    defaultValues: {
+      name: "",
+      height: room.height,
+    },
+  });
+
+  const getHighestRackHeight = (room: Room) => {
+    let max = 0;
+    for (const rack of room.racks) {
+      if (rack.height > max) {
+        max = rack.height;
+      }
+    }
+    return max;
+  };
+
+  const getDCHeight = async (dc_name: string) => {
+    try {
+      const dc = await getDC(dc_name);
+      return dc.height;
+    } catch (e) {
+      console.error("Failed to fetch DC height:", e);
+      return 60; // Default value if fetching fails
+    }
+  };
+
+  const getConstrains = async (simple_room: SimpleRoom) => {
+    try {
+      const dcHeight = await getDCHeight(simple_room.dc_name);
+      const room = await getRoom(simple_room.name);
+      const highestRackHeight = getHighestRackHeight(room);
+      setConstraints({
+        min: highestRackHeight,
+        max: dcHeight,
+      });
+    } catch (e) {
+      console.error("Failed to get constraints:", e);
+    }
+  };
 
   useEffect(() => {
     if (!room) return;
     setOpen(true);
-    setFormData({
-      name: room.name,
-      height: room.height.toString(),
-    });
+    getConstrains(room);
   }, [room]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    if (!room) return;
-    e.preventDefault();
-    setError(null);
-
+  function onSubmit(values: z.infer<typeof form_schema>) {
     modifyRoom(room.name, {
-      name: formData.name,
-      height: Number.parseInt(formData.height),
-      dc_name: room.dc_name,
+      name: values.name,
+      height: values.height,
     })
       .then(() => {
-        // 如果修改成功，更新父组件中的数据
-        // 由于modifyDC只返回布尔值，我们需要构造一个更新后的对象
-        const updatedRoom: SimpleRoom = {
-          ...room,
-          name: formData.name,
-          height: Number.parseInt(formData.height),
-        };
-        toast.success(`Room ${formData.name} edited successfully`);
-        if (onUpdateSuccess) onUpdateSuccess(updatedRoom);
+        toast.success(`Room ${values.name} updated successfully`);
+        form.reset();
+
+        if (onUpdateSuccess) {
+          // Create a new SimpleRoom object to pass to the callback
+          const updatedRoom: SimpleRoom = {
+            ...room,
+            name: values.name,
+            height: values.height,
+          };
+          onUpdateSuccess(updatedRoom);
+        }
         setOpen(false);
       })
       .catch((e: APIError) => {
         console.error(e);
         toast.error(e.error);
-        setError(e.error);
       });
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -83,37 +130,48 @@ export function EditRoomDialog({ room, onUpdateSuccess }: EditRoomDialogProps) {
             <Edit className="h-5 w-5" /> Edit Room
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-          {error && <AlertError message={error} />}
-
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
               name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Room-103" {...field} value={field.value || ""} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="height">Height (U)</Label>
-            <Input
-              id="height"
+            <FormField
+              control={form.control}
               name="height"
-              type="number"
-              value={formData.height}
-              onChange={handleChange}
-              required
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Height</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="42"
+                      min={constraints.min}
+                      max={constraints.max}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">Save</Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Edit</Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

@@ -1,7 +1,5 @@
 "use client";
 
-import type React from "react";
-
 import { useState, useEffect } from "react";
 import {
   Dialog,
@@ -12,95 +10,112 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Edit } from "lucide-react";
-import type { APIError, Datacenter, SimpleDatacenter } from "@/lib/type";
+import {
+  datacenter_schema,
+  type APIError,
+  type Datacenter,
+  type SimpleDatacenter,
+} from "@/lib/type";
 import { getDC, modifyDC } from "@/lib/api";
 import { toast } from "sonner";
-import { AlertError } from "../alert-error-success";
-
-interface EditDatacenterDialogProps {
-  datacenter: SimpleDatacenter | null;
-  onUpdateSuccess?: (updatedDC: SimpleDatacenter) => void;
-}
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export function EditDatacenterDialog({
   datacenter,
   onUpdateSuccess,
-}: EditDatacenterDialogProps) {
+}: {
+  datacenter: SimpleDatacenter;
+  onUpdateSuccess?: (updatedDC: SimpleDatacenter) => void;
+}) {
   // 添加内部状态管理打开/关闭状态
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    height: "",
+
+  const [constraints, setConstraints] = useState<{ min: number; max: number }>({
+    min: 42,
+    max: 60,
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  // 当 datacenter 变化时，如果有值则打开对话框
-  useEffect(() => {
-    setLoading(true);
-    if (!datacenter) return;
-    setOpen(true);
-    setError(null);
-    getDC(datacenter.name)
-      .then((dc: Datacenter) => {
-        setFormData({
-          name: dc.name,
-          height: dc.height.toString(),
-        });
-      })
-      .catch((e: APIError) => {
-        console.error(e);
-        toast.error(e.error);
-        setFormData({
-          name: datacenter.name,
-          height: datacenter.height.toString(),
-        });
-        setError(e.error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [datacenter]);
+  const form_schema = datacenter_schema
+    .pick({
+      name: true,
+      height: true,
+    })
+    .extend({
+      height: z.coerce.number().int(),
+    });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const form = useForm<z.infer<typeof form_schema>>({
+    resolver: zodResolver(form_schema),
+    defaultValues: {
+      name: "",
+      height: datacenter.height,
+    },
+  });
+
+  const getHighestRoomHeight = (dc: Datacenter) => {
+    let max = 0;
+    for (const room of dc.rooms) {
+      if (room.height > max) {
+        max = room.height;
+      }
+    }
+    return max;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const getConstrains = async (simple_dc: SimpleDatacenter) => {
+    try {
+      const dc = await getDC(simple_dc.name);
+      const highestRoomHeight = getHighestRoomHeight(dc);
+      setConstraints({
+        min: highestRoomHeight,
+        max: 60,
+      });
+    } catch (e) {
+      console.error("Failed to get constraints:", e);
+    }
+  };
+
+  useEffect(() => {
     if (!datacenter) return;
-    e.preventDefault();
+    setOpen(true);
+    getConstrains(datacenter);
+  }, [datacenter]);
 
-    setError(null);
-    setLoading(true);
-
+  function onSubmit(values: z.infer<typeof form_schema>) {
     modifyDC(datacenter.name, {
-      name: formData.name,
-      height: Number.parseInt(formData.height),
+      name: values.name,
+      height: values.height,
     })
       .then(() => {
-        // 如果修改成功，更新父组件中的数据
-        // 由于modifyDC只返回布尔值，我们需要构造一个更新后的对象
-        const updatedDC: SimpleDatacenter = {
-          ...datacenter,
-          name: formData.name,
-          height: Number.parseInt(formData.height),
-        };
-        toast.success(`Data Center ${formData.name} edited successfully`);
-        if (onUpdateSuccess) onUpdateSuccess(updatedDC);
+        toast.success(`Datacenter ${values.name} updated successfully`);
+        form.reset();
+
+        if (onUpdateSuccess) {
+          const updatedDC: SimpleDatacenter = {
+            ...datacenter,
+            name: values.name,
+            height: values.height,
+          };
+          onUpdateSuccess(updatedDC);
+        }
         setOpen(false);
       })
       .catch((e: APIError) => {
         console.error(e);
         toast.error(e.error);
-        setError(e.error);
-      })
-      .finally(() => {
-        setLoading(false);
       });
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -110,46 +125,48 @@ export function EditDatacenterDialog({
             <Edit className="h-5 w-5" /> Edit Data Center
           </DialogTitle>
         </DialogHeader>
-        {loading ? (
-          <div className="flex h-40 items-center justify-center">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-            {error && <AlertError message={error} />}
-
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="height">Height (U)</Label>
-              <Input
-                id="height"
-                name="height"
-                type="number"
-                value={formData.height}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Room-103" {...field} value={field.value || ""} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="height"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Height</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="42"
+                      min={constraints.min}
+                      max={constraints.max}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? "Saving..." : "Save"}
-              </Button>
+              <Button type="submit">Edit</Button>
             </DialogFooter>
           </form>
-        )}
+        </Form>
       </DialogContent>
     </Dialog>
   );

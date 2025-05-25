@@ -35,7 +35,7 @@ export function hostColumns({
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
-          className="ml-1 h-5 w-5"
+          className="ml-1 size-4"
         />
       ),
       cell: ({ row }) => (
@@ -43,7 +43,7 @@ export function hostColumns({
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
-          className="ml-1 h-5 w-5"
+          className="ml-1 size-4"
         />
       ),
       enableSorting: false,

@@ -25,17 +25,18 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { createPortal } from "react-dom";
-import type { APIError, SimpleRack, SimpleService } from "@/lib/type";
+import { type APIError, type SimpleRack, type SimpleService } from "@/lib/type";
 import { modifyRack, getAllService } from "@/lib/api";
 import { toast } from "sonner";
 import { AlertError } from "../alert-error-success";
 
-interface EditRackDialogProps {
+export function EditRackDialog({
+  rack,
+  onUpdateSuccess,
+}: {
   rack: SimpleRack | null;
   onUpdateSuccess?: (updatedRack: SimpleRack) => void;
-}
-
-export function EditRackDialog({ rack, onUpdateSuccess }: EditRackDialogProps) {
+}) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [services, setServices] = useState<SimpleService[]>([]);

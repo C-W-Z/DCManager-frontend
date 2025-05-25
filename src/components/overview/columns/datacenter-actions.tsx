@@ -76,8 +76,9 @@ export function DatacenterRowActions({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* 编辑对话框 */}
-      <EditDatacenterDialog datacenter={dcToEdit} onUpdateSuccess={onUpdateSuccess} />
+      {dcToEdit && (
+        <EditDatacenterDialog datacenter={dcToEdit} onUpdateSuccess={onUpdateSuccess} />
+      )}
 
       {/* 删除确认对话框 */}
       <DeleteConfirmation

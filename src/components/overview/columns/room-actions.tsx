@@ -90,7 +90,7 @@ export function RoomRowActions({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <EditRoomDialog room={roomToEdit} onUpdateSuccess={onUpdateSuccess} />
+      {roomToEdit && <EditRoomDialog room={roomToEdit} onUpdateSuccess={onUpdateSuccess} />}
 
       <MoveItemDialog type="room" items={roomsToMove} onSuccess={onMoveSuccess} />
 
