@@ -30,6 +30,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { MAX_HEIGHT } from "@/lib/constant";
 
 export function EditDatacenterDialog({
   datacenter,
@@ -43,7 +44,7 @@ export function EditDatacenterDialog({
 
   const [constraints, setConstraints] = useState<{ min: number; max: number }>({
     min: 42,
-    max: 60,
+    max: MAX_HEIGHT,
   });
 
   const form_schema = datacenter_schema
@@ -58,7 +59,7 @@ export function EditDatacenterDialog({
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
     defaultValues: {
-      name: "",
+      name: datacenter.name,
       height: datacenter.height,
     },
   });
