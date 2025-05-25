@@ -134,7 +134,7 @@ export function DataTable<TData extends WithID, TValue>({
   const selectedRowCount = table.getFilteredSelectedRowModel().rows.length;
 
   return (
-    <div className="px-0">
+    <div className="px-0 pb-12">
       <div className="mt-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Input
@@ -213,7 +213,7 @@ export function DataTable<TData extends WithID, TValue>({
         </DropdownMenu>
       </div>
 
-      <div className="mt-4 mb-12 h-fit w-full overflow-y-hidden rounded-sm border border-gray-200 bg-white">
+      <div className="my-4 h-fit w-full overflow-y-hidden rounded-sm border border-gray-200 bg-white">
         {loading ? (
           <div className="flex h-60 w-full flex-col items-center justify-center gap-2 bg-gray-50">
             <div className="size-6 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
