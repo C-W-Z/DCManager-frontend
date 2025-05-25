@@ -9,7 +9,7 @@ import {
   createInitialState,
 } from "@/components/rack-dnd/rack-dnd-reducer";
 import { AddHostDialog } from "@/components/dialogs/add-host-dialog";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Icon from "@/components/icon";
 import { LoadingView } from "@/components/loading-view";
 import { useUser } from "@/context/use-user";
@@ -127,6 +127,7 @@ function AdminWrapper({
   const [deleteIds, setDeleteIds] = useState<string[]>([]);
   const [editRack, setEditRack] = useState<Rack | null>(null);
   const [racksToMove, setRacksToMove] = useState<Rack[]>([]);
+  const navigate = useNavigate();
 
   return (
     <RackContext.Provider value={{ state, dispatch }}>
@@ -199,7 +200,7 @@ function AdminWrapper({
 
       <EditRackDialog
         rack={editRack}
-        onUpdateSuccess={(updatedRack) => setRack({ ...rack, ...updatedRack })}
+        onUpdateSuccess={(updatedRack) => navigate(`/rack/${updatedRack.name}`)}
       />
       <MoveItemDialog type="rack" items={racksToMove} />
       <DeleteConfirmation

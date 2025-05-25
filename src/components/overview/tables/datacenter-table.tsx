@@ -68,11 +68,8 @@ export default function DataCenterTable() {
   }, [loadDataCenters]);
 
   const onUpdateSuccess = (updatedDC: SimpleDatacenter) => {
-    if (updatedDC) {
-      setDataCenters((prev) =>
-        prev.map((dc) => (dc.name === updatedDC.name ? updatedDC : dc)),
-      );
-    }
+    console.log("Update Success", updatedDC);
+    loadDataCenters();
   };
 
   const onDeleteSuccess = (idsToDelete: string[]) => {

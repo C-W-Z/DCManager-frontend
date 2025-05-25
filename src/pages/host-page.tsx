@@ -68,11 +68,11 @@ export function HostPage() {
     return <FallbackView text="請登入以瀏覽此頁面。" />;
   }
 
-  if (loading || !rack) {
+  if (loading) {
     return <LoadingView text={`Loading host...`} />;
   }
 
-  if (!host) {
+  if (!host || !rack) {
     return <FallbackView text={`Host: ${hostName} not found.`} />;
   }
 
@@ -183,7 +183,7 @@ function Wrapper({
 
       <EditHostDialog
         host={editHost}
-        onUpdateSuccess={(updatedHost) => setHost({ ...host, ...updatedHost })}
+        onUpdateSuccess={(updatedHost) => navigate(`/host/${updatedHost.name}`)}
       />
       <MoveHostDialog items={moveHost} onSuccess={onMoveSuccess} />
       <DeleteConfirmation

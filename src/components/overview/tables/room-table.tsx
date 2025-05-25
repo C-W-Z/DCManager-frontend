@@ -44,11 +44,8 @@ export default function RoomTable() {
   }, [dcName, loadRooms]);
 
   const onUpdateSuccess = (updatedRoom: SimpleRoom) => {
-    if (updatedRoom) {
-      setRooms((prev) =>
-        prev.map((room) => (room.name === updatedRoom.name ? updatedRoom : room)),
-      );
-    }
+    console.log("Update Success", updatedRoom);
+    handleRefresh();
   };
 
   const onDeleteSuccess = (idsToDelete: string[]) => {

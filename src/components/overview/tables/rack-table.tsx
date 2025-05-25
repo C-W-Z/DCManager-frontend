@@ -42,11 +42,8 @@ export default function RackTable() {
   }, [roomName, loadRacks]);
 
   const onUpdateSuccess = (updatedRack: SimpleRack) => {
-    if (updatedRack) {
-      setRacks((prev) =>
-        prev.map((rack) => (rack.name === updatedRack.name ? updatedRack : rack)),
-      );
-    }
+    console.log("Update Succes", updatedRack);
+    handleRefresh();
   };
 
   const onDeleteSuccess = (idsToDelete: string[]) => {

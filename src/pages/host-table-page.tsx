@@ -43,9 +43,8 @@ export function HostTablePage() {
   }, [loadHosts]);
 
   const onUpdateSuccess = (updatedDC: Host) => {
-    if (updatedDC) {
-      setHost((prev) => prev.map((dc) => (dc.name === updatedDC.name ? updatedDC : dc)));
-    }
+    console.log("Update success:", updatedDC);
+    loadHosts();
   };
 
   const onDeleteSuccess = (idsToDelete: string[]) => {

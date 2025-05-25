@@ -85,12 +85,12 @@ export function ServicePage() {
           </p>
         </div>
         <div className="flex-1"></div>
-        <Button className="flex h-fit w-fit flex-row items-center justify-start gap-3 text-sm font-bold">
-          <Plus />
-          <Link to={`/bulk-add-host/${service.name}`} className="h-fit pr-2">
+        <Link to={`/bulk-add-host/${service.name}`} className="h-fit pr-2">
+          <Button className="flex h-fit w-fit flex-row items-center justify-start gap-3 text-sm font-bold">
+            <Plus />
             批量新增主機
-          </Link>
-        </Button>
+          </Button>
+        </Link>
         <EditServiceDialog service={service} />
       </div>
 
