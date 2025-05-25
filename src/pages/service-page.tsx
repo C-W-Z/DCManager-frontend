@@ -176,7 +176,7 @@ function RackBlock({ rack, hosts }: { rack: SimpleRack; hosts: Host[] }) {
         {hosts.map((host) => {
           return (
             <div key={host.name} className="text-sm text-gray-500">
-              {host.ip}
+              {host.ip ? host.ip : "無"}
             </div>
           );
         })}
