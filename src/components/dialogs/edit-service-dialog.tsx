@@ -196,8 +196,9 @@ export function EditServiceDialog({ service, onUpdateSuccess }: EditServiceDialo
     setErrorMessage(null);
     const n_allocated_racks = allocatedRacks.reduce(
       (acc, rack) => {
-        if (rack.dc_name.trim() && rack.n_racks > 0) {
-          acc[rack.dc_name] = rack.n_racks;
+        const n_racks = rack.n_racks - (rack.originalN_racks || 0);
+        if (rack.dc_name.trim() && n_racks > 0) {
+          acc[rack.dc_name] = n_racks;
         }
         return acc;
       },
@@ -206,10 +207,14 @@ export function EditServiceDialog({ service, onUpdateSuccess }: EditServiceDialo
 
     setLoading(true);
 
+    const allocated_subnets = allocatedSubnets
+        .filter((subnet) => !subnet.isOriginal)
+        .map((subnet) => subnet.value.trim())
+
     modifyService(service.name, {
       name: values.name,
-      n_allocated_racks,
-      allocated_subnets: values.allocated_subnet.filter((subnet) => subnet.trim()),
+      n_allocated_racks: Object.keys(n_allocated_racks).length > 0 ? n_allocated_racks: undefined,
+      allocated_subnets: allocated_subnets.length > 0 ? allocated_subnets : undefined,
     })
       .then(() => {
         toast.success(`Service ${values.name} updated successfully!`);
