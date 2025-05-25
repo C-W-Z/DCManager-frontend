@@ -32,7 +32,7 @@ export function HostPage() {
       .then((rack) => {
         setRack(rack);
       })
-     .catch((e: APIError) => {
+      .catch((e: APIError) => {
         console.error(e);
         toast.error(e.error);
         setRack(null);
@@ -183,7 +183,11 @@ function Wrapper({
 
       <EditHostDialog
         host={editHost}
-        onUpdateSuccess={(updatedHost) => navigate(`/host/${updatedHost.name}`)}
+        onUpdateSuccess={(updatedHost) => {
+          // navigate(`/host/${updatedHost.name}`);
+          // 強制重載
+          window.location.href = `/host/${updatedHost.name}`;
+        }}
       />
       <MoveHostDialog items={moveHost} onSuccess={onMoveSuccess} />
       <DeleteConfirmation
