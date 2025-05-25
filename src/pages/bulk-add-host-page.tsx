@@ -140,19 +140,20 @@ export function BulkAddHostPage() {
         );
 
         // Validate rows
-        const isValid = parsedData.every((row) => {
-          const rack = racks.find(
-            (r) =>
-              r.name === row.rack_name &&
-              availablePositions[r.name]?.includes(parseInt(row.position)),
-          );
-          const isHeightValid = !isNaN(parseInt(row.height)) && parseInt(row.height) > 0;
-          const isPositionValid = !isNaN(parseInt(row.position));
+        const isValid = parsedData.every((row, index) => {
+          const rack = racks.find((r) => r.name === row.rack_name);
+          const height = parseInt(row.height);
+          const position = parseInt(row.position);
+          const isHeightValid = !isNaN(height) && height > 0;
+          const isPositionValid = !isNaN(position);
           const isHostNameValid = row.new_host_name.length > 0;
+
+          // Calculate occupied positions for this row
+          const occupiedPositions = Array.from({ length: height }, (_, i) => position + i);
 
           if (!rack) {
             row.status = "Failed";
-            row.error = `Invalid rack or position, room: ${row.rack_name}, position: ${row.position}`;
+            row.error = `Invalid rack: ${row.rack_name}`;
             return false;
           }
           if (!isHostNameValid) {
@@ -170,11 +171,44 @@ export function BulkAddHostPage() {
             row.error = "Position must be a valid number";
             return false;
           }
+          if (!rack || !availablePositions[rack.name]?.length) {
+            row.status = "Failed";
+            row.error = `No available positions for rack: ${row.rack_name}`;
+            return false;
+          }
+          if (
+            !occupiedPositions.every((pos) => availablePositions[rack.name]?.includes(pos))
+          ) {
+            row.status = "Failed";
+            row.error = `Insufficient space at position ${position} for height ${height} in rack ${row.rack_name}`;
+            return false;
+          }
+
+          // Check for conflicts with other new hosts
+          for (let j = 0; j < parsedData.length; j++) {
+            if (j === index) continue; // Skip self-comparison
+            const otherRow = parsedData[j];
+            const otherHeight = parseInt(otherRow.height);
+            const otherPosition = parseInt(otherRow.position);
+            const otherOccupiedPositions = Array.from(
+              { length: otherHeight },
+              (_, i) => otherPosition + i,
+            );
+
+            if (occupiedPositions.some((pos) => otherOccupiedPositions.includes(pos))) {
+              row.status = "Failed";
+              row.error = `Position conflict with another host at rack ${row.rack_name}, position ${otherPosition}`;
+              return false;
+            }
+          }
+
           return true;
         });
 
         if (!isValid) {
-          setError("Some rows in the CSV are invalid. Please review the preview.");
+          setError(
+            "Some rows in the CSV are invalid or have conflicts. Please review the preview.",
+          );
         }
 
         setPreviewData(parsedData);
@@ -198,8 +232,6 @@ export function BulkAddHostPage() {
       for (let i = 0; i < updatedPreviewData.length; i++) {
         const row = updatedPreviewData[i];
         if (row.status !== "Pending") continue; // Skip already processed rows
-
-        // console.log("Processing row", i, row);
 
         try {
           const rack = racks.find(
@@ -226,7 +258,6 @@ export function BulkAddHostPage() {
             index === i ? { ...r, status: "Added" as const } : r,
           );
           setPreviewData(updatedPreviewData);
-          // console.log("Added row", i, updatedPreviewData[i]);
         } catch (err) {
           // Update the local copy on error
           updatedPreviewData = updatedPreviewData.map((r, index) =>
@@ -235,8 +266,7 @@ export function BulkAddHostPage() {
               : r,
           );
           setPreviewData(updatedPreviewData);
-          // console.log("Failed row", i, updatedPreviewData[i]);
-          break; // early stop if error occur
+          break; // Early stop if error occurs
         }
       }
 

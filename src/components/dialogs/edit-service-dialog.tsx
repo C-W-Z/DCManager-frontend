@@ -27,6 +27,7 @@ import { Edit, Plus, Trash2 } from "lucide-react";
 import { Label } from "../ui/label";
 import { DataCenterSelect } from "../select-datacenter";
 import { AlertError } from "@/components/alert-error-success";
+import { useNavigate } from "react-router-dom";
 
 // Update form_schema to make allocated_subnet a string array
 const form_schema = z.object({
@@ -57,6 +58,7 @@ export function EditServiceDialog({ service, onUpdateSuccess }: EditServiceDialo
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [dataCenters, setDataCenters] = useState<SimpleDatacenter[]>([]);
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
@@ -226,6 +228,9 @@ export function EditServiceDialog({ service, onUpdateSuccess }: EditServiceDialo
         setAllocatedSubnets([]);
         setOpen(false);
         if (onUpdateSuccess) onUpdateSuccess();
+        navigate(`/service/${values.name}`)
+        // 強制重載
+        // window.location.href = `/service/${values.name}`;
       })
       .catch((e: APIError) => {
         toast.error(e.error);
