@@ -72,7 +72,7 @@ export function BulkAddHostPage() {
           const occupiedPositions = service.hosts
             .filter((host) => host.rack_name === rack.name)
             .flatMap((host) => Array.from({ length: host.height }, (_, i) => host.pos + i));
-          const allPositions = Array.from({ length: rack.capacity }, (_, i) => i + 1);
+          const allPositions = Array.from({ length: rack.height }, (_, i) => i + 1);
           positions[rack.name] = allPositions.filter(
             (pos) => !occupiedPositions.includes(pos),
           );
