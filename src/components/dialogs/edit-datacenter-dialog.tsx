@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -74,24 +74,24 @@ export function EditDatacenterDialog({
     return max;
   };
 
-  const getConstrains = async (simple_dc: SimpleDatacenter) => {
+  const getConstrains = useCallback(async (simple_dc: SimpleDatacenter) => {
     try {
       const dc = await getDC(simple_dc.name);
       const highestRoomHeight = getHighestRoomHeight(dc);
       setConstraints({
         min: highestRoomHeight,
-        max: 60,
+        max: MAX_HEIGHT,
       });
     } catch (e) {
       console.error("Failed to get constraints:", e);
     }
-  };
+  }, [])
 
   useEffect(() => {
     if (!datacenter) return;
     setOpen(true);
     getConstrains(datacenter);
-  }, [datacenter]);
+  }, [datacenter, getConstrains]);
 
   function onSubmit(values: z.infer<typeof form_schema>) {
     modifyDC(datacenter.name, {

@@ -73,7 +73,7 @@ export function EditRoomDialog({
       return dc.height;
     } catch (e) {
       console.error("Failed to fetch DC height:", e);
-      return 60; // Default value if fetching fails
+      return MAX_HEIGHT; // Default value if fetching fails
     }
   };
 
