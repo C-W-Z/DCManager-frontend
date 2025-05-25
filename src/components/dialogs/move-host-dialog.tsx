@@ -19,18 +19,18 @@ import { useUser } from "@/context/use-user";
 import Icon from "@/components/icon";
 
 interface MoveItemDialogProps {
-  items: Host[];
+  host: Host;
   onSuccess?: (new_rack_name: string) => void;
 }
 
-export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
+export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
   const { accessableService } = useUser();
   const [isOpen, setIsOpen] = useState(false);
-  const [parentRacks, setParentRacks] = useState<string[]>([]);
+  const [parentRack, setParentRack] = useState<string | null>(null);
   const [loadingRack, setLoadingRack] = useState(false);
   const [racks, setRacks] = useState<SimpleRack[]>([]);
   const [selectedRack, setSelectedRack] = useState<string | null>(null);
-  const [newPos, setNewPos] = useState<Record<string, number> | null>(null);
+  const [newPos, setNewPos] = useState<number | null>(null);
   const [loadingPos, setLoadingPos] = useState(false);
   const [loadingMoveRequest, setLoadingMoveRequest] = useState(false);
 
@@ -39,12 +39,10 @@ export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
       setLoadingRack(true);
 
       const all: SimpleRack[] = [];
-      for (const serviceName of accessableService) {
-        const service = await getService(serviceName);
-        Object.values(service.allocated_racks).forEach((racks) => {
-          all.push(...racks);
-        });
-      }
+      const service = await getService(host.service_name);
+      Object.values(service.allocated_racks).forEach((racks) => {
+        all.push(...racks);
+      });
 
       setRacks(all);
       setLoadingRack(false);
@@ -61,25 +59,11 @@ export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
     }
   }, [accessableService]);
 
-  const initParentRacks = useCallback(() => {
-    const parentRacks: Set<string> = new Set();
-    items.forEach((item) => {
-      if (item.rack_name) {
-        parentRacks.add(item.rack_name);
-      }
-    });
-    setParentRacks(Array.from(parentRacks));
-  }, [items]);
-
   useEffect(() => {
-    if (items.length > 0) {
-      setIsOpen(true);
-      LoadRack();
-      initParentRacks();
-    } else {
-      setIsOpen(false);
-    }
-  }, [LoadRack, initParentRacks, items]);
+    setIsOpen(true);
+    LoadRack();
+    setParentRack(host.rack_name);
+  }, [LoadRack, host]);
 
   const handleSelectRack = (rack_name: string) => {
     setSelectedRack(rack_name);
@@ -87,7 +71,7 @@ export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
 
     getRack(rack_name)
       .then((rack) => {
-        const newPos = isHostFit(items, rack);
+        const newPos = isHostFit(host.height, rack);
         setNewPos(newPos);
         setLoadingPos(false);
       })
@@ -99,43 +83,28 @@ export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
       });
   };
 
-  const isHostFit = (insertHosts: Host[], rack: Rack) => {
+  function isHostFit(hostHeight: number, rack: Rack) {
     if (rack.hosts.length === 0) {
-      const newPos: Record<string, number> = {};
-      let currentTop = rack.height;
-      for (const host of insertHosts) {
-        newPos[host.name] = currentTop - host.height + 1;
-        currentTop -= host.height;
-      }
-      return newPos;
+      return rack.height - hostHeight + 1;
     }
 
     const sortedHosts = [...rack.hosts].sort((a, b) => a.pos - b.pos);
     let currentTop = rack.height;
-    let currentInsert = 0;
-    const newPos: Record<string, number> = {};
 
     for (let i = sortedHosts.length - 1; i >= 0; i--) {
       const host = sortedHosts[i];
       const host_top = host.pos + host.height - 1;
       const space = currentTop - host_top;
 
-      if (space >= insertHosts[currentInsert].height) {
-        newPos[insertHosts[currentInsert].name] =
-          currentTop - insertHosts[currentInsert].height + 1;
-        currentTop -= insertHosts[currentInsert].height;
-
-        currentInsert++;
-        if (currentInsert >= insertHosts.length) {
-          return newPos;
-        }
-      } else {
-        currentTop = host.pos - 1;
+      if (space >= hostHeight) {
+        return currentTop - hostHeight + 1;
       }
+
+      currentTop = host.pos - 1;
     }
 
     return null;
-  };
+  }
 
   const handleMove = async () => {
     if (!newPos || !selectedRack) return;
@@ -143,15 +112,13 @@ export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
     try {
       setLoadingMoveRequest(true);
 
-      for (const item of items) {
-        modifyHost(item.name, {
-          rack_name: selectedRack,
-          pos: newPos[item.name],
-        }).catch((e: APIError) => {
-          console.error(e);
-          toast.error(e.error);
-        });
-      }
+      modifyHost(host.name, {
+        rack_name: selectedRack,
+        pos: newPos,
+      }).catch((e: APIError) => {
+        console.error(e);
+        toast.error(e.error);
+      });
 
       toast.success(`成功將主機移動到 ${selectedRack}`);
       onSuccess?.(selectedRack);
@@ -164,22 +131,16 @@ export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
     }
   };
 
-  if (items.length === 0) return null;
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[500px] [&>button]:hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-            {items.length > 1 ? `移動多台主機` : `移動主機 ${items[0].name}`}
+            {`移動主機 ${host.name}`}
           </DialogTitle>
           <DialogDescription>
             {newPos ? (
-              <span className="text-sm">
-                {items.length > 1
-                  ? `目的機櫃: ${selectedRack}`
-                  : `目的機櫃: ${selectedRack} (位置: ${newPos[items[0].name]})`}
-              </span>
+              <span className="text-sm">{`目的機櫃: ${selectedRack} (位置: ${newPos})`}</span>
             ) : (
               <span className="text-sm text-red-500">
                 {selectedRack === null
@@ -204,7 +165,7 @@ export function MoveHostDialog({ items, onSuccess }: MoveItemDialogProps) {
                     className={cn(
                       "flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100",
                       selectedRack === rack.name ? "bg-gray-100" : "",
-                      parentRacks.includes(rack.name) ? "pointer-events-none opacity-50" : "",
+                      parentRack === rack.name ? "pointer-events-none opacity-50" : "",
                     )}
                     onClick={() => handleSelectRack(rack.name)}
                   >
