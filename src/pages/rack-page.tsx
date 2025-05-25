@@ -131,13 +131,13 @@ function AdminWrapper({
 
   return (
     <RackContext.Provider value={{ state, dispatch }}>
-      <div className="mx-auto flex h-fit items-start justify-between px-20 pt-12">
-        <div className="flex h-fit w-full flex-col items-start justify-start">
+      <div className="mx-auto flex h-fit flex-col items-center gap-10 px-20 pt-12 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex h-fit w-md flex-col items-start justify-start">
           <div className="mb-4 flex flex-row items-center gap-2">
             <Icon id="rack" className="size-8" />
             <div className="text-2xl font-bold">{rack.name}</div>
           </div>
-          <div className="flex h-fit w-md flex-col gap-4">
+          <div className="flex h-fit w-full flex-col gap-4">
             <Separator />
             <DataFlexRow label="Datacenter" data={rack.dc_name} />
             <DataFlexRow label="Room" data={rack.room_name} />
@@ -191,7 +191,7 @@ function AdminWrapper({
             </div>
           </div>
         </div>
-        <div className="flex flex-col items-center justify-start gap-2">
+        <div className="mb-10 flex flex-col items-center justify-start gap-2 lg:mb-0">
           <AddHostDialog context={RackContext} onSuccess={() => LoadRack(rack.name)} />
           <RackDnD context={RackContext} />
           <div className="text-sm text-gray-500">Click the host to manage host.</div>

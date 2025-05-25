@@ -36,6 +36,9 @@ export function HostPage() {
         console.error(e);
         toast.error(e.error);
         setRack(null);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
@@ -52,8 +55,6 @@ export function HostPage() {
           console.error(e);
           toast.error(e.error);
           setHost(null);
-        })
-        .finally(() => {
           setLoading(false);
         });
     },
@@ -113,13 +114,13 @@ function Wrapper({
 
   return (
     <HostContext.Provider value={{ state, dispatch }}>
-      <div className="mx-auto flex h-fit items-start justify-between px-20 pt-12">
-        <div className="flex h-fit w-full flex-col items-start justify-start">
+      <div className="mx-auto flex h-fit flex-col items-center gap-10 px-20 pt-12 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex h-fit w-md flex-col items-start justify-start">
           <div className="mb-4 flex flex-row items-center gap-2">
             <Icon id="host" className="size-8" />
             <div className="text-2xl font-bold">{host.name}</div>
           </div>
-          <div className="flex h-fit w-md flex-col gap-4">
+          <div className="flex h-fit w-full flex-col gap-4">
             <Separator />
             <DataFlexRow label="Datacenter" data={host.dc_name} />
             <DataFlexRow label="Room" data={host.room_name} />
@@ -163,7 +164,7 @@ function Wrapper({
             </div>
           </div>
         </div>
-        <div className="flex flex-col items-center justify-start gap-2">
+        <div className="mb-10 flex flex-col items-center justify-start gap-2 lg:mb-0">
           <Button
             onClick={() => {
               setMoveHost([]);
@@ -194,7 +195,7 @@ function Wrapper({
         ids={deleteIds}
         type="host"
         itemNames={[host.name]}
-        onSuccess={() => setHost(null)}
+        onSuccess={() => navigate(`/rack/${host.rack_name}`)}
       />
     </HostContext.Provider>
   );
