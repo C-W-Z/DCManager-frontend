@@ -8,4 +8,4 @@ export const height2Px = (height: number) => {
   return height * (HOST_HEIGHT + RACK_GAP) - RACK_GAP;
 };
 
-export const MAX_HEIGHT = 80; // U
+export const MAX_HEIGHT = 100; // U

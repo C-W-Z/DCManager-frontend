@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { MAX_HEIGHT } from "@/lib/constant";
 
 export function EditRoomDialog({
   room,
@@ -36,7 +37,7 @@ export function EditRoomDialog({
   const [open, setOpen] = useState(false);
   const [constraints, setConstraints] = useState<{ min: number; max: number }>({
     min: 42,
-    max: 60,
+    max: MAX_HEIGHT,
   });
 
   const form_schema = room_schema
@@ -51,7 +52,7 @@ export function EditRoomDialog({
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
     defaultValues: {
-      name: "",
+      name: room.name,
       height: room.height,
     },
   });
@@ -72,11 +73,11 @@ export function EditRoomDialog({
       return dc.height;
     } catch (e) {
       console.error("Failed to fetch DC height:", e);
-      return 60; // Default value if fetching fails
+      return MAX_HEIGHT; // Default value if fetching fails
     }
   };
 
-  const getConstrains = async (simple_room: SimpleRoom) => {
+  const getConstrains = useCallback(async (simple_room: SimpleRoom) => {
     try {
       const dcHeight = await getDCHeight(simple_room.dc_name);
       const room = await getRoom(simple_room.name);
@@ -88,13 +89,13 @@ export function EditRoomDialog({
     } catch (e) {
       console.error("Failed to get constraints:", e);
     }
-  };
+  }, [])
 
   useEffect(() => {
     if (!room) return;
     setOpen(true);
     getConstrains(room);
-  }, [room]);
+  }, [getConstrains, room]);
 
   function onSubmit(values: z.infer<typeof form_schema>) {
     modifyRoom(room.name, {

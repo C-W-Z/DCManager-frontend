@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +30,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { MAX_HEIGHT } from "@/lib/constant";
 
 export function EditDatacenterDialog({
   datacenter,
@@ -43,7 +44,7 @@ export function EditDatacenterDialog({
 
   const [constraints, setConstraints] = useState<{ min: number; max: number }>({
     min: 42,
-    max: 60,
+    max: MAX_HEIGHT,
   });
 
   const form_schema = datacenter_schema
@@ -58,7 +59,7 @@ export function EditDatacenterDialog({
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
     defaultValues: {
-      name: "",
+      name: datacenter.name,
       height: datacenter.height,
     },
   });
@@ -73,24 +74,24 @@ export function EditDatacenterDialog({
     return max;
   };
 
-  const getConstrains = async (simple_dc: SimpleDatacenter) => {
+  const getConstrains = useCallback(async (simple_dc: SimpleDatacenter) => {
     try {
       const dc = await getDC(simple_dc.name);
       const highestRoomHeight = getHighestRoomHeight(dc);
       setConstraints({
         min: highestRoomHeight,
-        max: 60,
+        max: MAX_HEIGHT,
       });
     } catch (e) {
       console.error("Failed to get constraints:", e);
     }
-  };
+  }, [])
 
   useEffect(() => {
     if (!datacenter) return;
     setOpen(true);
     getConstrains(datacenter);
-  }, [datacenter]);
+  }, [datacenter, getConstrains]);
 
   function onSubmit(values: z.infer<typeof form_schema>) {
     modifyDC(datacenter.name, {
