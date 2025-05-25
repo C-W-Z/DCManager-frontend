@@ -16,13 +16,6 @@ import { host_schema, Host, APIError } from "@/lib/type";
 import { modifyHost } from "@/lib/api";
 import { toast } from "sonner";
 import { z } from "zod";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { AlertError } from "../alert-error-success";
 
 interface EditHostDialogProps {
@@ -33,7 +26,6 @@ interface EditHostDialogProps {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const form_schema = host_schema.pick({
   name: true,
-  height: true,
   running: true,
 });
 
@@ -42,7 +34,6 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<z.infer<typeof form_schema>>({
     name: "",
-    height: 0,
     running: false,
   });
 
@@ -51,7 +42,6 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
     setOpen(true);
     setFormData({
       name: host.name,
-      height: host.height,
       running: host.running,
     });
   }, [host]);
@@ -68,14 +58,12 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
 
     modifyHost(host.name, {
       name: formData.name,
-      height: formData.height,
       running: formData.running,
     })
       .then(() => {
         const updatedHost: Host = {
           ...host,
           name: formData.name,
-          height: formData.height,
           running: formData.running,
         };
         if (onUpdateSuccess) onUpdateSuccess(updatedHost);
@@ -111,25 +99,8 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
               required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="height">Height (U)</Label>
-            <Select
-              onValueChange={(value) => setFormData({ ...formData, height: parseInt(value) })}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a height" />
-              </SelectTrigger>
-              <SelectContent>
-                {["1U", "2U", "3U", "4U"].map((height) => (
-                  <SelectItem key={height} value={height}>
-                    {height}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
           <div className="flex flex-row gap-4 space-y-2">
-            <Label htmlFor="running">Stop Running?</Label>
+            <Label htmlFor="running">Stop?</Label>
             <Checkbox
               id="running"
               name="running"
