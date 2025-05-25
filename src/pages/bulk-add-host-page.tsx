@@ -30,6 +30,8 @@ interface CsvRow {
 interface PreviewRow extends CsvRow {
   status: "Pending" | "Added" | "Failed";
   error?: string;
+  ip?: string | null; // IP address (null if not assigned)
+  running?: boolean; // Running status
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -72,7 +74,7 @@ export function BulkAddHostPage() {
           const occupiedPositions = service.hosts
             .filter((host) => host.rack_name === rack.name)
             .flatMap((host) => Array.from({ length: host.height }, (_, i) => host.pos + i));
-          const allPositions = Array.from({ length: rack.height }, (_, i) => i + 1);
+          const allPositions = Array.from({ length: rack.capacity }, (_, i) => i + 1); // Fixed to use rack.capacity
           positions[rack.name] = allPositions.filter(
             (pos) => !occupiedPositions.includes(pos),
           );
@@ -246,16 +248,23 @@ export function BulkAddHostPage() {
             );
           }
 
-          await addHost({
+          const added_host = await addHost({
             name: row.new_host_name,
             height: parseInt(row.height),
             rack_name: rack.name,
             pos: parseInt(row.position),
           });
 
-          // Update the local copy
+          // Update the local copy with IP and running status
           updatedPreviewData = updatedPreviewData.map((r, index) =>
-            index === i ? { ...r, status: "Added" as const } : r,
+            index === i
+              ? {
+                  ...r,
+                  status: "Added" as const,
+                  ip: added_host.ip || null, // Store IP (null if not assigned)
+                  running: added_host.running || false, // Store running status (default to false if undefined)
+                }
+              : r,
           );
           setPreviewData(updatedPreviewData);
         } catch (err) {
@@ -331,6 +340,8 @@ export function BulkAddHostPage() {
                   <TableHead>New Host Name</TableHead>
                   <TableHead>Height</TableHead>
                   <TableHead>Position</TableHead>
+                  <TableHead>IP</TableHead>
+                  <TableHead>Running</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
@@ -341,6 +352,12 @@ export function BulkAddHostPage() {
                     <TableCell>{row.new_host_name}</TableCell>
                     <TableCell>{row.height}</TableCell>
                     <TableCell>{row.position}</TableCell>
+                    <TableCell>
+                      {row.status === "Added" ? row.ip || "No IP Assigned" : "-"}
+                    </TableCell>
+                    <TableCell>
+                      {row.status === "Added" ? (row.running ? "Yes" : "No") : "-"}
+                    </TableCell>
                     <TableCell className="flex items-center gap-2">
                       {row.status === "Pending" && (
                         <>
