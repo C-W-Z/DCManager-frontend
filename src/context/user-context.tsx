@@ -35,7 +35,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("username", JSON.stringify(username));
     localStorage.setItem("role", JSON.stringify(role));
 
-    if (role === "normal") loadAccessableService(username);
+    if (role === "normal") loadAccessableService();
   };
 
   const logout = () => {
@@ -51,8 +51,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loadAccessableService = useCallback(
-    (username: string) => {
-      getUserService(username)
+    () => {
+      if (!user) return;
+      getUserService(user?.username)
         .then((serviceList) => {
           setAccessableService(serviceList.map((service) => service.name));
         })
@@ -61,7 +62,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
           toast.error(e.error);
         });
     },
-    [setAccessableService],
+    [setAccessableService, user],
   );
 
   return (

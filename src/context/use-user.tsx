@@ -5,7 +5,7 @@ interface UserContextType {
   user: User | null;
   accessableService: string[];
   setAccessableService: (services: string[]) => void;
-  loadAccessableService: (username: string) => void;
+  loadAccessableService: () => void;
   login: (username: string, role: "admin" | "normal") => void;
   logout: () => void;
 }

@@ -183,7 +183,7 @@ export function AddServiceDialog({
         setAllocatedRacks([]);
         setAllocatedSubnets([""]);
         form.reset();
-        loadAccessableService(user.username);
+        loadAccessableService();
         onSuccess?.(newService);
       })
       .catch((e: APIError) => {

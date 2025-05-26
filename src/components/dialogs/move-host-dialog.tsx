@@ -15,7 +15,6 @@ import { Host, SimpleRack, Rack, APIError } from "@/lib/type";
 import { modifyHost, getService, getRack } from "@/lib/api";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useUser } from "@/context/use-user";
 import Icon from "@/components/icon";
 
 interface MoveItemDialogProps {
@@ -24,7 +23,6 @@ interface MoveItemDialogProps {
 }
 
 export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
-  const { accessableService } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [parentRack, setParentRack] = useState<string | null>(null);
   const [loadingRack, setLoadingRack] = useState(false);
@@ -57,7 +55,7 @@ export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
       setRacks([]);
       setLoadingRack(false);
     }
-  }, [accessableService]);
+  }, [host.service_name]);
 
   useEffect(() => {
     setIsOpen(true);

@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { APIError } from "@/lib/type";
 import { Trash2 } from "lucide-react";
 import { AlertError } from "../alert-error-success";
+import { useUser } from "@/context/use-user";
 
 export function DeleteServiceDialog({
   serviceName,
@@ -20,12 +21,15 @@ export function DeleteServiceDialog({
 }: {
   serviceName: string;
   onSuccess: () => void;
-}) {
+  }) {
+  const { loadAccessableService } = useUser();
+
   const handleDelete = () => {
     deleteService(serviceName)
       .then(() => {
         toast.success(`Service ${serviceName} deleted successfully`);
         onSuccess();
+        loadAccessableService();
       })
       .catch((e: APIError) => {
         console.error(e);
