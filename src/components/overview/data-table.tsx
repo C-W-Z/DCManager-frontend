@@ -289,7 +289,7 @@ export function DataTable<TData extends WithID, TValue>({
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody className="**:data-[slot=table-cell]:first:w-10">
+            <TableBody className="**:data-[slot=table-cell]:first:w-fit">
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
