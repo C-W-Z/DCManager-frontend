@@ -1,11 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import { AlertCircle, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteDC, deleteRoom, deleteRack, deleteHost } from "@/lib/api";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { APIError } from "@/lib/type";
+import { AlertError } from "../alert-error-success";
 
 export type DeleteType = "datacenter" | "room" | "rack" | "host";
 
@@ -116,10 +116,10 @@ export function DeleteConfirmation({
   const title =
     itemCount > 1 ? `Delete ${itemCount} ${typeName}s` : `Delete ${itemName || "item"}`;
 
-  const description =
-    itemCount > 1
-      ? `Are you sure you want to delete these ${itemCount} ${typeName}s?`
-      : `Are you sure you want to delete ${itemName || "this item"}?`;
+  // const description =
+  //   itemCount > 1
+  //     ? `Are you sure you want to delete these ${itemCount} ${typeName}s?`
+  //     : `Are you sure you want to delete ${itemName || "this item"}?`;
 
   return (
     <div
@@ -131,17 +131,12 @@ export function DeleteConfirmation({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex flex-col space-y-2 text-center sm:text-left">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-red-600">
-            <Trash2 className="h-5 w-5" />
+          <h2 className="flex items-center gap-2 text-2xl font-semibold text-red-600 mb-4">
+            <Trash2 className="h-6 w-6" />
             {title}
           </h2>
-          <p className="text-sm text-black">{description}</p>
-          <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              This action cannot be undone. All associated content will also be deleted.
-            </AlertDescription>
-          </Alert>
+          {/* <p className="text-sm text-black">{description}</p> */}
+          <AlertError message="所有相關物件也將被刪除。此動作無法復原。" />
         </div>
 
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">

@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,21 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Edit, AlertCircle, ChevronsUpDown, Check } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import { cn } from "@/lib/utils";
-import { createPortal } from "react-dom";
-import { type APIError, type SimpleRack, type SimpleService } from "@/lib/type";
-import { modifyRack, getAllService } from "@/lib/api";
+import { Edit } from "lucide-react";
+import { type APIError, type SimpleRack } from "@/lib/type";
+import { modifyRack } from "@/lib/api";
 import { toast } from "sonner";
 import { AlertError } from "../alert-error-success";
 
@@ -39,36 +27,13 @@ export function EditRackDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [services, setServices] = useState<SimpleService[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [popoverOpen, setPopoverOpen] = useState(false);
-  const popoverTriggerRef = useRef<HTMLButtonElement>(null);
-  const commandInputRef = useRef<HTMLInputElement>(null);
+
   const [formData, setFormData] = useState({
     name: "",
-    service_name: "", // Use service_name instead of service_name
     height: "",
   });
 
   const hasHosts = rack ? rack.n_hosts > 0 : false;
-
-  // Fetch services when dialog opens
-  useEffect(() => {
-    if (open) {
-      setLoading(true);
-      getAllService()
-        .then((data) => {
-          setServices(data);
-        })
-        .catch((e: APIError) => {
-          console.error(e);
-          toast.error(e.error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [open]);
 
   // Initialize form data when rack changes
   useEffect(() => {
@@ -76,17 +41,9 @@ export function EditRackDialog({
     setOpen(true);
     setFormData({
       name: rack.name,
-      service_name: rack.service_name || "", // Use service_name
       height: rack.height.toString(),
     });
   }, [rack]);
-
-  // Focus CommandInput when Popover opens
-  useEffect(() => {
-    if (popoverOpen && commandInputRef.current) {
-      commandInputRef.current.focus();
-    }
-  }, [popoverOpen]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -100,7 +57,6 @@ export function EditRackDialog({
 
     modifyRack(rack.name, {
       name: formData.name,
-      service_name: formData.service_name || "", // Use service_name
       height: Number.parseInt(formData.height),
       room_name: rack.room_name,
     })
@@ -108,7 +64,6 @@ export function EditRackDialog({
         const updatedRack: SimpleRack = {
           ...rack,
           name: formData.name,
-          service_name: formData.service_name,
           height: Number.parseInt(formData.height),
         };
         toast.success(`Rack ${formData.name} edited successfully`);
@@ -122,112 +77,6 @@ export function EditRackDialog({
       });
   };
 
-  const ServicePopover = useMemo(() => {
-    return function ServicePopoverComponent({disabled}: {disabled?: boolean}) {
-      const [searchQuery, setSearchQuery] = useState("");
-
-      // Filter services based on search query
-      const filteredServices = searchQuery
-        ? services.filter((service) =>
-            service.name.toLowerCase().includes(searchQuery.toLowerCase()),
-          )
-        : services;
-
-      return (
-        <Popover
-          open={popoverOpen}
-          onOpenChange={(open) => {
-            setPopoverOpen(open);
-            if (!open) {
-              setSearchQuery("");
-              popoverTriggerRef.current?.focus();
-            }
-          }}
-          modal={true}
-        >
-          <PopoverTrigger asChild disabled={disabled}>
-            <Button
-              ref={popoverTriggerRef}
-              variant="outline"
-              role="combobox"
-              className="w-full justify-between border-black"
-              disabled={loading || disabled}
-            >
-              {loading
-                ? "Loading services..."
-                : formData.service_name
-                  ? services.find((service) => service.name === formData.service_name)?.name ||
-                    "None"
-                  : "None"}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0" />
-            </Button>
-          </PopoverTrigger>
-          {createPortal(
-            <PopoverContent
-              className="z-[200] p-0"
-              align="start"
-              side="bottom"
-              onClick={(e) => e.stopPropagation()}
-              onWheel={(e) => e.stopPropagation()}
-            >
-              <Command>
-                <CommandInput
-                  ref={commandInputRef}
-                  placeholder="Search service..."
-                  value={searchQuery}
-                  onValueChange={setSearchQuery}
-                  onClick={(e) => e.stopPropagation()}
-                  aria-label="Search services"
-                />
-                <CommandList className="max-h-[200px] overflow-y-auto">
-                  <CommandEmpty>No service found.</CommandEmpty>
-                  <CommandGroup>
-                    <CommandItem
-                      value="none"
-                      onSelect={() => {
-                        setFormData((prev) => ({ ...prev, service_name: "" }));
-                        setPopoverOpen(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          formData.service_name === "" ? "opacity-100" : "opacity-0",
-                        )}
-                      />
-                      None
-                    </CommandItem>
-                    {filteredServices.map((service) => (
-                      <CommandItem
-                        key={service.name}
-                        value={service.name}
-                        onSelect={() => {
-                          setFormData((prev) => ({ ...prev, service_name: service.name }));
-                          setPopoverOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            formData.service_name === service.name
-                              ? "opacity-100"
-                              : "opacity-0",
-                          )}
-                        />
-                        {service.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>,
-            document.body, // Render PopoverContent at the root
-          )}
-        </Popover>
-      );
-    };
-  }, [services, formData.service_name, popoverOpen, loading]);
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px] [&>button]:hidden">
@@ -238,13 +87,10 @@ export function EditRackDialog({
         </DialogHeader>
 
         {hasHosts && (
-          <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              There are hosts in this rack, so the height and service cannot be changed. Please remove all
-              hosts before changing the height.
-            </AlertDescription>
-          </Alert>
+          <AlertError
+            message="There are hosts in this rack, so the height cannot be changed. Please remove all
+              hosts before changing the height."
+          />
         )}
 
         {error && <AlertError message={error} />}
@@ -271,10 +117,6 @@ export function EditRackDialog({
               required
               disabled={hasHosts}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="service_name">Service</Label>
-            <ServicePopover disabled={hasHosts}/>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
