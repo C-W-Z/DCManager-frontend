@@ -119,18 +119,18 @@ function ServiceCard({
           </Link>
         </CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-cols-2 gap-4">
-        <div>
+      <CardContent className="grid grid-cols-12 gap-4">
+        <div className="col-span-7">
           <label className="text-sm text-gray-500">已上架機器數量</label>
           <p>{service.n_hosts}</p>
         </div>
-        <div>
+        <div className="col-span-5">
           <label className="text-sm text-gray-500">已使用 IP 數量</label>
           <p className={cn(available_ip <= 2 ? "text-red-500" : "")}>
             {total_ip - available_ip} / {total_ip}
           </p>
         </div>
-        <div>
+        <div className="col-span-7">
           <label className="text-sm text-gray-500">已分配機櫃</label>
           {Object.entries(service.n_allocated_racks).map(([dc_name, n_racks], index) => (
             <p key={index}>
@@ -139,7 +139,7 @@ function ServiceCard({
           ))}
         </div>
         {displayUsername && (
-          <div>
+          <div className="col-span-5">
             <label className="text-sm text-gray-500">上架使用者</label>
             <p>{service.username}</p>
           </div>
