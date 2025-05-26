@@ -1,7 +1,7 @@
 import { getService } from "@/lib/api";
 import { Service, SimpleRack, Host, APIError } from "@/lib/type";
 import { useEffect, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Icon from "@/components/icon";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -12,11 +12,13 @@ import { FallbackView } from "@/components/fallback-view";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { DeleteServiceDialog } from "@/components/dialogs/delete-service-dialog";
 
 export function ServicePage() {
   const serviceName = useParams().serviceName as string;
   const [service, setService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const { user } = useUser();
 
   const LoadService = useCallback((serviceName: string) => {
@@ -92,6 +94,10 @@ export function ServicePage() {
           </Button>
         </Link>
         <EditServiceDialog service={service} />
+        <DeleteServiceDialog
+          serviceName={service.name}
+          onSuccess={() => navigate(`/service`)}
+        />
       </div>
 
       <div className="grid w-full grid-cols-[1fr_2fr_2fr_2fr] gap-4">
