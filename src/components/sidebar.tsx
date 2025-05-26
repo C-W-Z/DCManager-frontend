@@ -43,13 +43,6 @@ export default function Sidebar() {
         href="/overview"
         active={currentPath === "/overview"}
       />
-      {/* <SidebarItem
-        iconId="rack"
-        label="Racks"
-        collapsed={collapsed}
-        href="/rack"
-        active={currentPath === "/rack"}
-      /> */}
       <SidebarItem
         iconId="host"
         label="主機管理"
