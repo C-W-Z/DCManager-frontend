@@ -115,7 +115,6 @@ function Wrapper({
   }
 
   function onMoveSuccess(rack_name: string) {
-    setMoveHost(null);
     navigate(`/rack/${rack_name}`);
   }
 
@@ -188,7 +187,10 @@ function Wrapper({
         <div className="mb-10 flex flex-col items-center justify-start gap-2 lg:mb-0">
           <Button
             onClick={() => {
-              setMoveHost(host);
+              setMoveHost(null);
+              setTimeout(() => {
+                setMoveHost(host);
+              }, 0);
             }}
             className="flex h-fit w-full flex-row items-center justify-start gap-3 self-start text-sm font-bold"
           >

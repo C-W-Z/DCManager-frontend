@@ -30,6 +30,7 @@ import {
 } from "@/lib/api";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import Icon from "../icon";
 
 type MoveItemType = "room" | "rack" | "host";
 
@@ -447,7 +448,7 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
                         {checkingRackPos ? (
                           <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
                         ) : (
-                          <Home className="h-4 w-4 text-gray-500" />
+                          <Icon id="rack" className="size-4" />
                         )}
                         <span>{rack.name}</span>
                         {parentRackId === rack.name && (
