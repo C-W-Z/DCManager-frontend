@@ -38,6 +38,13 @@ import { Move, Trash2 } from "lucide-react";
 import { DeleteConfirmation, DeleteType } from "../dialogs/delete-confirm";
 import { MoveItemDialog } from "../dialogs/move-item";
 import { useUser } from "@/context/use-user";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface WithID {
   name: string;
@@ -148,15 +155,29 @@ export function DataTable<TData extends WithID, TValue>({
                 className="w-fit"
                 disabled={loading}
               />
-              <Input
-                placeholder="Filter by service..."
+              <Select
                 value={(table.getColumn("service_name")?.getFilterValue() as string) ?? ""}
-                onChange={(event) =>
-                  table.getColumn("service_name")?.setFilterValue(event.target.value)
-                }
-                className="w-fit"
+                onValueChange={(value) => {
+                  if (value !== "All Services")
+                    table.getColumn("service_name")?.setFilterValue(value || undefined);
+                  else table.getColumn("service_name")?.setFilterValue("");
+                }}
                 disabled={loading}
-              />
+              >
+                <SelectTrigger className="w-[200px] border-black">
+                  <SelectValue placeholder="Filter by service..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={"All Services"}>All Services</SelectItem>
+                  {Array.from(
+                    table.getColumn("service_name")?.getFacetedUniqueValues().keys() || [],
+                  ).map((service) => (
+                    <SelectItem key={service} value={service}>
+                      {service}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Input
                 placeholder="Filter by rack name..."
                 value={(table.getColumn("rack_name")?.getFilterValue() as string) ?? ""}
