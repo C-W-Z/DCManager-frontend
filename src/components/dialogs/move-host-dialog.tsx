@@ -9,26 +9,38 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { MoveRight } from "lucide-react";
-import { Host, SimpleRack, Rack, APIError } from "@/lib/type";
+import { Host, SimpleRack, APIError } from "@/lib/type";
 import { modifyHost, getService, getRack } from "@/lib/api";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/context/use-user";
 import Icon from "@/components/icon";
+import { getPossiblePositions } from "@/lib/constant";
 
 interface MoveItemDialogProps {
   host: Host;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
   onSuccess?: (new_rack_name: string) => void;
 }
 
-export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function MoveHostDialog({ host, isOpen, setIsOpen, onSuccess }: MoveItemDialogProps) {
+  const { accessableService } = useUser();
   const [parentRack, setParentRack] = useState<string | null>(null);
   const [loadingRack, setLoadingRack] = useState(false);
   const [racks, setRacks] = useState<SimpleRack[]>([]);
   const [selectedRack, setSelectedRack] = useState<string | null>(null);
-  const [newPos, setNewPos] = useState<number | null>(null);
+  const [possiblePositions, setPossiblePositions] = useState<number[]>([]);
+  const [selectPos, setSelectPos] = useState<number | null>(null);
   const [loadingPos, setLoadingPos] = useState(false);
   const [loadingMoveRequest, setLoadingMoveRequest] = useState(false);
 
@@ -55,13 +67,14 @@ export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
       setRacks([]);
       setLoadingRack(false);
     }
-  }, [host.service_name]);
+  }, [accessableService]);
 
   useEffect(() => {
-    setIsOpen(true);
+    if (isOpen === false) return;
+
     LoadRack();
     setParentRack(host.rack_name);
-  }, [LoadRack, host]);
+  }, [isOpen, host]);
 
   const handleSelectRack = (rack_name: string) => {
     setSelectedRack(rack_name);
@@ -69,50 +82,26 @@ export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
 
     getRack(rack_name)
       .then((rack) => {
-        const newPos = isHostFit(host.height, rack);
-        setNewPos(newPos);
+        setPossiblePositions(getPossiblePositions(host.height, rack));
         setLoadingPos(false);
       })
       .catch((e: APIError) => {
         console.error(e);
         toast.error(e.error);
-        setNewPos(null);
+        setPossiblePositions([]);
         setLoadingPos(false);
       });
   };
 
-  function isHostFit(hostHeight: number, rack: Rack) {
-    if (rack.hosts.length === 0) {
-      return rack.height - hostHeight + 1;
-    }
-
-    const sortedHosts = [...rack.hosts].sort((a, b) => a.pos - b.pos);
-    let currentTop = rack.height;
-
-    for (let i = sortedHosts.length - 1; i >= 0; i--) {
-      const host = sortedHosts[i];
-      const host_top = host.pos + host.height - 1;
-      const space = currentTop - host_top;
-
-      if (space >= hostHeight) {
-        return currentTop - hostHeight + 1;
-      }
-
-      currentTop = host.pos - 1;
-    }
-
-    return null;
-  }
-
   const handleMove = async () => {
-    if (!newPos || !selectedRack) return;
+    if (!selectPos || !selectedRack) return;
 
     try {
       setLoadingMoveRequest(true);
 
       modifyHost(host.name, {
         rack_name: selectedRack,
-        pos: newPos,
+        pos: selectPos,
       }).catch((e: APIError) => {
         console.error(e);
         toast.error(e.error);
@@ -137,14 +126,10 @@ export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
             {`移動主機 ${host.name}`}
           </DialogTitle>
           <DialogDescription>
-            {newPos ? (
-              <span className="text-sm">{`目的機櫃: ${selectedRack} (位置: ${newPos})`}</span>
+            {selectedRack ? (
+              <span className="text-sm">{`移動至機櫃: ${selectedRack} | 位置: ${selectPos}`}</span>
             ) : (
-              <span className="text-sm text-red-500">
-                {selectedRack === null
-                  ? "請選擇目的機櫃"
-                  : "無法將主機移動到此機櫃，請選擇其他機櫃"}
-              </span>
+              <span className="text-sm text-red-500">{"請選擇目的機櫃"}</span>
             )}
           </DialogDescription>
         </DialogHeader>
@@ -155,7 +140,7 @@ export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
             </div>
           ) : (
-            <div className="max-h-[300px] overflow-y-auto rounded-md border">
+            <div className="max-h-[200px] overflow-y-auto rounded-md border">
               {racks.length > 0 ? (
                 <ul className="space-y-1 p-3">
                   {racks.map((rack) => (
@@ -190,6 +175,24 @@ export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
           )}
         </div>
 
+        <div>
+          <Select
+            onValueChange={(value) => setSelectPos(parseInt(value))}
+            disabled={possiblePositions.length === 0}
+          >
+            <SelectTrigger className="h-40 w-full">
+              <SelectValue placeholder="選擇機櫃內位置" />
+            </SelectTrigger>
+            <SelectContent className="max-h-[200px] overflow-y-auto">
+              {possiblePositions.map((pos) => (
+                <SelectItem key={pos} value={pos.toString()}>
+                  {pos}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
             Cancel
@@ -197,7 +200,7 @@ export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
           <Button
             type="submit"
             onClick={handleMove}
-            disabled={!newPos || loadingMoveRequest}
+            disabled={!selectPos || loadingMoveRequest}
             className="gap-1"
           >
             {loadingMoveRequest ? "Moving..." : "Move"}
