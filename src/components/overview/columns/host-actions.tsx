@@ -13,6 +13,7 @@ import { DeleteConfirmation } from "../../dialogs/delete-confirm";
 import { Row } from "@tanstack/react-table";
 import type { Host } from "@/lib/type";
 import { MoveItemDialog } from "../../dialogs/move-item";
+import { HostToggleButton } from "@/components/host-toggle-button";
 
 interface HostRowActionsProps {
   row: Row<Host>;
@@ -72,6 +73,7 @@ export function HostRowActions({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <HostToggleButton host={row.original} onUpdateSuccess={onUpdateSuccess} dropdown />
           <DropdownMenuItem onClick={() => handleEdit(host)}>
             <Edit className="mr-2 h-4 w-4" /> Edit
           </DropdownMenuItem>

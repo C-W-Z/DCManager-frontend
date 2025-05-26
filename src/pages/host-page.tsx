@@ -19,6 +19,7 @@ import { FallbackView } from "@/components/fallback-view";
 import { useUser } from "@/context/use-user";
 import { MoveHostDialog } from "../components/dialogs/move-host-dialog";
 import { toast } from "sonner";
+import { HostToggleButton } from "@/components/host-toggle-button";
 
 export function HostPage() {
   const hostName = useParams().hostName as string;
@@ -138,6 +139,7 @@ function Wrapper({
             {/* TODO: not sure is this ok? */}
             <DataFlexRow label="Status" data={host.running ? "running" : "stopped"} />
             <div className="mt-4 flex flex-row items-center justify-center gap-8">
+              <HostToggleButton host={host} className="w-24" />
               <Button
                 variant="outline"
                 className="w-24"
