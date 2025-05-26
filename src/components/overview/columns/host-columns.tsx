@@ -12,11 +12,7 @@ import Icon from "@/components/icon";
 interface HostColumnsProps {
   onUpdateSuccess: (host: Host) => void;
   onDeleteSuccess: (ids: string[]) => void;
-  onMoveSuccess: (data: {
-    dc_name: string | null;
-    room_name: string | null;
-    rack_name: string | null;
-  }) => void;
+  onMoveSuccess: (new_rack_name: string) => void;
 }
 
 export function hostColumns({

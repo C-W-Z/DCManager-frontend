@@ -12,18 +12,14 @@ import { EditHostDialog } from "@/components/dialogs/edit-host-dialog";
 import { DeleteConfirmation } from "../../dialogs/delete-confirm";
 import { Row } from "@tanstack/react-table";
 import type { Host } from "@/lib/type";
-import { MoveItemDialog } from "../../dialogs/move-item";
 import { HostToggleButton } from "@/components/host-toggle-button";
+import { MoveHostDialog } from "@/components/dialogs/move-host-dialog";
 
 interface HostRowActionsProps {
   row: Row<Host>;
   onUpdateSuccess: (host: Host) => void;
   onDeleteSuccess: (ids: string[]) => void;
-  onMoveSuccess: (data: {
-    dc_name: string | null;
-    room_name: string | null;
-    rack_name: string | null;
-  }) => void;
+  onMoveSuccess: (new_rack_name: string) => void;
 }
 
 export function HostRowActions({
@@ -35,7 +31,7 @@ export function HostRowActions({
   const host = row.original;
 
   const [hostToEdit, setHostToEdit] = useState<Host | null>(null);
-  const [hostToMove, setHostToMove] = useState<Host[]>([]);
+  const [hostToMove, setHostToMove] = useState<Host | null>(null);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
   const handleEdit = (host: Host) => {
@@ -57,9 +53,9 @@ export function HostRowActions({
   };
 
   const handleMove = (host: Host) => {
-    setHostToMove([]);
+    setHostToMove(null);
     setTimeout(() => {
-      setHostToMove([host]);
+      setHostToMove(host);
     }, 0);
   };
 
@@ -89,7 +85,7 @@ export function HostRowActions({
 
       <EditHostDialog host={hostToEdit} onUpdateSuccess={onUpdateSuccess} />
 
-      <MoveItemDialog type="host" items={hostToMove} onSuccess={onMoveSuccess} />
+      {hostToMove && <MoveHostDialog host={hostToMove} onSuccess={onMoveSuccess} />}
 
       <DeleteConfirmation
         ids={idsToDelete}

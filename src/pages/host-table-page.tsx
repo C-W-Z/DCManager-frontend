@@ -53,13 +53,9 @@ export function HostTablePage() {
     setHost(updatedDCs);
   };
 
-  const onMoveSuccess = (data: {
-    dc_name: string | null;
-    room_name: string | null;
-    rack_name: string | null;
-  }) => {
+  const onMoveSuccess = (rack_name: string) => {
     // Handle the move success logic here
-    console.log("Move success:", data);
+    console.log(`Move host to ${rack_name} success`);
     loadHosts();
   };
 
@@ -90,7 +86,6 @@ export function HostTablePage() {
         getRowId={(row) => row.name}
         loading={loading}
         onDeleteSuccess={onDeleteSuccess}
-        onMoveSuccess={onMoveSuccess}
         type="host"
       />
     </div>
