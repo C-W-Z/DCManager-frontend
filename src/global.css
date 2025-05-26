@@ -150,6 +150,23 @@
     color: white !important;
   }
 
+  [role="menuitem"]:has(svg.lucide-square) {
+    color: red !important;
+  }
+
+  [role="menuitem"]:has(svg.lucide-square):hover {
+    background-color: red !important;
+    color: white !important;
+  }
+
+  [role="menuitem"]:hover svg.lucide-square {
+    fill: white;
+  }
+
+  [role="menuitem"]:hover svg.lucide-play {
+    fill: white;
+  }
+
   /* Ensure icons in dropdown menu items change color on hover */
   [role="menuitem"] svg {
     color: inherit !important;

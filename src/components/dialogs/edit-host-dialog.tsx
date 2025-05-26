@@ -10,7 +10,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Edit } from "lucide-react";
 import { host_schema, Host, APIError } from "@/lib/type";
 import { modifyHost } from "@/lib/api";
@@ -26,7 +25,6 @@ interface EditHostDialogProps {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const form_schema = host_schema.pick({
   name: true,
-  running: true,
 });
 
 export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
@@ -34,7 +32,6 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<z.infer<typeof form_schema>>({
     name: "",
-    running: false,
   });
 
   useEffect(() => {
@@ -42,7 +39,6 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
     setOpen(true);
     setFormData({
       name: host.name,
-      running: host.running,
     });
   }, [host]);
 
@@ -58,13 +54,11 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
 
     modifyHost(host.name, {
       name: formData.name,
-      running: formData.running,
     })
       .then(() => {
         const updatedHost: Host = {
           ...host,
           name: formData.name,
-          running: formData.running,
         };
         if (onUpdateSuccess) onUpdateSuccess(updatedHost);
         setOpen(false);
@@ -97,17 +91,6 @@ export function EditHostDialog({ host, onUpdateSuccess }: EditHostDialogProps) {
               value={formData.name}
               onChange={handleChange}
               required
-            />
-          </div>
-          <div className="flex flex-row gap-4 space-y-2">
-            <Label htmlFor="running">Stop?</Label>
-            <Checkbox
-              id="running"
-              name="running"
-              checked={!formData.running}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, running: checked ? false : true })
-              }
             />
           </div>
 
