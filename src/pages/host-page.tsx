@@ -78,7 +78,12 @@ export function HostPage() {
     return <FallbackView text={`Host: ${hostName} not found.`} />;
   }
 
-  if (host.service_name.length > 0 && !accessableService.includes(host.service_name) && user.role !== "admin") {
+  if (
+    host.service_name &&
+    host.service_name.length > 0 &&
+    !accessableService.includes(host.service_name) &&
+    user.role !== "admin"
+  ) {
     return <FallbackView text={`你沒有權限瀏覽 ${host.name}`} />;
   }
 
@@ -131,8 +136,14 @@ function Wrapper({
             <Separator />
             <DataFlexRow
               label="運行服務"
-              data={host.service_name.length > 0 ? host.service_name : "無"}
-              link={host.service_name.length > 0 ? `/service/${host.service_name}`: undefined}
+              data={
+                host.service_name && host.service_name.length > 0 ? host.service_name : "無"
+              }
+              link={
+                host.service_name && host.service_name.length > 0
+                  ? `/service/${host.service_name}`
+                  : undefined
+              }
             />
             <DataFlexRow label="機器高度" data={`${host.height}`} />
             <DataFlexRow label="分配 IP" data={host.ip ? host.ip : "無"} />

@@ -64,7 +64,11 @@ export function RackPage() {
     return <AdminWrapper rack={rack} setRack={setRack} LoadRack={LoadRack} />;
   }
 
-  if (rack.service_name.length > 0 && !accessableService.includes(rack.service_name)) {
+  if (
+    rack.service_name &&
+    rack.service_name.length > 0 &&
+    !accessableService.includes(rack.service_name)
+  ) {
     return <FallbackView text={`你沒有權限瀏覽 ${rack.name}`} />;
   }
 
@@ -94,8 +98,14 @@ function UserWrapper({ rack, LoadRack }: { rack: Rack; LoadRack: (_: string) => 
             <Separator />
             <DataFlexRow
               label="運行服務"
-              data={rack.service_name.length > 0 ? rack.service_name : "無"}
-              link={rack.service_name.length > 0 ? `/service/${rack.service_name}`: undefined}
+              data={
+                rack.service_name && rack.service_name.length > 0 ? rack.service_name : "無"
+              }
+              link={
+                rack.service_name && rack.service_name.length > 0
+                  ? `/service/${rack.service_name}`
+                  : undefined
+              }
             />
             <DataFlexRow
               label="已用單位"
@@ -144,8 +154,8 @@ function AdminWrapper({
             <Separator />
             <DataFlexRow
               label="運行服務"
-              data={rack.service_name.length > 0 ? rack.service_name : "無"}
-              link={rack.service_name.length > 0 ? `/service/${rack.service_name}`: undefined}
+              data={rack.service_name && rack.service_name.length > 0 ? rack.service_name : "無"}
+              link={rack.service_name && rack.service_name.length > 0 ? `/service/${rack.service_name}` : undefined}
             />
             <DataFlexRow
               label="已用單位"
