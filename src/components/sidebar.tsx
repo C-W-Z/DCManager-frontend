@@ -5,7 +5,7 @@ import Icon from "@/components/icon";
 import { useUser } from "@/context/use-user";
 
 export default function Sidebar() {
-  const { logout } = useUser();
+  const { user, logout } = useUser();
 
   const [collapsed, setCollapsed] = useState(false);
   const currentPath = useResolvedPath("").pathname;
@@ -64,6 +64,7 @@ export default function Sidebar() {
         active={currentPath === "/service"}
       />
       <div className="flex-1"></div>
+      {user && <div>Youre now logged as {user.username}</div>}
       <SidebarItem
         iconId="logout"
         label="Logout"
