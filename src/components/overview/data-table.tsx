@@ -158,7 +158,7 @@ export function DataTable<TData extends WithID, TValue>({
               <Select
                 value={(table.getColumn("service_name")?.getFilterValue() as string) ?? ""}
                 onValueChange={(value) => {
-                  if (value !== "All Services")
+                  if (value !== "None")
                     table.getColumn("service_name")?.setFilterValue(value || undefined);
                   else table.getColumn("service_name")?.setFilterValue("");
                 }}
@@ -168,7 +168,7 @@ export function DataTable<TData extends WithID, TValue>({
                   <SelectValue placeholder="Filter by service..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={"All Services"}>All Services</SelectItem>
+                  <SelectItem value="None">All Services</SelectItem>
                   {Array.from(
                     table.getColumn("service_name")?.getFacetedUniqueValues().keys() || [],
                   ).map((service) => (
