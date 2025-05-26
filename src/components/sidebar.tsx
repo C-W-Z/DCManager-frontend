@@ -64,7 +64,15 @@ export default function Sidebar() {
         active={currentPath === "/service"}
       />
       <div className="flex-1"></div>
-      {user && <div>Youre now logged as {user.username}</div>}
+      {user && (
+        <div className="flex flex-col">
+          <div>
+            <Icon id="user" className="size-6" />
+          </div>
+          <p>Username:</p> {user.username}
+          <p>Role: {user.role}</p>
+        </div>
+      )}
       <SidebarItem
         iconId="logout"
         label="Logout"

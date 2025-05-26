@@ -22,17 +22,18 @@ import { Host, SimpleRack, APIError } from "@/lib/type";
 import { modifyHost, getService, getRack } from "@/lib/api";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/context/use-user";
 import Icon from "@/components/icon";
 import { getPossiblePositions } from "@/lib/constant";
 
 interface MoveItemDialogProps {
-  host: Host;
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
+  host: Host | null;
   onSuccess?: (new_rack_name: string) => void;
 }
 
-export function MoveHostDialog({ host, isOpen, setIsOpen, onSuccess }: MoveItemDialogProps) {
+export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
+  const { accessableService } = useUser();
+  const [isOpen, setIsOpen] = useState(false);
   const [parentRack, setParentRack] = useState<string | null>(null);
   const [loadingRack, setLoadingRack] = useState(false);
   const [racks, setRacks] = useState<SimpleRack[]>([]);
@@ -42,39 +43,45 @@ export function MoveHostDialog({ host, isOpen, setIsOpen, onSuccess }: MoveItemD
   const [loadingPos, setLoadingPos] = useState(false);
   const [loadingMoveRequest, setLoadingMoveRequest] = useState(false);
 
-  const LoadRack = useCallback(async () => {
-    try {
-      setLoadingRack(true);
+  const LoadRack = useCallback(
+    async (host: Host) => {
+      try {
+        setLoadingRack(true);
 
-      const all: SimpleRack[] = [];
-      const service = await getService(host.service_name);
-      Object.values(service.allocated_racks).forEach((racks) => {
-        all.push(...racks);
-      });
+        const all: SimpleRack[] = [];
+        const service = await getService(host.service_name);
+        Object.values(service.allocated_racks).forEach((racks) => {
+          all.push(...racks);
+        });
 
-      setRacks(all);
-      setLoadingRack(false);
-    } catch (e) {
-      if (e instanceof APIError) {
-        console.error(e);
-        toast.error(e.error);
-      } else {
-        console.error("Unexpected Error:", e);
+        setRacks(all);
+        setLoadingRack(false);
+      } catch (e) {
+        if (e instanceof APIError) {
+          console.error(e);
+          toast.error(e.error);
+        } else {
+          console.error("Unexpected Error:", e);
+        }
+
+        setRacks([]);
+        setLoadingRack(false);
       }
-
-      setRacks([]);
-      setLoadingRack(false);
-    }
-  }, [host.service_name]);
+    },
+    [accessableService],
+  );
 
   useEffect(() => {
-    if (isOpen === false) return;
+    if (!host) return;
 
-    LoadRack();
+    setIsOpen(true);
+    LoadRack(host);
     setParentRack(host.rack_name);
-  }, [isOpen, host, LoadRack]);
+  }, [LoadRack, host]);
 
   const handleSelectRack = (rack_name: string) => {
+    if (!host) return;
+
     setSelectedRack(rack_name);
     setLoadingPos(true);
 
@@ -92,7 +99,7 @@ export function MoveHostDialog({ host, isOpen, setIsOpen, onSuccess }: MoveItemD
   };
 
   const handleMove = async () => {
-    if (!selectPos || !selectedRack) return;
+    if (!selectPos || !selectedRack || !host) return;
 
     try {
       setLoadingMoveRequest(true);
@@ -121,7 +128,7 @@ export function MoveHostDialog({ host, isOpen, setIsOpen, onSuccess }: MoveItemD
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[500px] [&>button]:hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-            {`移動主機 ${host.name}`}
+            {`移動主機 ${host?.name}`}
           </DialogTitle>
           <DialogDescription>
             {selectedRack ? (
@@ -138,37 +145,30 @@ export function MoveHostDialog({ host, isOpen, setIsOpen, onSuccess }: MoveItemD
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
             </div>
           ) : (
-            <div className="max-h-[200px] overflow-y-auto rounded-md border">
-              {racks.length > 0 ? (
-                <ul className="space-y-1 p-3">
-                  {racks.map((rack) => (
-                    <li
-                      key={rack.name}
-                      className={cn(
-                        "flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100",
-                        selectedRack === rack.name ? "bg-gray-100" : "",
-                        parentRack === rack.name ? "pointer-events-none opacity-50" : "",
+            <div className="max-h-[300px] overflow-y-auto rounded-md border">
+              <ul className="space-y-1 p-3">
+                {racks.map((rack) => (
+                  <li
+                    key={rack.name}
+                    className={cn(
+                      "flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100",
+                      selectedRack === rack.name ? "bg-gray-100" : "",
+                      parentRack === rack.name ? "pointer-events-none opacity-50" : "",
+                    )}
+                    onClick={() => handleSelectRack(rack.name)}
+                  >
+                    <div className="flex items-center gap-2">
+                      {loadingPos && selectedRack === rack.name ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
+                      ) : (
+                        <Icon id="rack" className="size-4" />
                       )}
-                      onClick={() => handleSelectRack(rack.name)}
-                    >
-                      <div className="flex items-center gap-2">
-                        {loadingPos && selectedRack === rack.name ? (
-                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
-                        ) : (
-                          <Icon id="rack" className="size-4" />
-                        )}
-                        <span>{rack.name}</span>
-                        {parentRack === rack.name && (
-                          <span className="ml-auto text-xs text-gray-500">(Current)</span>
-                        )}
-                      </div>
-                      <MoveRight></MoveRight>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="p-3 text-center">No Service or no other racks in the same service.</p>
-              )}
+                      <span>{rack.name}</span>
+                    </div>
+                    <MoveRight></MoveRight>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </div>
@@ -179,7 +179,7 @@ export function MoveHostDialog({ host, isOpen, setIsOpen, onSuccess }: MoveItemD
             disabled={possiblePositions.length === 0}
           >
             <SelectTrigger className="h-40 w-full">
-              <SelectValue placeholder="選擇機櫃內位置" />
+              <SelectValue placeholder="Select a position" />
             </SelectTrigger>
             <SelectContent className="max-h-[200px] overflow-y-auto">
               {possiblePositions.map((pos) => (

@@ -107,7 +107,7 @@ function Wrapper({
   const [state, dispatch] = useReducer(RackDnDReducer, rack, createInitialState);
   const [deleteIds, setDeleteIds] = useState<string[]>([]);
   const [editHost, setEditHost] = useState<Host | null>(null);
-  const [moveDialogOpen, setMoveDialogOpen] = useState(false);
+  const [moveHost, setMoveHost] = useState<Host | null>(null);
   const navigate = useNavigate();
 
   function onMoveUpdate(newPos: number) {
@@ -186,7 +186,12 @@ function Wrapper({
         </div>
         <div className="mb-10 flex flex-col items-center justify-start gap-2 lg:mb-0">
           <Button
-            onClick={() => setMoveDialogOpen(true)}
+            onClick={() => {
+              setMoveHost(null);
+              setTimeout(() => {
+                setMoveHost(host);
+              }, 0);
+            }}
             className="flex h-fit w-full flex-row items-center justify-start gap-3 self-start text-sm font-bold"
           >
             <Icon id="move" className="size-4 fill-white" />
@@ -205,12 +210,7 @@ function Wrapper({
           window.location.href = `/host/${updatedHost.name}`;
         }}
       />
-      <MoveHostDialog
-        host={host}
-        isOpen={moveDialogOpen}
-        setIsOpen={setMoveDialogOpen}
-        onSuccess={onMoveSuccess}
-      />
+      <MoveHostDialog host={moveHost} onSuccess={onMoveSuccess} />
       <DeleteConfirmation
         ids={deleteIds}
         type="host"

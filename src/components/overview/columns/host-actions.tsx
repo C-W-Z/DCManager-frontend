@@ -31,7 +31,7 @@ export function HostRowActions({
   const host = row.original;
 
   const [hostToEdit, setHostToEdit] = useState<Host | null>(null);
-  const [moveDialogOpen, setMoveDialogOpen] = useState(false);
+  const [hostToMove, setHostToMove] = useState<Host | null>(null);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
   const handleEdit = (host: Host) => {
@@ -52,8 +52,11 @@ export function HostRowActions({
     onDeleteSuccess(ids);
   };
 
-  const handleMove = () => {
-    setMoveDialogOpen(true);
+  const handleMove = (host: Host) => {
+    setHostToMove(null);
+    setTimeout(() => {
+      setHostToMove(host);
+    }, 0);
   };
 
   return (
@@ -70,7 +73,7 @@ export function HostRowActions({
           <DropdownMenuItem onClick={() => handleEdit(host)}>
             <Edit className="mr-2 h-4 w-4" /> Edit
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleMove()}>
+          <DropdownMenuItem onClick={() => handleMove(host)}>
             <Move className="mr-2 h-4 w-4" /> Move
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -82,12 +85,7 @@ export function HostRowActions({
 
       <EditHostDialog host={hostToEdit} onUpdateSuccess={onUpdateSuccess} />
 
-      <MoveHostDialog
-        host={host}
-        isOpen={moveDialogOpen}
-        setIsOpen={setMoveDialogOpen}
-        onSuccess={onMoveSuccess}
-      />
+      {hostToMove && <MoveHostDialog host={hostToMove} onSuccess={onMoveSuccess} />}
 
       <DeleteConfirmation
         ids={idsToDelete}
