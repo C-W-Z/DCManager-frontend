@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Edit, MoreHorizontal, /*Move,*/ Trash2 } from "lucide-react";
+import { Edit, MoreHorizontal, Move, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,7 +14,7 @@ import { EditRoomDialog } from "../../dialogs/edit-room-dialog";
 import { DeleteConfirmation } from "../../dialogs/delete-confirm";
 import { Row } from "@tanstack/react-table";
 import type { SimpleRoom } from "@/lib/type";
-// import { MoveItemDialog } from "../../dialogs/move-item";
+import { MoveItemDialog } from "../../dialogs/move-item";
 
 interface RoomRowActionsProps {
   row: Row<SimpleRoom>;
@@ -31,12 +31,12 @@ export function RoomRowActions({
   row,
   onUpdateSuccess,
   onDeleteSuccess,
-  // onMoveSuccess,
+  onMoveSuccess,
 }: RoomRowActionsProps) {
   const room = row.original;
 
   const [roomToEdit, setRoomToEdit] = useState<SimpleRoom | null>(null);
-  // const [roomsToMove, setRoomsToMove] = useState<SimpleRoom[]>([]);
+  const [roomsToMove, setRoomsToMove] = useState<SimpleRoom[]>([]);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
   const handleEditDataCenter = (room: SimpleRoom) => {
@@ -57,12 +57,12 @@ export function RoomRowActions({
     onDeleteSuccess(ids);
   };
 
-  // const handleMoveRoom = (room: SimpleRoom) => {
-  //   setRoomsToMove([]);
-  //   setTimeout(() => {
-  //     setRoomsToMove([room]);
-  //   }, 0);
-  // };
+  const handleMoveRoom = (room: SimpleRoom) => {
+    setRoomsToMove([]);
+    setTimeout(() => {
+      setRoomsToMove([room]);
+    }, 0);
+  };
 
   return (
     <>
@@ -77,9 +77,9 @@ export function RoomRowActions({
           <DropdownMenuItem onClick={() => handleEditDataCenter(room)}>
             <Edit className="mr-2 h-4 w-4" /> Edit
           </DropdownMenuItem>
-          {/* <DropdownMenuItem onClick={() => handleMoveRoom(room)}>
+          <DropdownMenuItem onClick={() => handleMoveRoom(room)}>
             <Move className="mr-2 h-4 w-4" /> Move
-          </DropdownMenuItem> */}
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-red-600"
@@ -92,7 +92,7 @@ export function RoomRowActions({
 
       {roomToEdit && <EditRoomDialog room={roomToEdit} onUpdateSuccess={onUpdateSuccess} />}
 
-      {/* <MoveItemDialog type="room" items={roomsToMove} onSuccess={onMoveSuccess} /> */}
+      <MoveItemDialog type="room" items={roomsToMove} onSuccess={onMoveSuccess} />
 
       <DeleteConfirmation
         ids={idsToDelete}

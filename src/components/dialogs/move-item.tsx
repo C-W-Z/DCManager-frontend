@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Icon from "../icon";
+import { useNavigate } from "react-router-dom";
 
 type MoveItemType = "room" | "rack" | "host";
 
@@ -49,6 +50,7 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
   const [selectedRackPos, setSelectedRackPos] = useState<number | null>(null);
   const [checkingRackPos, setCheckingRackPos] = useState(false);
   const [loadingDestinations, setLoadingDestinations] = useState(false);
+  const navigate = useNavigate();
 
   const [parentDCId, setParentDCId] = useState<string | null>(null);
   const [parentRoomId, setParentRoomId] = useState<string | null>(null);
@@ -233,11 +235,19 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
 
         // 关闭对话框并通知成功
         setIsOpen(false);
-        const names =
-          items.length > 1
-            ? `${items.length} ${getTypeName()}s`
-            : `${getTypeName()} ${items[0].name}`;
-        toast.success(names + " has successfully move to " + getSelectedDestinationName());
+        toast.success(`Successfully moved to ${getSelectedDestinationName()}`);
+
+        let destinationPath = "";
+        if (type === "room") {
+          destinationPath = `/overview/dc/${selectedDC}`;
+        } else if (type === "rack") {
+          destinationPath = `/overview/room/${selectedRoom}`;
+        } else if (type === "host") {
+          destinationPath = `/overview/rack/${selectedRack}`;
+        } else {
+          destinationPath = "/overview";
+        }
+        navigate(destinationPath);
       } else {
         console.error("Some moving operations failed");
         toast.error("Some moving operations failed");
