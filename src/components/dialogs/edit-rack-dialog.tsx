@@ -123,7 +123,7 @@ export function EditRackDialog({
   };
 
   const ServicePopover = useMemo(() => {
-    return function ServicePopoverComponent() {
+    return function ServicePopoverComponent({disabled}: {disabled?: boolean}) {
       const [searchQuery, setSearchQuery] = useState("");
 
       // Filter services based on search query
@@ -145,13 +145,13 @@ export function EditRackDialog({
           }}
           modal={true}
         >
-          <PopoverTrigger asChild>
+          <PopoverTrigger asChild disabled={disabled}>
             <Button
               ref={popoverTriggerRef}
               variant="outline"
               role="combobox"
               className="w-full justify-between border-black"
-              disabled={loading}
+              disabled={loading || disabled}
             >
               {loading
                 ? "Loading services..."
@@ -241,7 +241,7 @@ export function EditRackDialog({
           <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              There are hosts in this rack, so the height cannot be changed. Please remove all
+              There are hosts in this rack, so the height and service cannot be changed. Please remove all
               hosts before changing the height.
             </AlertDescription>
           </Alert>
@@ -274,7 +274,7 @@ export function EditRackDialog({
           </div>
           <div className="space-y-2">
             <Label htmlFor="service_name">Service</Label>
-            <ServicePopover />
+            <ServicePopover disabled={hasHosts}/>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>

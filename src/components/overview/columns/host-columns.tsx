@@ -116,7 +116,13 @@ export function hostColumns({
       },
       cell: ({ row }) => {
         const service: string = row.getValue("service_name");
-        return <div className="pl-4 text-left font-medium">{service}</div>;
+        return (
+          <div className="pl-4 text-left font-medium">
+            <Link to={`/service/${service}`} className="hover:underline focus:outline-none">
+              {service}
+            </Link>
+          </div>
+        );
       },
     },
     {
@@ -134,7 +140,13 @@ export function hostColumns({
       },
       cell: ({ row }) => {
         const rackName: string = row.getValue("rack_name");
-        return <div className="pl-4 text-left font-medium">{rackName || "N/A"}</div>;
+        return (
+          <div className="pl-4 text-left font-medium">
+            <Link to={`/rack/${rackName}`} className="hover:underline focus:outline-none">
+              {rackName || "N/A"}
+            </Link>
+          </div>
+        );
       },
     },
     {

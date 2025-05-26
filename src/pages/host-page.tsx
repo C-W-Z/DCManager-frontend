@@ -139,7 +139,15 @@ function Wrapper({
             {/* TODO: not sure is this ok? */}
             <DataFlexRow label="Status" data={host.running ? "running" : "stopped"} />
             <div className="mt-4 flex flex-row items-center justify-center gap-8">
-              <HostToggleButton host={host} className="w-24" />
+              <HostToggleButton
+                host={host}
+                onUpdateSuccess={(updatedHost) => {
+                  // navigate(`/host/${updatedHost.name}`);
+                  // 強制重載
+                  window.location.href = `/host/${updatedHost.name}`;
+                }}
+                className="w-24"
+              />
               <Button
                 variant="outline"
                 className="w-24"
