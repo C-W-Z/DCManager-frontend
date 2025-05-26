@@ -78,12 +78,7 @@ export function HostPage() {
     return <FallbackView text={`Host: ${hostName} not found.`} />;
   }
 
-  if (
-    host.service_name &&
-    host.service_name.length > 0 &&
-    !accessableService.includes(host.service_name) &&
-    user.role !== "admin"
-  ) {
+  if (!accessableService.includes(host.service_name) && user.role !== "admin") {
     return <FallbackView text={`你沒有權限瀏覽 ${host.name}`} />;
   }
 
@@ -107,7 +102,7 @@ function Wrapper({
   const [state, dispatch] = useReducer(RackDnDReducer, rack, createInitialState);
   const [deleteIds, setDeleteIds] = useState<string[]>([]);
   const [editHost, setEditHost] = useState<Host | null>(null);
-  const [moveHost, setMoveHost] = useState<Host | null>(null);
+  const [moveDialogOpen, setMoveDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   function onMoveUpdate(newPos: number) {
@@ -135,17 +130,12 @@ function Wrapper({
             <Separator />
             <DataFlexRow
               label="運行服務"
-              data={
-                host.service_name && host.service_name.length > 0 ? host.service_name : "無"
-              }
-              link={
-                host.service_name && host.service_name.length > 0
-                  ? `/service/${host.service_name}`
-                  : undefined
-              }
+              data={host.service_name}
+              link={`/service/${host.service_name}`}
             />
             <DataFlexRow label="機器高度" data={`${host.height}`} />
             <DataFlexRow label="分配 IP" data={host.ip ? host.ip : "無"} />
+            {/* TODO: not sure is this ok? */}
             <DataFlexRow label="Status" data={host.running ? "running" : "stopped"} />
             <div className="mt-4 flex flex-row items-center justify-center gap-8">
               <HostToggleButton
@@ -187,10 +177,7 @@ function Wrapper({
         <div className="mb-10 flex flex-col items-center justify-start gap-2 lg:mb-0">
           <Button
             onClick={() => {
-              setMoveHost(null);
-              setTimeout(() => {
-                setMoveHost(host);
-              }, 0);
+              setMoveDialogOpen(true);
             }}
             className="flex h-fit w-full flex-row items-center justify-start gap-3 self-start text-sm font-bold"
           >
@@ -210,7 +197,12 @@ function Wrapper({
           window.location.href = `/host/${updatedHost.name}`;
         }}
       />
-      {moveHost && <MoveHostDialog host={moveHost} onSuccess={onMoveSuccess} />}
+      <MoveHostDialog
+        host={host}
+        isOpen={moveDialogOpen}
+        setIsOpen={setMoveDialogOpen}
+        onSuccess={onMoveSuccess}
+      />
       <DeleteConfirmation
         ids={deleteIds}
         type="host"

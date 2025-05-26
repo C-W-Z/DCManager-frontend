@@ -28,14 +28,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-import { APIError, Host, Rack, host_schema } from "@/lib/type";
+import { APIError, Host, host_schema } from "@/lib/type";
 import { toast } from "sonner";
 import { addHost } from "@/lib/api";
 import Icon from "@/components/icon";
 import { RackContextType } from "@/components/rack-dnd/rack-dnd-reducer";
 import { useContextSafe } from "@/lib/utils";
+import { getPossiblePositions } from "@/lib/constant";
 
-const form_schema = host_schema.pick({ name: true, height: true });
+const form_schema = host_schema.pick({ name: true, height: true, pos: true });
 
 export function AddHostDialog({
   context,
@@ -53,18 +54,10 @@ export function AddHostDialog({
   });
 
   function onSubmit(values: z.infer<typeof form_schema>) {
-    const newPos = isHostFit(values.height, state.rack);
-
-    if (newPos === null) {
-      toast.error("Rack don't have enough space!");
-      setOpen(false);
-      return;
-    }
-
     addHost({
       name: values.name,
       height: values.height,
-      pos: newPos,
+      pos: values.pos,
       rack_name: state.rack.name,
     })
       .then((newHost) => {
@@ -85,13 +78,13 @@ export function AddHostDialog({
       <DialogTrigger asChild>
         <Button className="flex h-fit w-full flex-row items-center justify-start gap-3 text-sm font-bold">
           <Icon id="add" className="size-4 fill-white" />
-          <p className="pr-2">New Host</p>
+          <p className="pr-2">新增主機</p>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[400px] [&>button]:hidden">
         <DialogHeader>
-          <DialogTitle>Add New Host</DialogTitle>
-          <DialogDescription>add a new host to current rack</DialogDescription>
+          <DialogTitle>新增主機</DialogTitle>
+          <DialogDescription>請指定名字、高度以及位置。</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -100,7 +93,7 @@ export function AddHostDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>主機名字</FormLabel>
                   <FormControl>
                     <Input placeholder="Lenovo-SR650" {...field} value={field.value || ""} />
                   </FormControl>
@@ -113,11 +106,11 @@ export function AddHostDialog({
               name="height"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Height</FormLabel>
+                  <FormLabel>主機高度</FormLabel>
                   <FormControl>
                     <Select onValueChange={(value) => field.onChange(parseInt(value))}>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a height" />
+                        <SelectValue placeholder="選擇一個高度" />
                       </SelectTrigger>
                       <SelectContent>
                         {["1U", "2U", "3U", "4U"].map((height) => (
@@ -132,38 +125,47 @@ export function AddHostDialog({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="pos"
+              render={({ field }) => {
+                const selectedHeight = form.watch("height");
+                const possiblePositions = getPossiblePositions(selectedHeight, state.rack);
+
+                return (
+                  <FormItem>
+                    <FormLabel>機櫃內位置</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={(value) => field.onChange(parseInt(value))}
+                        disabled={possiblePositions.length === 0}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="選擇一個位置" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[200px] overflow-y-auto">
+                          {possiblePositions.map((pos) => (
+                            <SelectItem key={pos} value={pos.toString()}>
+                              {pos}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
+            />
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit">Add</Button>
+              <Button type="submit">新增</Button>
             </DialogFooter>
           </form>
         </Form>
       </DialogContent>
     </Dialog>
   );
-}
-
-function isHostFit(hostHeight: number, rack: Rack) {
-  if (rack.hosts.length === 0) {
-    return rack.height - hostHeight + 1;
-  }
-
-  const sortedHosts = [...rack.hosts].sort((a, b) => a.pos - b.pos);
-  let currentTop = rack.height;
-
-  for (let i = sortedHosts.length - 1; i >= 0; i--) {
-    const host = sortedHosts[i];
-    const host_top = host.pos + host.height - 1;
-    const space = currentTop - host_top;
-
-    if (space >= hostHeight) {
-      return currentTop - hostHeight + 1;
-    }
-
-    currentTop = host.pos - 1;
-  }
-
-  return null;
 }
