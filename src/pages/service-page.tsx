@@ -13,6 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { DeleteServiceDialog } from "@/components/dialogs/delete-service-dialog";
+import {
+  CRITICAL_AVAILABLE_IP_PERCENT,
+  CRITICAL_AVAILABLE_RACK_POS_PERCENT,
+} from "@/lib/constant";
 
 export function ServicePage() {
   const serviceName = useParams().serviceName as string;
@@ -61,43 +65,71 @@ export function ServicePage() {
   const total_ip = service.total_ip_list.length;
   const available_ip = service.available_ip_list.length;
 
+  const used_rack_pos = service.hosts.reduce((sum, host) => sum + host.height, 0);
+  const total_rack_heights = Object.values(service.allocated_racks).reduce(
+    (sum, racks) => sum + racks.reduce((sum, rack) => sum + rack.height, 0),
+    0,
+  );
+
   return (
     <div className="flex h-screen w-full flex-col items-start justify-between px-20 pt-12">
       <div className="mb-4 flex flex-row items-center gap-2">
         <Icon id="service" className="size-8" />
         <div className="text-2xl font-bold">{service.name}</div>
       </div>
-      <div className="mb-8 flex w-full flex-row items-center gap-8 p-2">
-        <div>
+      <div className="mb-4 grid w-full grid-cols-12 gap-2 p-2">
+        <div className="col-span-2">
           <label className="text-sm text-gray-500">已上架機器數量</label>
           <p>{service.hosts.length}</p>
         </div>
-        <div>
+        <div className="col-span-2">
+          <label className="text-sm text-gray-500">已使用櫃位空間</label>
+          <p
+            className={cn(
+              total_rack_heights - used_rack_pos <=
+                total_rack_heights * CRITICAL_AVAILABLE_RACK_POS_PERCENT
+                ? "text-red-500"
+                : "",
+            )}
+          >
+            {used_rack_pos} / {total_rack_heights}
+          </p>
+        </div>
+
+        <div className="item-center col-span-8 flex justify-end gap-8">
+          <Link to={`/bulk-add-host/${service.name}`} className="h-fit pr-2">
+            <Button className="flex h-fit w-fit flex-row items-center justify-start gap-3 text-sm font-bold">
+              <Plus />
+              批量新增主機
+            </Button>
+          </Link>
+          <EditServiceDialog service={service} />
+          <DeleteServiceDialog
+            serviceName={service.name}
+            onSuccess={() => navigate(`/service`)}
+          />
+        </div>
+
+        <div className="col-span-2">
           <label className="text-sm text-gray-500">已使用 IP 數量</label>
-          <p className={cn(available_ip <= 2 ? "text-red-500" : "")}>
+          <p
+            className={cn(
+              available_ip <= total_ip * CRITICAL_AVAILABLE_IP_PERCENT ? "text-red-500" : "",
+            )}
+          >
             {total_ip - available_ip} / {total_ip}
           </p>
         </div>
-        <div>
+        <div className="col-span-10">
           <label className="text-sm text-gray-500">已分配網段</label>
-          <p>
-            {service.allocated_subnets.length > 0
-              ? service.allocated_subnets.join(", ")
-              : "無"}
-          </p>
+          <div className="flex overflow-x-auto">
+            {service.allocated_subnets.length > 0 ? (
+              service.allocated_subnets.map((subnet) => <p className="mr-1">{subnet}</p>)
+            ) : (
+              <p>"無"</p>
+            )}
+          </div>
         </div>
-        <div className="flex-1"></div>
-        <Link to={`/bulk-add-host/${service.name}`} className="h-fit pr-2">
-          <Button className="flex h-fit w-fit flex-row items-center justify-start gap-3 text-sm font-bold">
-            <Plus />
-            批量新增主機
-          </Button>
-        </Link>
-        <EditServiceDialog service={service} />
-        <DeleteServiceDialog
-          serviceName={service.name}
-          onSuccess={() => navigate(`/service`)}
-        />
       </div>
 
       <div className="grid w-full grid-cols-[1fr_2fr_2fr_2fr] gap-4">
