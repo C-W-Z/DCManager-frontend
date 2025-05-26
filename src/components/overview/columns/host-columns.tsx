@@ -120,6 +120,24 @@ export function hostColumns({
       },
     },
     {
+      accessorKey: "rack_name",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Rack Name
+            <Icon id="swap" className="size-4 fill-zinc-600" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => {
+        const rackName: string = row.getValue("rack_name");
+        return <div className="pl-4 text-left font-medium">{rackName || "N/A"}</div>;
+      },
+    },
+    {
       accessorKey: "height",
       header: ({ column }) => {
         return (

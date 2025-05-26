@@ -136,14 +136,46 @@ export function DataTable<TData extends WithID, TValue>({
   return (
     <div className="px-0 pb-12">
       <div className="mt-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Input
-            placeholder="Filter by name..."
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
-            className="w-sm"
-            disabled={loading}
-          />
+        <div className="flex items-center gap-4">
+          {type === "host" ? (
+            <>
+              <Input
+                placeholder="Filter by host name..."
+                value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                onChange={(event) =>
+                  table.getColumn("name")?.setFilterValue(event.target.value)
+                }
+                className="w-fit"
+                disabled={loading}
+              />
+              <Input
+                placeholder="Filter by service..."
+                value={(table.getColumn("service_name")?.getFilterValue() as string) ?? ""}
+                onChange={(event) =>
+                  table.getColumn("service_name")?.setFilterValue(event.target.value)
+                }
+                className="w-fit"
+                disabled={loading}
+              />
+              <Input
+                placeholder="Filter by rack name..."
+                value={(table.getColumn("rack_name")?.getFilterValue() as string) ?? ""}
+                onChange={(event) =>
+                  table.getColumn("rack_name")?.setFilterValue(event.target.value)
+                }
+                className="w-fit"
+                disabled={loading}
+              />
+            </>
+          ) : (
+            <Input
+              placeholder="Filter by name..."
+              value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+              onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
+              className="w-fit"
+              disabled={loading}
+            />
+          )}
 
           {user?.role === "admin" &&
             type !== "datacenter" &&
