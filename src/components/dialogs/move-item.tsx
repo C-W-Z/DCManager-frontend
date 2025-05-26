@@ -11,14 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { MoveRight, Home, Move, MoveLeft } from "lucide-react";
-import {
-  SimpleDatacenter,
-  Host,
-  SimpleRack,
-  SimpleRoom,
-  Rack,
-  APIError,
-} from "@/lib/type";
+import { SimpleDatacenter, Host, SimpleRack, SimpleRoom, Rack, APIError } from "@/lib/type";
 import {
   getAllDC,
   getDC,
@@ -386,80 +379,89 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
             </div>
           ) : (
             <div className="max-h-[300px] overflow-y-auto rounded-md border">
-              {showDCList && (
-                <ul className="space-y-1 p-3">
-                  {dataCenters.map((dc) => (
-                    <li
-                      key={dc.name}
-                      className={`flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100 ${
-                        selectedDC === dc.name ? "bg-gray-100" : ""
-                      } ${parentDCId === dc.name ? "opacity-50" : ""}`}
-                      onClick={() => handleSelectDC(dc.name)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Home className="h-4 w-4 text-gray-500" />
-                        <span>{dc.name}</span>
-                        {parentDCId === dc.name && (
-                          <span className="ml-auto text-xs text-gray-500">(Current)</span>
-                        )}
-                      </div>
-                      <MoveRight></MoveRight>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {showDCList &&
+                (dataCenters.length > 0 ? (
+                  <ul className="space-y-1 p-3">
+                    {dataCenters.map((dc) => (
+                      <li
+                        key={dc.name}
+                        className={`flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100 ${
+                          selectedDC === dc.name ? "bg-gray-100" : ""
+                        } ${parentDCId === dc.name ? "opacity-50" : ""}`}
+                        onClick={() => handleSelectDC(dc.name)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Home className="h-4 w-4 text-gray-500" />
+                          <span>{dc.name}</span>
+                          {parentDCId === dc.name && (
+                            <span className="ml-auto text-xs text-gray-500">(Current)</span>
+                          )}
+                        </div>
+                        <MoveRight></MoveRight>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="p-3 text-center">No Data Centers.</p>
+                ))}
 
-              {showRoomList && (
-                <ul className="space-y-1 p-3">
-                  {rooms.map((room) => (
-                    <li
-                      key={room.name}
-                      className={`flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100 ${
-                        selectedRoom === room.name ? "bg-gray-100" : ""
-                      } ${parentRoomId === room.name ? "opacity-50" : ""}`}
-                      onClick={() => handleSelectRoom(room.name)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Home className="h-4 w-4 text-gray-500" />
-                        <span>{room.name}</span>
-                        {parentRoomId === room.name && (
-                          <span className="ml-auto text-xs text-gray-500">(Current)</span>
-                        )}
-                      </div>
-                      <MoveRight></MoveRight>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {showRoomList &&
+                (rooms.length > 0 ? (
+                  <ul className="space-y-1 p-3">
+                    {rooms.map((room) => (
+                      <li
+                        key={room.name}
+                        className={`flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100 ${
+                          selectedRoom === room.name ? "bg-gray-100" : ""
+                        } ${parentRoomId === room.name ? "opacity-50" : ""}`}
+                        onClick={() => handleSelectRoom(room.name)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Home className="h-4 w-4 text-gray-500" />
+                          <span>{room.name}</span>
+                          {parentRoomId === room.name && (
+                            <span className="ml-auto text-xs text-gray-500">(Current)</span>
+                          )}
+                        </div>
+                        <MoveRight></MoveRight>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="p-3 text-center">No Rooms.</p>
+                ))}
 
-              {showRackList && (
-                <ul className="space-y-1 p-3">
-                  {racks.map((rack) => (
-                    <li
-                      key={rack.name}
-                      className={cn(
-                        "flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100",
-                        selectedRack === rack.name ? "bg-gray-100" : "",
-                        parentRackId === rack.name ? "opacity-50" : "",
-                      )}
-                      onClick={() => handleSelectRack(rack.name)}
-                    >
-                      <div className="flex items-center gap-2">
-                        {checkingRackPos ? (
-                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
-                        ) : (
-                          <Icon id="rack" className="size-4" />
+              {showRackList &&
+                (racks.length > 0 ? (
+                  <ul className="space-y-1 p-3">
+                    {racks.map((rack) => (
+                      <li
+                        key={rack.name}
+                        className={cn(
+                          "flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100",
+                          selectedRack === rack.name ? "bg-gray-100" : "",
+                          parentRackId === rack.name ? "opacity-50" : "",
                         )}
-                        <span>{rack.name}</span>
-                        {parentRackId === rack.name && (
-                          <span className="ml-auto text-xs text-gray-500">(Current)</span>
-                        )}
-                      </div>
-                      <MoveRight></MoveRight>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                        onClick={() => handleSelectRack(rack.name)}
+                      >
+                        <div className="flex items-center gap-2">
+                          {checkingRackPos ? (
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
+                          ) : (
+                            <Icon id="rack" className="size-4" />
+                          )}
+                          <span>{rack.name}</span>
+                          {parentRackId === rack.name && (
+                            <span className="ml-auto text-xs text-gray-500">(Current)</span>
+                          )}
+                        </div>
+                        <MoveRight></MoveRight>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="p-3 text-center">No Racks.</p>
+                ))}
             </div>
           )}
 
