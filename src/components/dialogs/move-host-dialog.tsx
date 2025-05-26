@@ -22,7 +22,6 @@ import { Host, SimpleRack, APIError } from "@/lib/type";
 import { modifyHost, getService, getRack } from "@/lib/api";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useUser } from "@/context/use-user";
 import Icon from "@/components/icon";
 import { getPossiblePositions } from "@/lib/constant";
 
@@ -34,7 +33,6 @@ interface MoveItemDialogProps {
 }
 
 export function MoveHostDialog({ host, isOpen, setIsOpen, onSuccess }: MoveItemDialogProps) {
-  const { accessableService } = useUser();
   const [parentRack, setParentRack] = useState<string | null>(null);
   const [loadingRack, setLoadingRack] = useState(false);
   const [racks, setRacks] = useState<SimpleRack[]>([]);
@@ -67,14 +65,14 @@ export function MoveHostDialog({ host, isOpen, setIsOpen, onSuccess }: MoveItemD
       setRacks([]);
       setLoadingRack(false);
     }
-  }, [accessableService]);
+  }, [host.service_name]);
 
   useEffect(() => {
     if (isOpen === false) return;
 
     LoadRack();
     setParentRack(host.rack_name);
-  }, [isOpen, host]);
+  }, [isOpen, host, LoadRack]);
 
   const handleSelectRack = (rack_name: string) => {
     setSelectedRack(rack_name);
@@ -169,7 +167,7 @@ export function MoveHostDialog({ host, isOpen, setIsOpen, onSuccess }: MoveItemD
                   ))}
                 </ul>
               ) : (
-                <p className="p-3 text-center">No other racks in the same service.</p>
+                <p className="p-3 text-center">No Service or no other racks in the same service.</p>
               )}
             </div>
           )}
