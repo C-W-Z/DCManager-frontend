@@ -43,7 +43,7 @@ export function AddRackDialog({
       height: true,
     })
     .extend({
-      height: z.coerce.number().int().min(42).max(currentRoom.height),
+      height: z.coerce.number().int().min(1).max(currentRoom.height),
     });
 
   const form = useForm<z.infer<typeof form_schema>>({
@@ -114,7 +114,7 @@ export function AddRackDialog({
                     <Input
                       type="number"
                       placeholder="42"
-                      min={42}
+                      min={1}
                       max={currentRoom.height}
                       {...field}
                       onChange={(e) => {

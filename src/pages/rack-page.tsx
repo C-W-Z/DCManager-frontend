@@ -9,7 +9,7 @@ import {
   createInitialState,
 } from "@/components/rack-dnd/rack-dnd-reducer";
 import { AddHostDialog } from "@/components/dialogs/add-host-dialog";
-import { useNavigate, useParams } from "react-router-dom";
+import { /*useNavigate,*/ useParams } from "react-router-dom";
 import Icon from "@/components/icon";
 import { LoadingView } from "@/components/loading-view";
 import { useUser } from "@/context/use-user";
@@ -64,7 +64,7 @@ export function RackPage() {
     return <AdminWrapper rack={rack} setRack={setRack} LoadRack={LoadRack} />;
   }
 
-  if (!accessableService.includes(rack.service_name)) {
+  if (rack.service_name.length > 0 && !accessableService.includes(rack.service_name)) {
     return <FallbackView text={`你沒有權限瀏覽 ${rack.name}`} />;
   }
 
@@ -94,8 +94,8 @@ function UserWrapper({ rack, LoadRack }: { rack: Rack; LoadRack: (_: string) => 
             <Separator />
             <DataFlexRow
               label="運行服務"
-              data={rack.service_name}
-              link={`/service/${rack.service_name}`}
+              data={rack.service_name.length > 0 ? rack.service_name : "無"}
+              link={rack.service_name.length > 0 ? `/service/${rack.service_name}`: undefined}
             />
             <DataFlexRow
               label="已用單位"
@@ -127,7 +127,7 @@ function AdminWrapper({
   const [deleteIds, setDeleteIds] = useState<string[]>([]);
   const [editRack, setEditRack] = useState<Rack | null>(null);
   const [racksToMove, setRacksToMove] = useState<Rack[]>([]);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   return (
     <RackContext.Provider value={{ state, dispatch }}>
@@ -144,8 +144,8 @@ function AdminWrapper({
             <Separator />
             <DataFlexRow
               label="運行服務"
-              data={rack.service_name}
-              link={`/service/${rack.service_name}`}
+              data={rack.service_name.length > 0 ? rack.service_name : "無"}
+              link={rack.service_name.length > 0 ? `/service/${rack.service_name}`: undefined}
             />
             <DataFlexRow
               label="已用單位"
@@ -200,7 +200,11 @@ function AdminWrapper({
 
       <EditRackDialog
         rack={editRack}
-        onUpdateSuccess={(updatedRack) => navigate(`/rack/${updatedRack.name}`)}
+        onUpdateSuccess={(updatedRack) => {
+          // navigate(`/rack/${updatedRack.name}`);
+          // 強制重載
+          window.location.href = `/rack/${updatedRack.name}`;
+        }}
       />
       <MoveItemDialog type="rack" items={racksToMove} />
       <DeleteConfirmation
