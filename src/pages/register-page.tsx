@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -76,7 +76,7 @@ export function RegisterPage() {
           <CardHeader className="mb-2">
             <CardTitle className="flex justify-center text-xl">Register</CardTitle>
             <CardDescription className="flex justify-center">
-              Register a account to access DCManager.
+              Register an account to access DCManager
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -109,7 +109,7 @@ export function RegisterPage() {
                       <FormLabel>Password</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="gHy7!@#daw2"
+                          placeholder="password"
                           type="password"
                           disabled={isLoading}
                           {...field}
@@ -152,6 +152,12 @@ export function RegisterPage() {
                       "Register"
                     )}
                   </Button>
+                  <Link
+                    to="/"
+                    className="ml-4 text-sm font-bold text-gray-500 hover:underline"
+                  >
+                    Already have an account?
+                  </Link>
                 </CardFooter>
               </form>
             </Form>
