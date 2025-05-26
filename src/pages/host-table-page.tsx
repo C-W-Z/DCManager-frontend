@@ -9,6 +9,7 @@ import { useUser } from "@/context/use-user";
 import Icon from "@/components/icon";
 import { RefreshButton } from "@/components/refresh-button";
 import { toast } from "sonner";
+import { FallbackView } from "@/components/fallback-view";
 
 export function HostTablePage() {
   const { user, accessableService } = useUser();
@@ -67,6 +68,10 @@ export function HostTablePage() {
     onDeleteSuccess,
     onMoveSuccess,
   });
+
+  if (!user) {
+    return <FallbackView text="請登入以瀏覽此頁面。" />;
+  }
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-12">
