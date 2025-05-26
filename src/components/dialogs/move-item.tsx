@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Icon from "../icon";
+import { useNavigate } from "react-router-dom";
 
 type MoveItemType = "room" | "rack" | "host";
 
@@ -53,6 +54,8 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
   const [parentDCId, setParentDCId] = useState<string | null>(null);
   const [parentRoomId, setParentRoomId] = useState<string | null>(null);
   const [parentRackId, setParentRackId] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const loadRacksByRoomId = useCallback(async (room_name: string) => {
     setLoadingDestinations(true);
@@ -237,7 +240,13 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
           items.length > 1
             ? `${items.length} ${getTypeName()}s`
             : `${getTypeName()} ${items[0].name}`;
-        toast.success(names + " has successfully move to " + getSelectedDestinationName());
+        const destinationName = getSelectedDestinationName()
+        toast.success(names + " has successfully move to " + destinationName, {
+          action: {
+            label: "Go To",
+            onClick: () => navigate(`${getDestinationLinkPrefix()}/${destinationName}`),
+          },
+        });
       } else {
         console.error("Some moving operations failed");
         toast.error("Some moving operations failed");
@@ -263,18 +272,18 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
     }
   };
 
-  // const getDestinationTypeName = () => {
-  //   switch (type) {
-  //     case "room":
-  //       return "Data Center";
-  //     case "rack":
-  //       return "Room";
-  //     case "host":
-  //       return "Rack";
-  //     default:
-  //       return "";
-  //   }
-  // };
+  const getDestinationLinkPrefix = () => {
+    switch (type) {
+      case "room":
+        return "/overview/dc";
+      case "rack":
+        return "/overview/room";
+      case "host":
+        return "/rack";
+      default:
+        return "";
+    }
+  };
 
   // 检查是否可以移动
   const canMove = () => {
@@ -336,17 +345,14 @@ export function MoveItemDialog({ type, items, onSuccess }: MoveItemDialogProps) 
 
   // 获取当前选择的目标名称
   const getSelectedDestinationName = () => {
-    if (type === "room" && selectedDC) {
-      const dc = dataCenters.find((dc) => dc.name === selectedDC);
-      return dc?.name || "";
+    if (type === "room") {
+      return selectedDC || "";
     }
-    if (type === "rack" && selectedRoom) {
-      const room = rooms.find((room) => room.name === selectedRoom);
-      return room?.name || "";
+    if (type === "rack") {
+      return selectedRoom || "";
     }
-    if (type === "host" && selectedRack) {
-      const rack = racks.find((rack) => rack.name === selectedRack);
-      return rack?.name || "";
+    if (type === "host") {
+      return selectedRack || "";
     }
     return "";
   };
