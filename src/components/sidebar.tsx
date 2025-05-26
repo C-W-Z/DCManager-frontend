@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Link, useResolvedPath } from "react-router-dom";
 import Icon from "@/components/icon";
 import { useUser } from "@/context/use-user";
+import { CircleUserRound } from "lucide-react";
 
 export default function Sidebar() {
   const { user, logout } = useUser();
@@ -64,7 +65,11 @@ export default function Sidebar() {
         active={currentPath === "/service"}
       />
       <div className="flex-1"></div>
-      {user && <div>Youre now logged as {user.username}</div>}
+      {user && (
+        <SidebarItem label={user.username} collapsed={collapsed}>
+          <CircleUserRound />
+        </SidebarItem>
+      )}
       <SidebarItem
         iconId="logout"
         label="Logout"
