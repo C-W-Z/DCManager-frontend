@@ -49,7 +49,7 @@ export function RackPage() {
   }, [LoadRack, rackName]);
 
   if (!user) {
-    return <FallbackView text="請登入以瀏覽此頁面。" />;
+    return <FallbackView text="請登入以瀏覽此頁面。" link="/" />;
   }
 
   if (loading) {
@@ -154,8 +154,14 @@ function AdminWrapper({
             <Separator />
             <DataFlexRow
               label="運行服務"
-              data={rack.service_name && rack.service_name.length > 0 ? rack.service_name : "無"}
-              link={rack.service_name && rack.service_name.length > 0 ? `/service/${rack.service_name}` : undefined}
+              data={
+                rack.service_name && rack.service_name.length > 0 ? rack.service_name : "無"
+              }
+              link={
+                rack.service_name && rack.service_name.length > 0
+                  ? `/service/${rack.service_name}`
+                  : undefined
+              }
             />
             <DataFlexRow
               label="已用單位"

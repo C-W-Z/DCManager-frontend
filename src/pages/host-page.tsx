@@ -67,7 +67,7 @@ export function HostPage() {
   }, [LoadHost, hostName]);
 
   if (!user) {
-    return <FallbackView text="請登入以瀏覽此頁面。" />;
+    return <FallbackView text="請登入以瀏覽此頁面。" link="/" />;
   }
 
   if (loading) {
