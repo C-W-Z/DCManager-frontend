@@ -11,6 +11,7 @@ import Icon from "@/components/icon";
 import { LoadingView } from "@/components/loading-view";
 import { FallbackView } from "@/components/fallback-view";
 import { toast } from "sonner";
+import { CRITICAL_AVAILABLE_IP_PERCENT } from "@/lib/constant";
 
 export function ServiceBoardPage() {
   const [services, setServices] = useState<SimpleService[]>([]);
@@ -126,7 +127,7 @@ function ServiceCard({
         </div>
         <div className="col-span-5">
           <label className="text-sm text-gray-500">已使用 IP 數量</label>
-          <p className={cn(available_ip <= 2 ? "text-red-500" : "")}>
+          <p className={cn(available_ip <= total_ip * CRITICAL_AVAILABLE_IP_PERCENT ? "text-red-500" : "")}>
             {total_ip - available_ip} / {total_ip}
           </p>
         </div>

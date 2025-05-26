@@ -4,6 +4,9 @@ export const MAX_HEIGHT = 100; // U
 export const HOST_HEIGHT = 30; // px
 export const RACK_GAP = 10; // px
 
+export const CRITICAL_AVAILABLE_IP_PERCENT = 0.1;
+export const CRITICAL_AVAILABLE_RACK_POS_PERCENT = 0.2;
+
 export const pos2translateY = (pos: number, hostHeight: number, rackHeight: number) => {
   return (rackHeight - (pos - 1) - hostHeight) * (HOST_HEIGHT + RACK_GAP);
 };

@@ -171,11 +171,13 @@ export function DataTable<TData extends WithID, TValue>({
                   <SelectItem value="None">All Services</SelectItem>
                   {Array.from(
                     table.getColumn("service_name")?.getFacetedUniqueValues().keys() || [],
-                  ).map((service) => (
-                    <SelectItem key={service} value={service}>
-                      {service}
-                    </SelectItem>
-                  ))}
+                  )
+                    .filter((service) => service && service.length > 0)
+                    .map((service) => (
+                      <SelectItem key={service} value={service}>
+                        {service}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
               <Input

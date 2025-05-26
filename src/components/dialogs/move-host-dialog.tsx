@@ -22,7 +22,6 @@ import { Host, SimpleRack, APIError } from "@/lib/type";
 import { modifyHost, getService, getRack } from "@/lib/api";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useUser } from "@/context/use-user";
 import Icon from "@/components/icon";
 import { getPossiblePositions } from "@/lib/constant";
 
@@ -32,7 +31,6 @@ interface MoveItemDialogProps {
 }
 
 export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
-  const { accessableService } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [parentRack, setParentRack] = useState<string | null>(null);
   const [loadingRack, setLoadingRack] = useState(false);
@@ -68,7 +66,7 @@ export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
         setLoadingRack(false);
       }
     },
-    [accessableService],
+    [],
   );
 
   useEffect(() => {
@@ -145,30 +143,37 @@ export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
             </div>
           ) : (
-            <div className="max-h-[300px] overflow-y-auto rounded-md border">
-              <ul className="space-y-1 p-3">
-                {racks.map((rack) => (
-                  <li
-                    key={rack.name}
-                    className={cn(
-                      "flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100",
-                      selectedRack === rack.name ? "bg-gray-100" : "",
-                      parentRack === rack.name ? "pointer-events-none opacity-50" : "",
-                    )}
-                    onClick={() => handleSelectRack(rack.name)}
-                  >
-                    <div className="flex items-center gap-2">
-                      {loadingPos && selectedRack === rack.name ? (
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
-                      ) : (
-                        <Icon id="rack" className="size-4" />
+            <div className="max-h-[200px] overflow-y-auto rounded-md border">
+              {racks.length > 0 ? (
+                <ul className="space-y-1 p-3">
+                  {racks.map((rack) => (
+                    <li
+                      key={rack.name}
+                      className={cn(
+                        "flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100",
+                        selectedRack === rack.name ? "bg-gray-100" : "",
+                        parentRack === rack.name ? "pointer-events-none opacity-50" : "",
                       )}
-                      <span>{rack.name}</span>
-                    </div>
-                    <MoveRight></MoveRight>
-                  </li>
-                ))}
-              </ul>
+                      onClick={() => handleSelectRack(rack.name)}
+                    >
+                      <div className="flex items-center gap-2">
+                        {loadingPos && selectedRack === rack.name ? (
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
+                        ) : (
+                          <Icon id="rack" className="size-4" />
+                        )}
+                        <span>{rack.name}</span>
+                        {parentRack === rack.name && (
+                          <span className="ml-auto text-xs text-gray-500">(Current)</span>
+                        )}
+                      </div>
+                      <MoveRight></MoveRight>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="p-3 text-center">No Service or no other racks in the same service.</p>
+              )}
             </div>
           )}
         </div>
