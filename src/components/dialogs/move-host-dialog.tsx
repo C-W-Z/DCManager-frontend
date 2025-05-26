@@ -156,29 +156,36 @@ export function MoveHostDialog({ host, onSuccess }: MoveItemDialogProps) {
             </div>
           ) : (
             <div className="max-h-[300px] overflow-y-auto rounded-md border">
-              <ul className="space-y-1 p-3">
-                {racks.map((rack) => (
-                  <li
-                    key={rack.name}
-                    className={cn(
-                      "flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100",
-                      selectedRack === rack.name ? "bg-gray-100" : "",
-                      parentRack === rack.name ? "pointer-events-none opacity-50" : "",
-                    )}
-                    onClick={() => handleSelectRack(rack.name)}
-                  >
-                    <div className="flex items-center gap-2">
-                      {loadingPos && selectedRack === rack.name ? (
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
-                      ) : (
-                        <Icon id="rack" className="size-4" />
+              {racks.length > 0 ? (
+                <ul className="space-y-1 p-3">
+                  {racks.map((rack) => (
+                    <li
+                      key={rack.name}
+                      className={cn(
+                        "flex cursor-pointer items-center justify-between rounded-md p-2 hover:bg-gray-100",
+                        selectedRack === rack.name ? "bg-gray-100" : "",
+                        parentRack === rack.name ? "pointer-events-none opacity-50" : "",
                       )}
-                      <span>{rack.name}</span>
-                    </div>
-                    <MoveRight></MoveRight>
-                  </li>
-                ))}
-              </ul>
+                      onClick={() => handleSelectRack(rack.name)}
+                    >
+                      <div className="flex items-center gap-2">
+                        {loadingPos && selectedRack === rack.name ? (
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
+                        ) : (
+                          <Icon id="rack" className="size-4" />
+                        )}
+                        <span>{rack.name}</span>
+                        {parentRack === rack.name && (
+                          <span className="ml-auto text-xs text-gray-500">(Current)</span>
+                        )}
+                      </div>
+                      <MoveRight></MoveRight>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="p-3 text-center">No other racks in the same service.</p>
+              )}
             </div>
           )}
         </div>
