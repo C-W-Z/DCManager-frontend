@@ -91,7 +91,7 @@ export default function RackTable() {
 
         <div className="flex items-center gap-4">
           <RefreshButton isLoading={loading} onClick={() => handleRefresh()} />
-          {room && <AddRackDialog currentRoom={room} onSuccess={() => handleRefresh()} />}
+          {user?.role === "admin" && room && <AddRackDialog currentRoom={room} onSuccess={() => handleRefresh()} />}
         </div>
       </div>
 

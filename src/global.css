@@ -166,6 +166,65 @@
   input::file-selector-button {
     cursor: pointer;
   }
+  /* Modern table styling */
+
+  .modern-table {
+    @apply overflow-hidden rounded-lg;
+  }
+
+  .modern-table table {
+    @apply border-separate border-spacing-x-0 border-spacing-y-2;
+    border-collapse: separate;
+  }
+
+  .modern-table thead tr {
+    @apply bg-gray-100;
+  }
+
+  .modern-table thead th {
+    @apply border-0 px-4 py-3 font-medium text-gray-600;
+  }
+
+  .modern-table tbody tr {
+    @apply overflow-hidden rounded-lg shadow-sm;
+  }
+
+  .table-data-row {
+    @apply border-0 transition-all hover:bg-gray-100;
+  }
+
+  .table-data-row td {
+    @apply border-0 px-4 py-3;
+  }
+
+  .table-data-row td.first-cell {
+    @apply rounded-l-lg;
+  }
+
+  .table-data-row td.last-cell {
+    @apply rounded-r-lg;
+  }
+
+  .table-data-row.bg-gray-50 {
+    @apply bg-gray-50;
+  }
+
+  .table-data-row.bg-white {
+    @apply bg-white;
+  }
+
+  .modern-table thead th:first-child {
+    @apply rounded-l-lg;
+  }
+
+  .modern-table thead th:last-child {
+    @apply rounded-r-lg;
+  }
+
+  /* Remove default table borders */
+  .modern-table .border-b {
+    @apply border-0;
+  }
 }
 
 /* Scrollbar styles */

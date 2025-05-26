@@ -93,7 +93,7 @@ export default function RoomTable() {
         <h1 className="text-2xl font-bold">Rooms</h1>
         <div className="flex items-center gap-4">
           <RefreshButton isLoading={loading} onClick={() => handleRefresh()} />
-          {dc && <AddRoomDialog currentDC={dc} onSuccess={() => handleRefresh()} />}
+          {user?.role === "admin" && dc && <AddRoomDialog currentDC={dc} onSuccess={() => handleRefresh()} />}
         </div>
       </div>
 

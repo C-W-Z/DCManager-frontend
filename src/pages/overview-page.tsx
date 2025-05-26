@@ -54,9 +54,9 @@ export function OverviewPage() {
     return <FallbackView text="請登入以瀏覽此頁面。" />;
   }
 
-  if (user.role !== "admin") {
-    return <FallbackView text="您沒有權限訪問此頁面。" />;
-  }
+  // if (user.role !== "admin") {
+  //   return <FallbackView text="您沒有權限訪問此頁面。" />;
+  // }
 
   const handleBreadcrumbClick = (level: ViewLevel) => {
     if (level === "datacenter-table") {
