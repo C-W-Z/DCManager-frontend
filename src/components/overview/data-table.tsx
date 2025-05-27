@@ -216,7 +216,7 @@ export function DataTable<TData extends WithID, TValue>({
               </Button>
             )}
 
-          {user?.role === "admin" && selectedRowCount > 0 && (
+          {(user?.role === "admin" || type === "host") && selectedRowCount > 0 && (
             <Button
               variant="destructive"
               size="sm"
@@ -328,7 +328,7 @@ export function DataTable<TData extends WithID, TValue>({
         />
       )}
 
-      {user?.role === "admin" && (
+      {(user?.role === "admin" || type === "host") && (
         <DeleteConfirmation
           ids={multipleIdsToDelete}
           type={type}
