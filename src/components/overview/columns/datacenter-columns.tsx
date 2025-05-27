@@ -30,7 +30,7 @@ function getCommonColumns(): ColumnDef<SimpleDatacenter>[] {
       cell: ({ row }) => {
         const name: string = row.getValue("name");
         return (
-          <div className="pl-4 text-left font-medium">
+          <div className="pl-4 text-left font-bold">
             <Link to={`/overview/dc/${name}`} className="hover:underline focus:outline-none">
               {name}
             </Link>

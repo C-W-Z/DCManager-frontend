@@ -37,7 +37,7 @@ function getCommonColumns(): ColumnDef<SimpleRack>[] {
       cell: ({ row }) => {
         const name: string = row.getValue("name");
         return (
-          <div className="pl-4 text-left font-medium">
+          <div className="pl-4 text-left font-bold">
             <Link to={`/rack/${name}`} className="hover:underline focus:outline-none">
               {name}
             </Link>

@@ -85,8 +85,8 @@ function UserWrapper({ rack, LoadRack }: { rack: Rack; LoadRack: (_: string) => 
 
   return (
     <RackContext.Provider value={{ state, dispatch }}>
-      <div className="flex h-screen w-full flex-row items-start justify-between px-20 pt-12">
-        <div className="flex h-fit w-full flex-col items-start justify-start">
+      <div className="mx-auto flex h-fit flex-col items-center gap-10 px-20 pt-12 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex h-fit w-md flex-col items-start justify-start">
           <div className="mb-4 flex flex-row items-center gap-2">
             <Icon id="rack" className="size-7" />
             <div className="text-2xl font-bold">{rack.name}</div>
@@ -114,8 +114,10 @@ function UserWrapper({ rack, LoadRack }: { rack: Rack; LoadRack: (_: string) => 
             <DataFlexRow label="已上架機器數量" data={`${rack.n_hosts}`} />
           </div>
         </div>
-        <div className="flex flex-col items-center justify-start gap-2">
-          <AddHostDialog context={RackContext} onSuccess={() => LoadRack(rack.name)} />
+        <div className="mb-10 flex flex-col items-center justify-start gap-2 lg:mb-0">
+          {rack.service_name && (
+            <AddHostDialog context={RackContext} onSuccess={() => LoadRack(rack.name)} />
+          )}
           <RackDnD context={RackContext} />
           <div className="text-sm text-gray-500">Click the host to manage host.</div>
         </div>
@@ -208,7 +210,9 @@ function AdminWrapper({
           </div>
         </div>
         <div className="mb-10 flex flex-col items-center justify-start gap-2 lg:mb-0">
-          <AddHostDialog context={RackContext} onSuccess={() => LoadRack(rack.name)} />
+          {rack.service_name && (
+            <AddHostDialog context={RackContext} onSuccess={() => LoadRack(rack.name)} />
+          )}
           <RackDnD context={RackContext} />
           <div className="text-sm text-gray-500">Click the host to manage host.</div>
         </div>

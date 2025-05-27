@@ -89,7 +89,7 @@ export function hostColumns({
       cell: ({ row }) => {
         const name: string = row.getValue("name");
         return (
-          <div className="flex pl-4 text-left font-medium">
+          <div className="flex pl-4 text-left font-bold">
             <Link to={`/host/${name}`} className="hover:underline focus:outline-none">
               {name}
             </Link>
