@@ -190,6 +190,7 @@ export function BulkAddHostPage() {
           for (let j = 0; j < parsedData.length; j++) {
             if (j === index) continue; // Skip self-comparison
             const otherRow = parsedData[j];
+            if (otherRow.rack_name !== row.rack_name) continue;
             const otherHeight = parseInt(otherRow.height);
             const otherPosition = parseInt(otherRow.position);
             const otherOccupiedPositions = Array.from(
