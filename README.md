@@ -1,5 +1,7 @@
 # DCManager-frontend
 
+Whole Project: [https://github.com/Tanimal19/DCM](https://github.com/Tanimal19/DCM)
+
 ## How to run
 
 ### Run Local
